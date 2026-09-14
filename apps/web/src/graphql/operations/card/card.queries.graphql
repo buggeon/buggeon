@@ -1,0 +1,11 @@
+query GetCard($cardId: ID!) {
+    card(cardId: $cardId) {
+        ...CardDetails
+    }
+}
+
+query GetCards($boardId: ID!) {
+    cards(boardId: $boardId) {
+        ...CardDetails
+    }
+}

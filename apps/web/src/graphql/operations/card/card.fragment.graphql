@@ -1,0 +1,17 @@
+fragment CardDetails on Card {
+    id
+    title
+    content
+    priority
+    createdAt
+    boardId
+    status
+    dueDate
+    updatedAt
+    assignees {
+        ...MemberDetails
+    }
+    messages {
+        ...MessageDetails
+    }
+}

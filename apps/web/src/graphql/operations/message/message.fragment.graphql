@@ -1,0 +1,24 @@
+fragment MessageDetails on Message {
+    id
+    content
+    createdAt
+    updatedAt
+    cardId
+    sender {
+        ...UserDetails
+    }
+    replyTo {
+        id
+        content
+        sender {
+            name
+        }
+    }
+    replies {
+        id
+        content
+        sender {
+            name
+        }
+    }
+}

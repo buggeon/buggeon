@@ -1,0 +1,10 @@
+fragment MemberDetails on Member {
+    id
+    role
+    directions
+    createdAt
+    projectId
+    user {
+        ...UserDetails
+    }
+}

@@ -1,0 +1,15 @@
+mutation CreateBoard($projectId: ID!, $input: CreateBoardInput!) {
+    createBoard(projectId: $projectId, input: $input) {
+        ...BoardDetails
+    }
+}
+
+mutation UpdateBoard($boardId: ID!, $input: UpdateBoardInput!) {
+    updateBoard(boardId: $boardId, input: $input) {
+        ...BoardDetails
+    }
+}
+
+mutation DeleteBoard($projectId: ID!, $boardId: ID!) {
+    deleteBoard(projectId: $projectId, boardId: $boardId)
+}

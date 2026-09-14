@@ -1,0 +1,15 @@
+mutation CreateCard($boardId: ID!, $input: CreateCardInput!) {
+    createCard(boardId: $boardId, input: $input) {
+        ...CardDetails
+    }
+}
+
+mutation UpdateCard($cardId: ID!, $input: UpdateCardInput!) {
+    updateCard(cardId: $cardId, input: $input) {
+        ...CardDetails
+    }
+}
+
+mutation DeleteCard($boardId: ID!, $cardId: ID!) {
+    deleteCard(boardId: $boardId, cardId: $cardId)
+}

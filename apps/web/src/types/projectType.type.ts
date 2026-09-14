@@ -1,0 +1,1 @@
+export type ProjectType = "Software" | "Design" | "Infrastructure" | "Security" | "Analytics" | "Education" | "Integration"

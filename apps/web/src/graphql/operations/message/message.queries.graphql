@@ -1,0 +1,11 @@
+query GetMessage($messageId: ID!) {
+    message(messageId: $messageId) {
+        ...MessageDetails
+    }
+}
+
+query GetMessages($cardId: ID!) {
+    messages(cardId: $cardId) {
+        ...MessageDetails
+    }
+}

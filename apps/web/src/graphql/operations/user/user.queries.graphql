@@ -1,0 +1,5 @@
+query GetUser($userId: ID!) {
+    user(userId: $userId) {
+        ...UserDetails
+    }
+}

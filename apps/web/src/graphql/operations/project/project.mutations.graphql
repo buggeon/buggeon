@@ -1,0 +1,15 @@
+mutation CreateProject($input: CreateProjectInput!) {
+    createProject(input: $input) {
+        ...ProjectDetails
+    }
+}
+
+mutation UpdateProject($projectId: ID!, $input: UpdateProjectInput!) {
+    updateProject(projectId: $projectId, input: $input) {
+        ...ProjectDetails
+    }
+}
+
+mutation DeleteProject($projectId: ID!) {
+    deleteProject(projectId: $projectId)
+}

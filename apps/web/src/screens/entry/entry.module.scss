@@ -1,0 +1,166 @@
+.main{
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding-left: 10%;
+    padding-right: 10%;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    gap: 20%;
+    
+    @media (max-width: 1000px) {
+        flex-direction: column;
+        align-items: center;
+        padding-left: 0%;
+        padding-right: 0%;
+    }
+
+    .entryFormBlock{
+        @media (max-width: 1000px) {
+            order: -100;
+        }
+    }
+
+    .onboardingBlock{
+        width: 80%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        animation: slideInFromLeft 0.6s ease-out;
+
+        @media (max-width: 1000px) {
+            align-items: center;
+        }
+
+        @keyframes slideInFromLeft {
+            0% {
+                opacity: 0;
+                transform: translateX(-100px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .logo{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 50px;
+
+            h1{
+                margin: 0;
+                color: white;
+                line-height: 1;
+            }
+
+            img{
+                width: 30px;
+                height: 30px;
+                display: block;
+            }
+        }
+
+        .title{
+            width: 400px;
+
+            p{
+                font-size: 40px;
+                font-weight: 700;
+                color: white;
+
+                span{
+                    color: #6a5dc8;
+                }
+            }
+        }
+
+        .wellcomeLabel{
+            background-color: #182231;
+            width: 200px;
+            height: 30px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+
+            p{
+                font-size: 16px;
+                color: #6a5dc8;
+                font-weight: 800;
+                line-height: 1;
+            }
+        }
+
+        .descriptionBlock{
+            p{
+                color: #b7becc;
+                font-size: 18px;
+            }
+        }
+
+        .tagsBlock{
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+
+            .tag{
+                display: flex;
+                align-items: center;
+                gap: 20px;
+
+                .tagIconBlock{
+                    width: 70px;
+                    height: 70px;
+                    border-radius: 10px;
+                    background-color: #171f36;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                
+                .tagTitle{
+                    color: white;
+                    font-weight: 800;
+                }
+
+                .tagDescription{
+                    color: #b7becc;
+                }
+            }
+        }
+
+        .securityBlock{
+            display: flex;
+            align-items: center;
+            gap: 20px;
+
+            .lockBlock{
+                width: 50px;
+                height: 50px;
+                background-color: #191d3394;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 50px;
+            }
+
+            .aboutSecurity{
+                width: 80%;
+                color: #b7becc;
+            }
+        }
+
+    }
+}

@@ -1,0 +1,170 @@
+scalar Upload
+
+type User {
+    id: ID!
+    name: String!
+    avatarUrl: String!
+    login: String!
+    email: String!
+    role: String!
+    createdAt: String!
+}
+
+type Project {
+    id: ID!
+    createdAt: String!
+    updatedAt: String!
+    name: String!
+    description: String!
+    logoUrl: String!
+    progress: Int!
+
+    lead: Member!
+    members: [Member!]!
+    boards: [Board!]!
+}
+
+type Message {
+    id: ID!
+    content: String!
+    createdAt: String!
+    updatedAt: String!
+    cardId: String!
+    sender: User!
+    replyTo: Message
+    replies: [Message!]!
+}
+
+type Member {
+    id: ID!
+    role: String!
+    directions: [String!]!
+    createdAt: String!
+    projectId: String!
+    user: User!
+}
+
+type Card {
+    id: ID!
+    title: String!
+    content: String!
+    priority: String!  
+    createdAt: String!
+    updatedAt: String!
+    boardId: String!
+    dueDate: String!
+    status: String!
+
+    assignees: [Member!]!
+    messages: [Message!]!
+}
+
+type Board {
+    id: ID!
+    name: String!
+    direction: String!
+    createdAt: String!
+    updatedAt: String!
+    projectId: String!
+    themeColor: String!
+    cardsStatus: String!
+
+    cards: [Card!]!
+}
+
+type Schema {
+    id: ID!
+    direction: String
+    url: String!
+    name: String!
+    author: Member!
+    createdAt: String!
+    updatedAt: String!
+}
+
+type Query {
+    
+    project(projectId: ID!): Project!
+    
+    projects(userId: ID!): [Project!]!
+    
+    message(messageId: ID!): Message!
+
+    messages(cardId: ID!): [Message!]!
+
+    board(boardId: ID!): Board!
+
+    boards(projectId: ID!): [Board!]!
+    
+    card(cardId: ID!): Card!
+
+    cards(boardId: ID!): [Card!]!
+    
+    member(memberId: ID!): Member!
+
+    members(projectId: ID!): [Member!]!
+
+    user(userId: ID!): User!
+
+}
+
+type Mutation {
+
+    createCard(boardId: ID!, input: CreateCardInput!): Card!
+    updateCard(cardId: ID!, input: UpdateCardInput!): Card!
+    deleteCard(boardId: ID!, cardId: ID!): Boolean!
+
+    createBoard(projectId: ID!, input: CreateBoardInput!): Board!
+    updateBoard(boardId: ID!, input: UpdateBoardInput!): Board!
+    deleteBoard(projectId: ID!, boardId: ID!): Boolean!
+
+    createProject(input: CreateProjectInput!): Project!
+    updateProject(projectId: ID!, input: UpdateProjectInput!): Project!
+    deleteProject(projectId: ID!): Boolean!
+
+}
+
+input CreateCardInput {
+    title: String!
+    content: String!
+    priority: String!
+    dueDate: String!
+}
+
+input UpdateCardInput {
+    title: String
+    content: String
+    status: String
+    priority: String
+    dueDate: String
+    assignees: [ID!]
+}
+
+input CreateBoardInput {
+    name: String!
+    direction: String!
+    themeColor: String
+    cardsStatus: String!
+}
+
+input UpdateBoardInput {
+    name: String
+    direction: String
+    themeColor: String
+    cardsStatus: String
+}
+
+input CreateProjectInput {
+    leadId: String!
+    name: String!
+    description: String
+    members: [String]
+    progress: Int
+}
+
+input UpdateProjectInput {
+    name: String
+    description: String
+    logoUrl: String
+    progress: Int
+}

@@ -1,0 +1,16 @@
+schema: './src/graphql/schema.graphql'
+documents: './src/graphql/operations/**/*.graphql'
+
+generates:
+  ./src/graphql/generated/types.ts:
+    plugins:
+      - typescript
+
+  ./src/graphql/generated/graphql.ts:
+    plugins:
+      - typescript-operations
+      - typed-document-node
+    config:
+      importSchemaTypesFrom: './types'
+      generateOperationTypes: true
+      useTypeImports: true

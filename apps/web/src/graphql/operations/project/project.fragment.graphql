@@ -1,0 +1,15 @@
+fragment ProjectDetails on Project {
+    id
+    name
+    description
+    logoUrl
+    progress
+    createdAt
+    updatedAt
+    lead {
+        ...MemberDetails
+    }
+    members {
+        ...MemberDetails
+    }
+}

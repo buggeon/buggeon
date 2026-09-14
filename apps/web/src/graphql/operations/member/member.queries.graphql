@@ -1,0 +1,11 @@
+query GetMember($memberId: ID!) {
+    member(memberId: $memberId) {
+        ...MemberDetails
+    }
+}
+
+query GetMembers($projectId: ID!) {
+    members(projectId: $projectId) {
+        ...MemberDetails
+    }
+}

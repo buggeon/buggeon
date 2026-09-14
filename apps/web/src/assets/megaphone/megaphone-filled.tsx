@@ -1,0 +1,16 @@
+import { type SVGProps } from 'react'
+
+export function MegaphoneFilledIcon(props: SVGProps<SVGSVGElement>) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="1em"
+            height="1em"
+            viewBox="0 0 12 12"
+            fill="currentColor"
+            {...props}
+        >
+            <path d="M8.963 1.104A1.5 1.5 0 0 1 11 2.504v5.998A1.5 1.5 0 0 1 9.044 9.93l-2.062-.658A2 2 0 0 1 3 9v-.997l-.956-.305A1.5 1.5 0 0 1 1 6.27V5.188a1.5 1.5 0 0 1 .963-1.401zM4 8.322V9a1 1 0 0 0 2 0v-.04z" />
+        </svg>
+    )
+}

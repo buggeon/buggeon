@@ -1,0 +1,11 @@
+query GetProject($projectId: ID!) {
+    project(projectId: $projectId) {
+        ...ProjectDetails
+    }
+}
+
+query GetProjects($userId: ID!) {
+    projects(userId: $userId) {
+        ...ProjectDetails
+    }
+}

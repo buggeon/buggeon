@@ -1,0 +1,11 @@
+query GetBoard($boardId: ID!) {
+    board(boardId: $boardId) {
+        ...BoardDetails
+    }
+}
+
+query GetBoards($projectId: ID!) {
+    boards(projectId: $projectId) {
+        ...BoardDetails
+    }
+}

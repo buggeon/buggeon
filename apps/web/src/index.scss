@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+html, body{
+
+    button{
+        font-family: "Inter", sans-serif;
+        transition: transform 0.2s ease;
+
+        &:hover{
+            cursor: pointer;
+            transform: scale(1.05);
+        }
+    }
+
+    background:
+        radial-gradient(circle at 10% 95%,
+            rgba(71, 90, 255, 0.18) 0%,
+            rgba(71, 90, 255, 0.08) 20%,
+            transparent 55%),
+
+        radial-gradient(circle at 95% 55%,
+            rgba(71, 90, 255, 0.18) 0%,
+            rgba(71, 90, 255, 0.08) 10%,
+            transparent 55%),
+
+        linear-gradient(
+            135deg,
+            #090d15 0%,
+            #0b1019 30%,
+            #101522 70%,
+            #0a0d14 100%
+        );
+
+    background-color: #090d15;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    
+    // div{
+    //     display: flex;
+    // }
+
+    font-family: "Inter", sans-serif;
+
+    h1, h2, h3, h4, h5, h6, p{
+        margin: 0;
+        color: white;
+    }
+}
+
+#root{
+    height: 100%;
+    width: 100%;
+}

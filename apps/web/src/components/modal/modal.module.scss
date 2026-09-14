@@ -1,0 +1,62 @@
+.overlay{
+    inset: 0;
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+
+    .form{
+        background-color: var(--light-background);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        position: relative;
+
+        header{
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+
+            p{
+                font-weight: 500;
+            }
+
+            .cross:hover{
+                cursor: pointer;
+            }
+        }
+
+        footer{
+            margin-top: 20px;
+            display: flex;
+            width: 100%;
+            justify-content: flex-end;
+            gap: 10px;
+
+            button{
+                padding-left: 15px;
+                padding-right: 15px;
+                color: white;
+                height: 35px;
+                border-width: 0;
+                border-radius: 5px;
+                font-size: 16px;
+
+                &:first-child{
+                    background-color: transparent;
+                    border-width: 0.5px;
+                    border-color: var(--dark-grey);
+                    border-style: solid;
+                }
+
+                &:last-child{
+                    background-color: var(--foreground-purple);
+                }
+            }
+        }
+    }
+}

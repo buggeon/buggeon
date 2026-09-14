@@ -1,0 +1,19 @@
+.progress{
+    display: flex;
+
+    .emptyProgressBar{  
+        margin: 0;
+        background-color: #192135;
+        height: 5px;
+        border-radius: 10px;
+        border-style: none;
+        display: flex;
+        position: relative;
+
+        div{
+            position: absolute;
+            height: 100%;
+            border-radius: 10px;
+        }
+    }
+}

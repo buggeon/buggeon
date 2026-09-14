@@ -1,0 +1,73 @@
+.app{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background-color: var(--dark-background);
+    overflow-y: hidden;
+
+    .sidebar{
+        @media (max-width: 1000px) {
+            display: none;
+        }
+    }
+
+    .screen{
+        width: 100%;
+        height: 100%;
+        display: flex;
+        padding: 2.5%;
+        flex-direction: column;
+        overflow-y: scroll;
+        position: relative;
+        overflow-x: hidden;
+        gap: 30px;
+
+        @media (max-width: 1000px) {
+            padding: 5%;
+        }
+
+        .header{
+            display: flex;
+            width: 100%;
+            justify-content: flex-end;
+            flex-direction: column;
+            
+            .highSection{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                div{
+                    display: flex;
+                    gap: 5px;
+                    flex-shrink: 0;
+                }
+
+                .backBlock{
+                    &:hover{
+                        cursor: pointer;
+                    }
+                }
+
+                .buttonBlock{
+                    flex: 1;    
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 10px;
+
+                    button{
+                        background-color: #0f1725;
+                        border: none;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 10px;
+                    }
+                }
+            }
+            
+        }
+    }
+}

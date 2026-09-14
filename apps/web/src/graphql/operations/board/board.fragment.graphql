@@ -1,0 +1,12 @@
+fragment BoardDetails on Board {
+    id
+    name
+    direction
+    createdAt
+    updatedAt
+    themeColor
+    cardsStatus
+    cards {
+        ...CardDetails
+    }
+}

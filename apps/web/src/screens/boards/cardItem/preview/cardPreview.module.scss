@@ -1,0 +1,16 @@
+.main{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    border-radius: 5px;
+    border-style: solid;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border-left-width: 5px !important;
+    border-width: 0.5px;
+    border-color: var(--dark-grey);
+    align-items: center;
+    height: 50px;
+}
