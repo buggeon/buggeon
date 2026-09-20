@@ -38,8 +38,6 @@ func (m *AuthMiddleware) AuthRequired() gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 
-		fmt.Println("You're in middleware")
-
 		authHeader := ctx.GetHeader("Authorization")
 
 		if authHeader == "" {
