@@ -13,7 +13,9 @@ export const useGetBoard = (id: string, fields : string[]) => {
   `
 
   const { data, loading, error } = useQuery(query as typeof GetBoardDocument, {
-    variables: { id },
+    variables: {
+        boardId: id
+    },
   })
   return { data, loading, error }
 }

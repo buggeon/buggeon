@@ -13,7 +13,7 @@ export const useGetProject = (id: string, fields : string[]) => {
   `
 
   const { data, loading, error } = useQuery(query as typeof GetProjectDocument, {
-    variables: { id },
+    variables: { projectId: id },
   })
   return { data, loading, error }
 }
