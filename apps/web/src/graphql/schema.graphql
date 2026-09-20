@@ -6,7 +6,6 @@ type User {
     avatarUrl: String!
     login: String!
     email: String!
-    role: String!
     createdAt: String!
 }
 
@@ -122,6 +121,8 @@ type Mutation {
     updateProject(projectId: ID!, input: UpdateProjectInput!): Project!
     deleteProject(projectId: ID!): Boolean!
 
+    updateUser(userId: ID!, input: UpdateUserInput!): User!
+
 }
 
 input CreateCardInput {
@@ -167,4 +168,10 @@ input UpdateProjectInput {
     description: String
     logoUrl: String
     progress: Int
+}
+
+input UpdateUserInput {
+    name: String
+    login: String
+    email: String
 }

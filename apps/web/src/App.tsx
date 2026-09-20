@@ -8,6 +8,8 @@ import NotFoundScreen from './screens/notFound/notFound'
 import SchemasScreen from './screens/schemas/schemas'
 import BoardsScreen from './screens/boards/boards'
 import CardAboutScreen from './screens/cardAbout/cardAbout'
+import SettingsScreen from './screens/accountSettings/accountSettings'
+import AccountSettingsScreen from './screens/accountSettings/accountSettings'
 
 function App() {
 
@@ -28,19 +30,15 @@ function App() {
                 <Route index element={<Navigate to="profile" replace/>}/>
                 <Route path="profile" element={<ProfileScreen/>}/>
                 <Route path="projects" element={<ProjectsScreen/>}/>
-                <Route path="settings" element={<></>}/>
+                <Route path="settings" element={<AccountSettingsScreen/>}/>
             </Route>
             <Route path="/auth" element={<EntryScreen/>}/>
 
             <Route path="/project/:projectId">
                 <Route index element={<Navigate to="overview" replace/>}/>
                 <Route path="overview" element={<MainLayout title="" description=""><></></MainLayout>}/>
-                <Route path="schemas" element={<SchemasScreen/>}/>
+                <Route path="settings" element={<SettingsScreen/>}/>
                 <Route path="boards" element={<BoardsScreen/>}/>
-                <Route path="reports" element={<></>}/>
-                <Route path="milestones" element={<></>}/>
-                <Route path="teams" element={<></>}/>
-                <Route path="settings" element={<></>}/>
 
                 <Route path='boards/:boardId/cards/:cardId' element={<CardAboutScreen/>}>
 

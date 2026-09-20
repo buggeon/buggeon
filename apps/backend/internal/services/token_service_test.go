@@ -18,10 +18,7 @@ package services
 
 import (
 	"buggeon/config"
-	"buggeon/internal/models"
 	"testing"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func testConfig() config.Config {
@@ -34,25 +31,9 @@ func testConfig() config.Config {
 	}
 }
 
-func testUser() *models.User {
-
-	userID, err := primitive.ObjectIDFromHex("6a9ffd23ff85e2540dbeec42")
-
-	if err != nil {
-		return &models.User{}
-	}
-
-	return &models.User{
-		ID:    userID,
-		Name:  "Test",
-		Login: "@test",
-		Email: "test@gmail.com",
-	}
-}
-
 var (
 	service = NewTokenService(testConfig())
-	user    = testUser()
+	userID  = "6a9ffd23ff85e2540dbeec42"
 )
 
 func validateToken(t *testing.T, token string, validate func(string) (*TokenClaims, error)) {
@@ -67,26 +48,14 @@ func validateToken(t *testing.T, token string, validate func(string) (*TokenClai
 		t.Errorf("Expected claims, got %v", err)
 	}
 
-	if claims.UserEmail != user.Email {
-		t.Errorf("Expected value '%v' on field 'email', got '%v'", user.Email, claims.UserEmail)
-	}
-
-	if claims.UserName != user.Name {
-		t.Errorf("Expected value '%v' on field 'name', got '%v'", user.Name, claims.UserName)
-	}
-
-	if claims.UserLogin != user.Login {
-		t.Errorf("Expected value '%v' on field 'login', got '%v'", user.Login, claims.UserLogin)
-	}
-
-	if claims.UserID != user.ID.Hex() {
-		t.Errorf("Expected value '%v' on field 'id', got '%v'", user.ID.Hex(), claims.UserID)
+	if claims.UserID != userID {
+		t.Errorf("Expected value '%v' on field 'id', got '%v'", userID, claims.UserID)
 	}
 }
 
 func TestTokenService_GenerateAccessToken_Success(t *testing.T) {
 
-	token, err := service.GenerateAccessToken(user)
+	token, err := service.GenerateAccessToken(userID)
 
 	if err != nil {
 		t.Errorf("Expected token, got %v", err)
@@ -98,7 +67,7 @@ func TestTokenService_GenerateAccessToken_Success(t *testing.T) {
 
 func TestTokenService_GenerateRefreshToken_Success(t *testing.T) {
 
-	token, err := service.GenerateRefreshToken(user)
+	token, err := service.GenerateRefreshToken(userID)
 
 	if err != nil {
 		t.Errorf("Expected token, got %v", err)
@@ -110,7 +79,7 @@ func TestTokenService_GenerateRefreshToken_Success(t *testing.T) {
 
 func TestTokenService_RefreshAccessToken_Success(t *testing.T) {
 
-	tokenPair, err := service.GenerateTokensPair(testUser())
+	tokenPair, err := service.GenerateTokensPair(userID)
 
 	if err != nil {
 		t.Errorf("Expected token pair, got %v", err)

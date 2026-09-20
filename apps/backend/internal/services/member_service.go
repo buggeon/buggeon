@@ -20,6 +20,7 @@ import (
 	"buggeon/internal/dto"
 	"buggeon/internal/models"
 	"buggeon/internal/repositories"
+	"context"
 	"fmt"
 	"time"
 
@@ -31,14 +32,17 @@ type MemberService struct {
 	projectRepo *repositories.ProjectRepo
 }
 
-func NewMemberService(memberRepo *repositories.MemberRepo, projectRepo *repositories.ProjectRepo) *MemberService {
+func NewMemberService(
+	memberRepo *repositories.MemberRepo,
+	projectRepo *repositories.ProjectRepo,
+) *MemberService {
 	return &MemberService{
 		memberRepo:  memberRepo,
 		projectRepo: projectRepo,
 	}
 }
 
-func (s *MemberService) CreateMember(dto *dto.CreateMemberDto) (*models.Member, error) {
+func (s *MemberService) CreateMember(ctx context.Context, dto *dto.CreateMemberDto) (*models.Member, error) {
 
 	userID, err := primitive.ObjectIDFromHex(dto.UserID)
 
@@ -60,12 +64,12 @@ func (s *MemberService) CreateMember(dto *dto.CreateMemberDto) (*models.Member, 
 		CreatedAt:  time.Now(),
 	}
 
-	memberID, err := s.memberRepo.CreateMember(member)
+	memberID, err := s.memberRepo.CreateMember(ctx, member)
 
-	return member, s.projectRepo.AddMember(projectID, memberID)
+	return member, s.projectRepo.AddMember(ctx, projectID, memberID)
 }
 
-func (s *MemberService) UpdateMember(memberID string, newMemberData *models.Member) (*models.Member, error) {
+func (s *MemberService) UpdateMember(ctx context.Context, memberID string, newMemberData *models.Member) (*models.Member, error) {
 
 	memberObjID, err := primitive.ObjectIDFromHex(memberID)
 
@@ -73,11 +77,11 @@ func (s *MemberService) UpdateMember(memberID string, newMemberData *models.Memb
 		return &models.Member{}, err
 	}
 
-	return newMemberData, s.memberRepo.UpdateMember(memberObjID, newMemberData)
+	return newMemberData, s.memberRepo.UpdateMember(ctx, memberObjID, newMemberData)
 
 }
 
-func (s *MemberService) GetMember(memberID string) (models.Member, error) {
+func (s *MemberService) GetMember(ctx context.Context, memberID string) (models.Member, error) {
 
 	memberObjID, err := primitive.ObjectIDFromHex(memberID)
 
@@ -87,13 +91,13 @@ func (s *MemberService) GetMember(memberID string) (models.Member, error) {
 		return models.Member{}, err
 	}
 
-	member, err := s.memberRepo.GetMember(memberObjID)
+	member, err := s.memberRepo.GetMember(ctx, memberObjID)
 
 	return member, err
 
 }
 
-func (s *MemberService) DeleteMember(memberID string) error {
+func (s *MemberService) DeleteMember(ctx context.Context, memberID string) error {
 
 	memberObjID, err := primitive.ObjectIDFromHex(memberID)
 
@@ -101,21 +105,21 @@ func (s *MemberService) DeleteMember(memberID string) error {
 		return err
 	}
 
-	err = s.memberRepo.DeleteMember(memberObjID)
+	err = s.memberRepo.DeleteMember(ctx, memberObjID)
 
 	return err
 
 }
 
-func (s *MemberService) GetMembers(projectID string) ([]models.Member, error) {
+func (s *MemberService) GetMembers(ctx context.Context, projectID string) ([]models.Member, error) {
 
-	memberObjID, err := primitive.ObjectIDFromHex(projectID)
+	projectObjID, err := primitive.ObjectIDFromHex(projectID)
 
 	if err != nil {
 		return nil, err
 	}
 
-	members, err := s.memberRepo.GetMembers(memberObjID)
+	members, err := s.memberRepo.GetMembersByProjectID(ctx, projectObjID)
 
 	return members, err
 

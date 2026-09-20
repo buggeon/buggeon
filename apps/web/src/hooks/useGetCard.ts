@@ -5,15 +5,15 @@ import { GetCardDocument } from '../graphql/generated/graphql'
 export const useGetCard = (id: string, fields : string[]) => {
 
   const query = gql`
-    query GetCard($id: ID!) {
-      card(id: $id) {
+    query GetCard($cardId: ID!) {
+      card(cardId: $cardId) {
         ${fields.join("\n")}
       }
     }
   `
 
   const { data, loading, error } = useQuery(query as typeof GetCardDocument, {
-    variables: { id },
+    variables: { cardId: id },
   })
   return { data, loading, error }
 }

@@ -1,0 +1,31 @@
+[data-theme="dark"] {
+    --color-bg: var(--dark-background);
+    --color-bg-elevated: var(--dark-foreground);
+
+    --color-text: var(--light);
+    --color-text-muted: var(--grey);
+}
+
+[data-theme="light"] {
+    --color-bg: var(--dark-background);
+    --color-bg-elevated: var(--dark-foreground);
+
+    --color-text: var(--light);
+    --color-text-muted: var(--grey);
+}
+
+[data-accent="red"] {
+    --color-accent: var(--red)
+}
+
+[data-accent="green"] {
+    --color-accent: var(--green)
+}
+
+[data-accent="blue"] {
+    --color-accent: var(--blue)
+}
+
+[data-accent="purple"] {
+    --color-accent: var(--purple)
+}

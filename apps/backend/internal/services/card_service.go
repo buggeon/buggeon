@@ -20,6 +20,7 @@ import (
 	"buggeon/internal/dto"
 	"buggeon/internal/models"
 	"buggeon/internal/repositories"
+	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -45,7 +46,7 @@ func NewCardService(
 	}
 }
 
-func (s *CardService) CreateCard(dto *dto.CreateCardDto) (*models.Card, error) {
+func (s *CardService) CreateCard(ctx context.Context, dto *dto.CreateCardDto) (*models.Card, error) {
 
 	boardID, err := primitive.ObjectIDFromHex(dto.BoardID)
 	var assigneeIDs []primitive.ObjectID
@@ -84,12 +85,12 @@ func (s *CardService) CreateCard(dto *dto.CreateCardDto) (*models.Card, error) {
 		UpdatedAt: time.Now(),
 	}
 
-	cardID, err := s.cardRepo.CreateCard(card)
+	cardID, err := s.cardRepo.CreateCard(ctx, card)
 
-	return card, s.boardRepo.AddCard(boardID, cardID)
+	return card, s.boardRepo.AddCard(ctx, boardID, cardID)
 }
 
-func (s *CardService) UpdateCard(cardID string, newCardData *models.Card) (*models.Card, error) {
+func (s *CardService) UpdateCard(ctx context.Context, cardID string, newCardData *models.Card) (*models.Card, error) {
 
 	cardObjID, err := primitive.ObjectIDFromHex(cardID)
 
@@ -97,11 +98,11 @@ func (s *CardService) UpdateCard(cardID string, newCardData *models.Card) (*mode
 		return &models.Card{}, err
 	}
 
-	return newCardData, s.cardRepo.UpdateCard(cardObjID, newCardData)
+	return newCardData, s.cardRepo.UpdateCard(ctx, cardObjID, newCardData)
 
 }
 
-func (s *CardService) GetCard(cardID string) (models.Card, error) {
+func (s *CardService) GetCard(ctx context.Context, cardID string) (models.Card, error) {
 
 	cardObjID, err := primitive.ObjectIDFromHex(cardID)
 
@@ -109,12 +110,12 @@ func (s *CardService) GetCard(cardID string) (models.Card, error) {
 		return models.Card{}, err
 	}
 
-	card, err := s.cardRepo.GetCard(cardObjID)
+	card, err := s.cardRepo.GetCard(ctx, cardObjID)
 
 	return card, err
 }
 
-func (s *CardService) DeleteCard(boardID, cardID string) (bool, error) {
+func (s *CardService) DeleteCard(ctx context.Context, boardID, cardID string) (bool, error) {
 
 	cardObjID, err := primitive.ObjectIDFromHex(cardID)
 
@@ -128,28 +129,28 @@ func (s *CardService) DeleteCard(boardID, cardID string) (bool, error) {
 		return false, err
 	}
 
-	err = s.boardRepo.DeleteCard(boardObjID, cardObjID)
+	err = s.boardRepo.DeleteCard(ctx, boardObjID, cardObjID)
 
 	if err != nil {
 		return false, err
 	}
 
-	err = s.cardRepo.DeleteCard(cardObjID)
+	err = s.cardRepo.DeleteCard(ctx, cardObjID)
 
 	if err != nil {
 		return false, err
 	}
 
-	err = s.messageRepo.DeleteMessages(cardObjID)
+	err = s.messageRepo.DeleteMessages(ctx, cardObjID)
 
 	return true, err
 }
 
-func (s *CardService) GetCards(boardID string) ([]models.Card, error) {
+func (s *CardService) GetCards(ctx context.Context, boardID string) ([]models.Card, error) {
 
-	cardObjID, err := primitive.ObjectIDFromHex(boardID)
+	boardObjID, err := primitive.ObjectIDFromHex(boardID)
 
-	cards, err := s.cardRepo.GetCards(cardObjID)
+	cards, err := s.cardRepo.GetCardsByBoardID(ctx, boardObjID)
 
 	return cards, err
 }
@@ -158,7 +159,7 @@ func (s *CardService) CloseCard() {
 
 }
 
-func (s *CardService) UpdateCardLocation(cardID, oldBoardID, newBoardID string) error {
+func (s *CardService) UpdateCardLocation(ctx context.Context, cardID, oldBoardID, newBoardID string) error {
 
 	cardObjID, err := primitive.ObjectIDFromHex(cardID)
 
@@ -178,20 +179,20 @@ func (s *CardService) UpdateCardLocation(cardID, oldBoardID, newBoardID string) 
 		return err
 	}
 
-	if err := s.boardRepo.DeleteCard(oldBoardObjID, cardObjID); err != nil {
+	if err := s.boardRepo.DeleteCard(ctx, oldBoardObjID, cardObjID); err != nil {
 		return err
 	}
 
-	if err := s.boardRepo.AddCard(newBoardObjID, cardObjID); err != nil {
+	if err := s.boardRepo.AddCard(ctx, newBoardObjID, cardObjID); err != nil {
 		return err
 	}
 
-	newBoard, err := s.boardRepo.GetBoard(newBoardObjID)
+	newBoard, err := s.boardRepo.GetBoard(ctx, newBoardObjID)
 
 	if err != nil {
 		return err
 	}
 
-	return s.cardRepo.UpdateCardLocation(cardObjID, newBoardObjID, newBoard.CardsStatus)
+	return s.cardRepo.UpdateCardLocation(ctx, cardObjID, newBoardObjID, newBoard.CardsStatus)
 
 }

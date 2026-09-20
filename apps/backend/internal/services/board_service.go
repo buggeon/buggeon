@@ -20,6 +20,7 @@ import (
 	"buggeon/internal/dto"
 	"buggeon/internal/models"
 	"buggeon/internal/repositories"
+	"context"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -45,7 +46,7 @@ func NewBoardService(
 	}
 }
 
-func (s *BoardService) CreateBoard(dto *dto.CreateBoardDto) (*models.Board, error) {
+func (s *BoardService) CreateBoard(ctx context.Context, dto *dto.CreateBoardDto) (*models.Board, error) {
 
 	projectID, err := primitive.ObjectIDFromHex(dto.ProjectID)
 
@@ -68,17 +69,17 @@ func (s *BoardService) CreateBoard(dto *dto.CreateBoardDto) (*models.Board, erro
 		Cards:       []primitive.ObjectID{},
 	}
 
-	boardID, err := s.boardRepo.CreateBoard(board)
+	boardID, err := s.boardRepo.CreateBoard(ctx, board)
 
 	if err != nil {
 		return &models.Board{}, err
 	}
 
-	return board, s.projectRepo.AddBoard(projectID, boardID)
+	return board, s.projectRepo.AddBoard(ctx, projectID, boardID)
 
 }
 
-func (s *BoardService) UpdateBoard(boardID string, newBoardData *models.Board) (*models.Board, error) {
+func (s *BoardService) UpdateBoard(ctx context.Context, boardID string, newBoardData *models.Board) (*models.Board, error) {
 
 	boardObjID, err := primitive.ObjectIDFromHex(boardID)
 
@@ -86,11 +87,11 @@ func (s *BoardService) UpdateBoard(boardID string, newBoardData *models.Board) (
 		return &models.Board{}, err
 	}
 
-	return newBoardData, s.boardRepo.UpdateBoard(boardObjID, newBoardData)
+	return newBoardData, s.boardRepo.UpdateBoard(ctx, boardObjID, newBoardData)
 
 }
 
-func (s *BoardService) GetBoard(boardID string) (models.Board, error) {
+func (s *BoardService) GetBoard(ctx context.Context, boardID string) (models.Board, error) {
 
 	boardObjID, err := primitive.ObjectIDFromHex(boardID)
 
@@ -98,12 +99,12 @@ func (s *BoardService) GetBoard(boardID string) (models.Board, error) {
 		return models.Board{}, err
 	}
 
-	boards, err := s.boardRepo.GetBoard(boardObjID)
+	boards, err := s.boardRepo.GetBoard(ctx, boardObjID)
 
 	return boards, err
 }
 
-func (s *BoardService) GetBoards(projectID string) ([]models.Board, error) {
+func (s *BoardService) GetBoards(ctx context.Context, projectID string) ([]models.Board, error) {
 
 	boardObjID, err := primitive.ObjectIDFromHex(projectID)
 
@@ -111,10 +112,10 @@ func (s *BoardService) GetBoards(projectID string) ([]models.Board, error) {
 		return nil, err
 	}
 
-	return s.boardRepo.GetBoards(boardObjID)
+	return s.boardRepo.GetBoardsByProjectID(ctx, boardObjID)
 }
 
-func (s *BoardService) DeleteBoard(projectID, boardID string) (bool, error) {
+func (s *BoardService) DeleteBoard(ctx context.Context, projectID, boardID string) (bool, error) {
 
 	boardObjID, err := primitive.ObjectIDFromHex(boardID)
 
@@ -128,25 +129,25 @@ func (s *BoardService) DeleteBoard(projectID, boardID string) (bool, error) {
 		return false, err
 	}
 
-	err = s.projectRepo.DeleteBoard(projectObjID, boardObjID)
+	err = s.projectRepo.DeleteBoard(ctx, projectObjID, boardObjID)
 
 	if err != nil {
 		return false, err
 	}
 
-	err = s.boardRepo.DeleteBoard(boardObjID)
+	err = s.boardRepo.DeleteBoard(ctx, boardObjID)
 
 	if err != nil {
 		return false, err
 	}
 
-	cards, err := s.cardRepo.GetCards(boardObjID)
+	cards, err := s.cardRepo.GetCardsByBoardID(ctx, boardObjID)
 
 	for _, card := range cards {
 
-		s.cardRepo.DeleteCard(card.ID)
+		s.cardRepo.DeleteCard(ctx, card.ID)
 
-		err := s.messageRepo.DeleteMessages(card.ID)
+		err := s.messageRepo.DeleteMessages(ctx, card.ID)
 
 		if err != nil {
 			continue

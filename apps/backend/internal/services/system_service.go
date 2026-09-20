@@ -19,6 +19,7 @@ package services
 import (
 	"buggeon/internal/models"
 	"buggeon/internal/repositories"
+	"context"
 )
 
 type SystemService struct {
@@ -31,9 +32,9 @@ func NewSystemService(userRepo *repositories.UserRepo) *SystemService {
 	}
 }
 
-func (s *SystemService) GetAllUsers() ([]models.User, error) {
+func (s *SystemService) GetAllUsers(ctx context.Context) ([]models.User, error) {
 
-	users, err := s.userRepo.GetAllUsers()
+	users, err := s.userRepo.GetAllUsers(ctx)
 
 	return users, err
 }

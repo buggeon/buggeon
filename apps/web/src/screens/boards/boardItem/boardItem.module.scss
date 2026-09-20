@@ -1,7 +1,7 @@
 .main{
     display: flex;
     flex-direction: column;
-    background-color: var(--light-background);
+    background-color: var(--dark-foreground);
     padding: 10px;
     border-radius: 10px;
     width: 250px;
@@ -19,7 +19,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: var(--light-background);
+            background-color: var(--dark-foreground);
             width: 20px;
             height: 20px;
         }

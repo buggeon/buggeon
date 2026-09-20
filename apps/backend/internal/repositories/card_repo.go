@@ -44,21 +44,21 @@ func NewCardRepoWithDbName() *CardRepo {
 	}
 }
 
-func (r *CardRepo) CreateCard(card *models.Card) (primitive.ObjectID, error) {
+func (r *CardRepo) CreateCard(ctx context.Context, card *models.Card) (primitive.ObjectID, error) {
 
 	card.ID = primitive.NewObjectID()
 	card.CreatedAt = time.Now()
 	card.UpdatedAt = time.Now()
 
-	_, err := r.collection.InsertOne(context.TODO(), card)
+	_, err := r.collection.InsertOne(ctx, card)
 	return card.ID, err
 
 }
 
-func (r *CardRepo) UpdateCard(cardID primitive.ObjectID, newCardData *models.Card) error {
+func (r *CardRepo) UpdateCard(ctx context.Context, cardID primitive.ObjectID, newCardData *models.Card) error {
 
 	_, err := r.collection.UpdateOne(
-		context.Background(),
+		ctx,
 		bson.M{"_id": cardID},
 		bson.M{"$set": newCardData},
 	)
@@ -67,21 +67,9 @@ func (r *CardRepo) UpdateCard(cardID primitive.ObjectID, newCardData *models.Car
 
 }
 
-func (r *CardRepo) DeleteCard(cardID primitive.ObjectID) error {
+func (r *CardRepo) DeleteCard(ctx context.Context, cardID primitive.ObjectID) error {
 
-	result, err := r.collection.DeleteOne(context.TODO(), bson.M{"_id": cardID})
-
-	if result.DeletedCount != 1 || err != nil {
-		return errors.New("Failed to delete card")
-	}
-
-	return nil
-
-}
-
-func (r *CardRepo) DeleteCards(boardID primitive.ObjectID) error {
-
-	result, err := r.collection.DeleteOne(context.TODO(), bson.M{"board_id": boardID})
+	result, err := r.collection.DeleteOne(ctx, bson.M{"_id": cardID})
 
 	if result.DeletedCount != 1 || err != nil {
 		return errors.New("Failed to delete card")
@@ -91,29 +79,41 @@ func (r *CardRepo) DeleteCards(boardID primitive.ObjectID) error {
 
 }
 
-func (r *CardRepo) GetCard(cardID primitive.ObjectID) (models.Card, error) {
+func (r *CardRepo) DeleteCards(ctx context.Context, boardID primitive.ObjectID) error {
+
+	result, err := r.collection.DeleteOne(ctx, bson.M{"board_id": boardID})
+
+	if result.DeletedCount != 1 || err != nil {
+		return errors.New("Failed to delete card")
+	}
+
+	return nil
+
+}
+
+func (r *CardRepo) GetCard(ctx context.Context, cardID primitive.ObjectID) (models.Card, error) {
 
 	var card models.Card
 
-	err := r.collection.FindOne(context.TODO(), bson.M{"_id": cardID}).Decode(&card)
+	err := r.collection.FindOne(ctx, bson.M{"_id": cardID}).Decode(&card)
 
 	return card, err
 
 }
 
-func (r *CardRepo) GetCards(boardID primitive.ObjectID) ([]models.Card, error) {
+func (r *CardRepo) GetCardsByBoardID(ctx context.Context, boardID primitive.ObjectID) ([]models.Card, error) {
 
 	var cards []models.Card
 
-	cursor, err := r.collection.Find(context.TODO(), bson.M{"board_id": boardID})
+	cursor, err := r.collection.Find(ctx, bson.M{"board_id": boardID})
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer cursor.Close(context.TODO())
+	defer cursor.Close(ctx)
 
-	if err := cursor.All(context.TODO(), &cards); err != nil {
+	if err := cursor.All(ctx, &cards); err != nil {
 		return nil, err
 	}
 
@@ -121,23 +121,54 @@ func (r *CardRepo) GetCards(boardID primitive.ObjectID) ([]models.Card, error) {
 
 }
 
-func (r *CardRepo) AddMessage(cardID, messageID primitive.ObjectID) error {
+func (r *CardRepo) GetCardsByIDs(ctx context.Context, cardIDs []primitive.ObjectID) ([]models.Card, error) {
+
+	if len(cardIDs) == 0 {
+		return []models.Card{}, nil
+	}
+
+	cursor, err := r.collection.Find(
+		ctx,
+		bson.M{
+			"_id": bson.M{
+				"$in": cardIDs,
+			},
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer cursor.Close(ctx)
+
+	var cards []models.Card
+
+	if err := cursor.All(ctx, &cards); err != nil {
+		return nil, err
+	}
+
+	return cards, nil
+
+}
+
+func (r *CardRepo) AddMessage(ctx context.Context, cardID, messageID primitive.ObjectID) error {
 
 	filter := bson.M{"_id": cardID}
 	update := bson.M{"$push": bson.M{"messages": messageID}}
 
-	_, err := r.collection.UpdateOne(context.TODO(), filter, update)
+	_, err := r.collection.UpdateOne(ctx, filter, update)
 
 	return err
 
 }
 
-func (r *CardRepo) UpdateCardLocation(cardID, boardID primitive.ObjectID, newStatus string) error {
+func (r *CardRepo) UpdateCardLocation(ctx context.Context, cardID, boardID primitive.ObjectID, newStatus string) error {
 
 	filter := bson.M{"_id": cardID}
 	update := bson.M{"$set": bson.M{"board_id": boardID, "status": newStatus}}
 
-	_, err := r.collection.UpdateOne(context.TODO(), filter, update)
+	_, err := r.collection.UpdateOne(ctx, filter, update)
 
 	return err
 

@@ -20,6 +20,7 @@ import (
 	"buggeon/internal/models"
 	"buggeon/internal/repositories"
 	s3storage "buggeon/internal/s3Storage"
+	"context"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -43,7 +44,7 @@ func NewSchemaService(
 	}
 }
 
-func (s *SchemaService) CreateSchema(projectID, direction, url, name, authorID string) (*models.Schema, error) {
+func (s *SchemaService) CreateSchema(ctx context.Context, projectID, direction, url, name, authorID string) (*models.Schema, error) {
 
 	schemaID := primitive.NewObjectID()
 
@@ -59,7 +60,7 @@ func (s *SchemaService) CreateSchema(projectID, direction, url, name, authorID s
 		return &models.Schema{}, err
 	}
 
-	_, err = s.schemaRepo.CreateSchema(&models.Schema{
+	_, err = s.schemaRepo.CreateSchema(ctx, &models.Schema{
 		ID:        schemaID,
 		ProjectID: projectObjID,
 		Direction: direction,
@@ -74,11 +75,11 @@ func (s *SchemaService) CreateSchema(projectID, direction, url, name, authorID s
 		return &models.Schema{}, err
 	}
 
-	return &models.Schema{}, s.projectRepo.AddSchema(projectObjID, url)
+	return &models.Schema{}, s.projectRepo.AddSchema(ctx, projectObjID, url)
 
 }
 
-func (s *SchemaService) UpdateSchema(schemaID string, newSchemaData *models.Schema) (*models.Schema, error) {
+func (s *SchemaService) UpdateSchema(ctx context.Context, schemaID string, newSchemaData *models.Schema) (*models.Schema, error) {
 
 	schemaObjID, err := primitive.ObjectIDFromHex(schemaID)
 
@@ -86,11 +87,11 @@ func (s *SchemaService) UpdateSchema(schemaID string, newSchemaData *models.Sche
 		return &models.Schema{}, err
 	}
 
-	return newSchemaData, s.schemaRepo.UpdateSchema(schemaObjID, newSchemaData)
+	return newSchemaData, s.schemaRepo.UpdateSchema(ctx, schemaObjID, newSchemaData)
 
 }
 
-func (s *SchemaService) GetSchemas(projectID string) ([]models.Schema, error) {
+func (s *SchemaService) GetSchemas(ctx context.Context, projectID string) ([]models.Schema, error) {
 
 	projectObjID, err := primitive.ObjectIDFromHex(projectID)
 
@@ -98,11 +99,11 @@ func (s *SchemaService) GetSchemas(projectID string) ([]models.Schema, error) {
 		return []models.Schema{}, err
 	}
 
-	return s.schemaRepo.GetSchemas(projectObjID)
+	return s.schemaRepo.GetSchemas(ctx, projectObjID)
 
 }
 
-func (s *SchemaService) GetSchema(schemaID string) (models.Schema, error) {
+func (s *SchemaService) GetSchema(ctx context.Context, schemaID string) (models.Schema, error) {
 
 	schemaObjID, err := primitive.ObjectIDFromHex(schemaID)
 
@@ -110,6 +111,6 @@ func (s *SchemaService) GetSchema(schemaID string) (models.Schema, error) {
 		return models.Schema{}, err
 	}
 
-	return s.schemaRepo.GetSchema(schemaObjID)
+	return s.schemaRepo.GetSchema(ctx, schemaObjID)
 
 }

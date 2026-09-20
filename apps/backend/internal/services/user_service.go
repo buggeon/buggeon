@@ -20,8 +20,12 @@ import (
 	"buggeon/internal/dto"
 	"buggeon/internal/models"
 	"buggeon/internal/repositories"
+	s3storage "buggeon/internal/s3Storage"
 	"buggeon/internal/security"
+	"context"
 	"errors"
+	"fmt"
+	"mime/multipart"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -29,16 +33,22 @@ import (
 type UserService struct {
 	userRepo     *repositories.UserRepo
 	tokenService *TokenService
+	s3Storage    *s3storage.S3Storage
 }
 
-func NewUserService(userRepo *repositories.UserRepo, tokenService *TokenService) *UserService {
+func NewUserService(
+	userRepo *repositories.UserRepo,
+	tokenService *TokenService,
+	s3Storage *s3storage.S3Storage,
+) *UserService {
 	return &UserService{
 		userRepo:     userRepo,
 		tokenService: tokenService,
+		s3Storage:    s3Storage,
 	}
 }
 
-func (s *UserService) Register(dto *dto.UserRegistrationDto) (models.TokenResponse, error) {
+func (s *UserService) Register(ctx context.Context, dto *dto.UserRegistrationDto) (models.TokenResponse, error) {
 
 	passwordHash, err := security.HashPassword(dto.Password)
 
@@ -58,7 +68,7 @@ func (s *UserService) Register(dto *dto.UserRegistrationDto) (models.TokenRespon
 		Role:      "user",
 	}
 
-	tokenPair, err := s.tokenService.GenerateTokensPair(user)
+	tokenPair, err := s.tokenService.GenerateTokensPair(userID.Hex())
 
 	if err != nil {
 		return models.TokenResponse{}, err
@@ -66,15 +76,15 @@ func (s *UserService) Register(dto *dto.UserRegistrationDto) (models.TokenRespon
 
 	user.RefreshTokens = []string{tokenPair.RefreshToken}
 
-	s.userRepo.CreateUser(user)
+	s.userRepo.CreateUser(ctx, user)
 
 	return tokenPair, nil
 
 }
 
-func (s *UserService) Login(dto *dto.UserLoginDto) (models.TokenResponse, error) {
+func (s *UserService) Login(ctx context.Context, dto *dto.UserLoginDto) (models.TokenResponse, error) {
 
-	user, err := s.userRepo.GetByLogin(dto.Login)
+	user, err := s.userRepo.GetByLogin(ctx, dto.Login)
 
 	if err != nil {
 		return models.TokenResponse{}, err
@@ -84,13 +94,13 @@ func (s *UserService) Login(dto *dto.UserLoginDto) (models.TokenResponse, error)
 
 	if verificationResult == true {
 
-		tokensPair, err := s.tokenService.GenerateTokensPair(user)
+		tokensPair, err := s.tokenService.GenerateTokensPair(user.ID.Hex())
 
 		if err != nil {
 			return models.TokenResponse{}, err
 		}
 
-		return tokensPair, s.userRepo.AddRefreshToken(user.ID, tokensPair.RefreshToken)
+		return tokensPair, s.userRepo.AddRefreshToken(ctx, user.ID, tokensPair.RefreshToken)
 
 	}
 
@@ -98,7 +108,7 @@ func (s *UserService) Login(dto *dto.UserLoginDto) (models.TokenResponse, error)
 
 }
 
-func (s *UserService) UpdateUser(userID string, newUserData *models.User) (*models.User, error) {
+func (s *UserService) UpdateUser(ctx context.Context, userID string, newUserData *models.User) (*models.User, error) {
 
 	userObjID, err := primitive.ObjectIDFromHex(userID)
 
@@ -106,13 +116,13 @@ func (s *UserService) UpdateUser(userID string, newUserData *models.User) (*mode
 		return &models.User{}, err
 	}
 
-	return newUserData, s.userRepo.UpdateUser(userObjID, newUserData)
+	return newUserData, s.userRepo.UpdateUser(ctx, userObjID, newUserData)
 
 }
 
-func (s *UserService) RefreshAccessToken(refreshToken string) (models.TokenResponse, error) {
+func (s *UserService) RefreshAccessToken(ctx context.Context, refreshToken string) (models.TokenResponse, error) {
 
-	user, err := s.userRepo.GetByRefreshToken(refreshToken)
+	user, err := s.userRepo.GetByRefreshToken(ctx, refreshToken)
 
 	if err != nil {
 		return models.TokenResponse{}, err
@@ -124,18 +134,42 @@ func (s *UserService) RefreshAccessToken(refreshToken string) (models.TokenRespo
 		return models.TokenResponse{}, err
 	}
 
-	return tokenPair, s.userRepo.UpdateRefreshToken(user.ID, refreshToken, tokenPair.RefreshToken)
+	return tokenPair, s.userRepo.UpdateRefreshToken(ctx, user.ID, refreshToken, tokenPair.RefreshToken)
 
 }
 
-func (s *UserService) GetUser(userID string) (*models.User, error) {
+func (s *UserService) GetUser(ctx context.Context, userID string) (models.User, error) {
 
-	user, err := s.userRepo.GetByID(userID)
+	user, err := s.userRepo.GetUser(ctx, userID)
 
 	if err != nil {
-		return &models.User{}, nil
+		return models.User{}, nil
 	}
 
 	return user, nil
+
+}
+
+func (s *UserService) SetAvatar(ctx context.Context, userID string, avatar *multipart.FileHeader) (string, error) {
+
+	src, err := avatar.Open()
+
+	if err != nil {
+		return "", err
+	}
+
+	url, err := s.s3Storage.Upload(context.TODO(), fmt.Sprintf("users/%s/avatar/%s", userID, avatar.Filename), src, avatar.Header.Get("Content-Type"))
+
+	if err != nil {
+		return "", err
+	}
+
+	userObjID, err := primitive.ObjectIDFromHex(userID)
+
+	if err != nil {
+		return "", err
+	}
+
+	return url, s.userRepo.SetAvatar(ctx, userObjID, url)
 
 }

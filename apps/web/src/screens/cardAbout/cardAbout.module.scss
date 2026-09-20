@@ -12,7 +12,7 @@
         width: 400px;
         border-radius: 10px;
         overflow: hidden;
-        border-color: var(--light-background);
+        border-color: var(--dark-foreground);
         border-width: 3px;
         border-style: solid;
         display: flex;
@@ -34,7 +34,7 @@
 
             .messageInput{
                 border-radius: 10px;
-                background-color: var(--light-background);
+                background-color: var(--dark-foreground);
                 //height: 50px;
                 flex-grow: 1;
                 position: absolute;
@@ -54,7 +54,7 @@
         }
         
         header{
-            background-color: var(--light-background);
+            background-color: var(--dark-foreground);
             display: flex;
             align-items: center;
             padding: 10px;

@@ -20,7 +20,6 @@ import (
 	"buggeon/internal/db"
 	"buggeon/internal/models"
 	"context"
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -44,17 +43,17 @@ func NewUserRepoWithDbName(dbName string) *UserRepo {
 	}
 }
 
-func (r *UserRepo) CreateUser(user *models.User) error {
+func (r *UserRepo) CreateUser(ctx context.Context, user *models.User) error {
 	user.CreatedAt = time.Now()
 
-	_, err := r.collection.InsertOne(context.TODO(), user)
+	_, err := r.collection.InsertOne(ctx, user)
 	return err
 }
 
-func (r *UserRepo) UpdateUser(userID primitive.ObjectID, newUserData *models.User) error {
+func (r *UserRepo) UpdateUser(ctx context.Context, userID primitive.ObjectID, newUserData *models.User) error {
 
 	_, err := r.collection.UpdateOne(
-		context.Background(),
+		ctx,
 		bson.M{"_id": userID},
 		bson.M{"$set": newUserData},
 	)
@@ -63,64 +62,75 @@ func (r *UserRepo) UpdateUser(userID primitive.ObjectID, newUserData *models.Use
 
 }
 
-func (r *UserRepo) GetByLogin(userLogin string) (*models.User, error) {
+func (r *UserRepo) GetByLogin(ctx context.Context, userLogin string) (*models.User, error) {
 
 	var result models.User
 
-	err := r.collection.FindOne(context.TODO(), bson.M{"login": userLogin}).Decode(&result)
+	err := r.collection.FindOne(ctx, bson.M{"login": userLogin}).Decode(&result)
 
 	return &result, err
 }
 
-func (r *UserRepo) GetByRefreshToken(refreshToken string) (*models.User, error) {
+func (r *UserRepo) GetByRefreshToken(ctx context.Context, refreshToken string) (*models.User, error) {
 
 	var result models.User
 
-	err := r.collection.FindOne(context.TODO(), bson.M{"refresh_tokens": refreshToken}).Decode(&result)
+	err := r.collection.FindOne(ctx, bson.M{"refresh_tokens": refreshToken}).Decode(&result)
 
 	return &result, err
 }
 
-func (r *UserRepo) GetByID(userID string) (*models.User, error) {
+func (r *UserRepo) GetUser(ctx context.Context, userID string) (models.User, error) {
 
 	userObjID, err := primitive.ObjectIDFromHex(userID)
 
 	if err != nil {
-		return nil, err
+		return models.User{}, err
 	}
 
 	var result models.User
 
-	err = r.collection.FindOne(context.TODO(), bson.M{"_id": userObjID}).Decode(&result)
+	err = r.collection.FindOne(ctx, bson.M{"_id": userObjID}).Decode(&result)
 
-	return &result, err
+	return result, err
 }
 
-func (r *UserRepo) GetUserPasswordHash(userLogin string) (string, error) {
+func (r *UserRepo) GetUserPasswordHash(ctx context.Context, userLogin string) (string, error) {
 
 	var result struct {
 		Password string `bson:"password"`
 	}
 
-	err := r.collection.FindOne(context.TODO(), bson.M{"login": userLogin}).Decode(&result)
+	err := r.collection.FindOne(ctx, bson.M{"login": userLogin}).Decode(&result)
 
 	return result.Password, err
 
 }
 
-func (r *UserRepo) GetAllUsers() ([]models.User, error) {
+func (r *UserRepo) GetUsersByIDs(ctx context.Context, userIDs []primitive.ObjectID) ([]models.User, error) {
 
-	var users []models.User
+	if len(userIDs) == 0 {
+		return []models.User{}, nil
+	}
 
-	cursor, err := r.collection.Find(context.TODO(), bson.M{"role": "user"})
+	cursor, err := r.collection.Find(
+		ctx,
+		bson.M{
+			"_id": bson.M{
+				"$in": userIDs,
+			},
+		},
+	)
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer cursor.Close(context.TODO())
+	defer cursor.Close(ctx)
 
-	if err := cursor.All(context.TODO(), &users); err != nil {
+	var users []models.User
+
+	if err := cursor.All(ctx, users); err != nil {
 		return nil, err
 	}
 
@@ -128,12 +138,32 @@ func (r *UserRepo) GetAllUsers() ([]models.User, error) {
 
 }
 
-func (r *UserRepo) UpdateRefreshToken(userID primitive.ObjectID, oldRefreshToken, newRefreshToken string) error {
+func (r *UserRepo) GetAllUsers(ctx context.Context) ([]models.User, error) {
+
+	var users []models.User
+
+	cursor, err := r.collection.Find(ctx, bson.M{"role": "user"})
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer cursor.Close(ctx)
+
+	if err := cursor.All(ctx, &users); err != nil {
+		return nil, err
+	}
+
+	return users, nil
+
+}
+
+func (r *UserRepo) UpdateRefreshToken(ctx context.Context, userID primitive.ObjectID, oldRefreshToken, newRefreshToken string) error {
 
 	filter := bson.M{"_id": userID}
 	pullUpdate := bson.M{"$pull": bson.M{"refresh_tokens": oldRefreshToken}}
 
-	_, err := r.collection.UpdateOne(context.TODO(), filter, pullUpdate)
+	_, err := r.collection.UpdateOne(ctx, filter, pullUpdate)
 
 	if err != nil {
 		return err
@@ -141,19 +171,25 @@ func (r *UserRepo) UpdateRefreshToken(userID primitive.ObjectID, oldRefreshToken
 
 	pushUpdate := bson.M{"$push": bson.M{"refresh_tokens": newRefreshToken}}
 
-	_, err = r.collection.UpdateOne(context.TODO(), filter, pushUpdate)
+	_, err = r.collection.UpdateOne(ctx, filter, pushUpdate)
 
 	return err
 }
 
-func (r *UserRepo) AddRefreshToken(userID primitive.ObjectID, refreshToken string) error {
-
-	fmt.Println("Start adding...")
+func (r *UserRepo) AddRefreshToken(ctx context.Context, userID primitive.ObjectID, refreshToken string) error {
 
 	filter := bson.M{"_id": userID}
 	update := bson.M{"$push": bson.M{"refresh_tokens": refreshToken}}
 
-	_, err := r.collection.UpdateOne(context.TODO(), filter, update)
+	_, err := r.collection.UpdateOne(ctx, filter, update)
+
+	return err
+
+}
+
+func (r *UserRepo) SetAvatar(ctx context.Context, userID primitive.ObjectID, avatarUrl string) error {
+
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": userID}, bson.M{"$set": bson.M{"avatar_url": avatarUrl}})
 
 	return err
 

@@ -58,7 +58,7 @@ func NewProjectService(
 	}
 }
 
-func (s *ProjectService) CreateProject(projectData *dto.CreateProjectDto) (*models.Project, error) {
+func (s *ProjectService) CreateProject(ctx context.Context, projectData *dto.CreateProjectDto) (*models.Project, error) {
 
 	projectID := primitive.NewObjectID()
 
@@ -72,7 +72,7 @@ func (s *ProjectService) CreateProject(projectData *dto.CreateProjectDto) (*mode
 		Progress:    projectData.Progress,
 	}
 
-	if err := s.projectRepo.CreateProject(project); err != nil {
+	if err := s.projectRepo.CreateProject(ctx, project); err != nil {
 		return &models.Project{}, err
 	}
 
@@ -84,7 +84,7 @@ func (s *ProjectService) CreateProject(projectData *dto.CreateProjectDto) (*mode
 
 	for _, member := range projectData.Members {
 
-		createdMember, _ := s.memberService.CreateMember(&dto.CreateMemberDto{
+		createdMember, _ := s.memberService.CreateMember(ctx, &dto.CreateMemberDto{
 			UserID:     member.UserID,
 			ProjectID:  projectID.Hex(),
 			Role:       member.Role,
@@ -92,7 +92,7 @@ func (s *ProjectService) CreateProject(projectData *dto.CreateProjectDto) (*mode
 		})
 
 		if createdMember.UserID.Hex() == projectData.LeadID {
-			s.projectRepo.AddLead(projectID, createdMember.ID)
+			s.projectRepo.AddLead(ctx, projectID, createdMember.ID)
 			project.LeadID = createdMember.ID
 		}
 
@@ -102,7 +102,7 @@ func (s *ProjectService) CreateProject(projectData *dto.CreateProjectDto) (*mode
 
 }
 
-func (s *ProjectService) UpdateProject(projectID string, newProjectData *models.Project) (*models.Project, error) {
+func (s *ProjectService) UpdateProject(ctx context.Context, projectID string, newProjectData *models.Project) (*models.Project, error) {
 
 	projectObjID, err := primitive.ObjectIDFromHex(projectID)
 
@@ -110,11 +110,11 @@ func (s *ProjectService) UpdateProject(projectID string, newProjectData *models.
 		return &models.Project{}, err
 	}
 
-	return newProjectData, s.projectRepo.UpdateProject(projectObjID, newProjectData)
+	return newProjectData, s.projectRepo.UpdateProject(ctx, projectObjID, newProjectData)
 
 }
 
-func (s *ProjectService) GetProjects(userID string) ([]models.Project, error) {
+func (s *ProjectService) GetProjects(ctx context.Context, userID string) ([]models.Project, error) {
 
 	projectObjID, err := primitive.ObjectIDFromHex(userID)
 
@@ -122,16 +122,16 @@ func (s *ProjectService) GetProjects(userID string) ([]models.Project, error) {
 		return nil, err
 	}
 
-	projectsIDs, err := s.memberRepo.GetProjectsIDsByUser(projectObjID)
+	projectsIDs, err := s.memberRepo.GetProjectsIDsByUser(ctx, projectObjID)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return s.projectRepo.GetProjectsByIDs(projectsIDs)
+	return s.projectRepo.GetProjectsByIDs(ctx, projectsIDs)
 }
 
-func (s *ProjectService) GetProject(projectID string) (models.Project, error) {
+func (s *ProjectService) GetProject(ctx context.Context, projectID string) (models.Project, error) {
 
 	projectObjID, err := primitive.ObjectIDFromHex(projectID)
 
@@ -139,7 +139,7 @@ func (s *ProjectService) GetProject(projectID string) (models.Project, error) {
 		return models.Project{}, err
 	}
 
-	project, err := s.projectRepo.GetProject(projectObjID)
+	project, err := s.projectRepo.GetProject(ctx, projectObjID)
 
 	if err != nil {
 		return models.Project{}, err
@@ -149,7 +149,7 @@ func (s *ProjectService) GetProject(projectID string) (models.Project, error) {
 
 }
 
-func (s *ProjectService) DeleteProject(projectID string) (bool, error) {
+func (s *ProjectService) DeleteProject(ctx context.Context, projectID string) (bool, error) {
 
 	projectObjID, err := primitive.ObjectIDFromHex(projectID)
 
@@ -157,15 +157,15 @@ func (s *ProjectService) DeleteProject(projectID string) (bool, error) {
 		return false, err
 	}
 
-	err = s.projectRepo.DeleteProject(projectObjID)
+	err = s.projectRepo.DeleteProject(ctx, projectObjID)
 
 	if err != nil {
 		return false, err
 	}
 
-	s.memberRepo.DeleteMembers(projectObjID)
+	s.memberRepo.DeleteMembers(ctx, projectObjID)
 
-	boards, err := s.boardRepo.GetBoards(projectObjID)
+	boards, err := s.boardRepo.GetBoardsByProjectID(ctx, projectObjID)
 
 	if err != nil {
 		return false, err
@@ -173,9 +173,9 @@ func (s *ProjectService) DeleteProject(projectID string) (bool, error) {
 
 	for _, board := range boards {
 
-		s.boardRepo.DeleteBoard(board.ID)
+		s.boardRepo.DeleteBoard(ctx, board.ID)
 
-		cards, err := s.cardRepo.GetCards(board.ID)
+		cards, err := s.cardRepo.GetCardsByBoardID(ctx, board.ID)
 
 		if err != nil {
 			continue
@@ -183,9 +183,9 @@ func (s *ProjectService) DeleteProject(projectID string) (bool, error) {
 
 		for _, card := range cards {
 
-			s.cardRepo.DeleteCard(card.ID)
+			s.cardRepo.DeleteCard(ctx, card.ID)
 
-			err := s.messageRepo.DeleteMessages(card.ID)
+			err := s.messageRepo.DeleteMessages(ctx, card.ID)
 
 			if err != nil {
 				continue
@@ -199,7 +199,7 @@ func (s *ProjectService) DeleteProject(projectID string) (bool, error) {
 
 }
 
-func (s *ProjectService) SetProjectLogo(projectID string, logo *multipart.FileHeader) error {
+func (s *ProjectService) SetProjectLogo(ctx context.Context, projectID string, logo *multipart.FileHeader) error {
 
 	projectObjID, err := primitive.ObjectIDFromHex(projectID)
 
@@ -219,7 +219,7 @@ func (s *ProjectService) SetProjectLogo(projectID string, logo *multipart.FileHe
 		return err
 	}
 
-	s.projectRepo.SetProjectLogoUrl(projectObjID, url)
+	s.projectRepo.SetProjectLogoUrl(ctx, projectObjID, url)
 
 	return nil
 

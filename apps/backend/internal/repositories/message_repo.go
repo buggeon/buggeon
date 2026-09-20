@@ -44,20 +44,20 @@ func NewMessageRepoWithDbName(dbName string) *MessageRepo {
 	}
 }
 
-func (r *MessageRepo) NewMessage(message *models.Message) (primitive.ObjectID, error) {
+func (r *MessageRepo) NewMessage(ctx context.Context, message *models.Message) (primitive.ObjectID, error) {
 
 	message.ID = primitive.NewObjectID()
 	message.CreatedAt = time.Now()
 
-	_, err := r.collection.InsertOne(context.TODO(), message)
+	_, err := r.collection.InsertOne(ctx, message)
 	return message.ID, err
 
 }
 
-func (r *MessageRepo) UpdateMessage(messageID primitive.ObjectID, newMessageData *models.Message) error {
+func (r *MessageRepo) UpdateMessage(ctx context.Context, messageID primitive.ObjectID, newMessageData *models.Message) error {
 
 	_, err := r.collection.UpdateOne(
-		context.Background(),
+		ctx,
 		bson.M{"_id": messageID},
 		bson.M{"$set": newMessageData},
 	)
@@ -66,9 +66,9 @@ func (r *MessageRepo) UpdateMessage(messageID primitive.ObjectID, newMessageData
 
 }
 
-func (r *MessageRepo) DeleteMessage(messageID primitive.ObjectID) error {
+func (r *MessageRepo) DeleteMessage(ctx context.Context, messageID primitive.ObjectID) error {
 
-	result, err := r.collection.DeleteOne(context.TODO(), bson.M{"_id": messageID})
+	result, err := r.collection.DeleteOne(ctx, bson.M{"_id": messageID})
 
 	if result.DeletedCount != 1 || err != nil {
 		return errors.New("Failed to delete message")
@@ -78,9 +78,9 @@ func (r *MessageRepo) DeleteMessage(messageID primitive.ObjectID) error {
 
 }
 
-func (r *MessageRepo) DeleteMessages(cardID primitive.ObjectID) error {
+func (r *MessageRepo) DeleteMessages(ctx context.Context, cardID primitive.ObjectID) error {
 
-	result, err := r.collection.DeleteOne(context.TODO(), bson.M{"card_id": cardID})
+	result, err := r.collection.DeleteOne(ctx, bson.M{"card_id": cardID})
 
 	if result.DeletedCount != 1 || err != nil {
 		return errors.New("Failed to delete messages")
@@ -90,32 +90,63 @@ func (r *MessageRepo) DeleteMessages(cardID primitive.ObjectID) error {
 
 }
 
-func (r *MessageRepo) GetMessage(messageID primitive.ObjectID) (models.Message, error) {
+func (r *MessageRepo) GetMessage(ctx context.Context, messageID primitive.ObjectID) (models.Message, error) {
 
 	var message models.Message
 
-	err := r.collection.FindOne(context.TODO(), bson.M{"_id": messageID}).Decode(&message)
+	err := r.collection.FindOne(ctx, bson.M{"_id": messageID}).Decode(&message)
 
 	return message, err
 
 }
 
-func (r *MessageRepo) GetMessages(cardID primitive.ObjectID) ([]models.Message, error) {
+func (r *MessageRepo) GetMessagesByCardID(ctx context.Context, cardID primitive.ObjectID) ([]models.Message, error) {
 
 	var members []models.Message
 
-	cursor, err := r.collection.Find(context.TODO(), bson.M{"card_id": cardID})
+	cursor, err := r.collection.Find(ctx, bson.M{"card_id": cardID})
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer cursor.Close(context.TODO())
+	defer cursor.Close(ctx)
 
-	if err := cursor.All(context.TODO(), &members); err != nil {
+	if err := cursor.All(ctx, &members); err != nil {
 		return nil, err
 	}
 
 	return members, nil
+
+}
+
+func (r *MessageRepo) GetMessagesByIDs(ctx context.Context, messageIDs []primitive.ObjectID) ([]models.Message, error) {
+
+	if len(messageIDs) == 0 {
+		return []models.Message{}, nil
+	}
+
+	cursor, err := r.collection.Find(
+		ctx,
+		bson.M{
+			"_id": bson.M{
+				"$in": messageIDs,
+			},
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer cursor.Close(ctx)
+
+	var messages []models.Message
+
+	if err := cursor.All(ctx, &messages); err != nil {
+		return nil, err
+	}
+
+	return messages, nil
 
 }

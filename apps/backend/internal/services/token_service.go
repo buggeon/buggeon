@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type TokenService struct {
@@ -38,23 +37,16 @@ func NewTokenService(cfg config.Config) *TokenService {
 }
 
 type TokenClaims struct {
-	UserID        string `json:"user_id"`
-	UserAvatarUrl string `json:"user_avatar_url"`
-	UserName      string `json:"user_name"`
-	UserLogin     string `json:"user_login"`
-	UserEmail     string `json:"user_email"`
+	UserID string `json:"userId"`
 	jwt.RegisteredClaims
 }
 
-func (s *TokenService) GenerateAccessToken(user *models.User) (string, error) {
+func (s *TokenService) GenerateAccessToken(userID string) (string, error) {
 
 	expiry := time.Now().Add(time.Duration(s.cfg.AccessTokenExpire) * time.Minute)
 
 	claims := TokenClaims{
-		UserID:    user.ID.Hex(),
-		UserName:  user.Name,
-		UserLogin: user.Login,
-		UserEmail: user.Email,
+		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiry),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -67,15 +59,12 @@ func (s *TokenService) GenerateAccessToken(user *models.User) (string, error) {
 
 }
 
-func (s *TokenService) GenerateRefreshToken(user *models.User) (string, error) {
+func (s *TokenService) GenerateRefreshToken(userID string) (string, error) {
 
 	expiry := time.Now().Add(time.Duration(s.cfg.RefreshTokenExpire) * time.Hour)
 
 	claims := TokenClaims{
-		UserID:    user.ID.Hex(),
-		UserName:  user.Name,
-		UserLogin: user.Login,
-		UserEmail: user.Email,
+		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiry),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -138,26 +127,13 @@ func (s *TokenService) RefreshAccessToken(refreshToken string) (models.TokenResp
 		return models.TokenResponse{}, errors.New("Invalid token")
 	}
 
-	userObjID, err := primitive.ObjectIDFromHex(claims.UserID)
-
-	if err != nil {
-		return models.TokenResponse{}, errors.New("Invalid user id")
-	}
-
-	user := &models.User{
-		ID:    userObjID,
-		Name:  claims.UserName,
-		Login: claims.UserLogin,
-		Email: claims.UserEmail,
-	}
-
-	return s.GenerateTokensPair(user)
+	return s.GenerateTokensPair(claims.UserID)
 
 }
 
-func (s *TokenService) GenerateTokensPair(user *models.User) (models.TokenResponse, error) {
+func (s *TokenService) GenerateTokensPair(userID string) (models.TokenResponse, error) {
 
-	accessToken, err := s.GenerateAccessToken(user)
+	accessToken, err := s.GenerateAccessToken(userID)
 
 	fmt.Println(err)
 
@@ -165,7 +141,7 @@ func (s *TokenService) GenerateTokensPair(user *models.User) (models.TokenRespon
 		return models.TokenResponse{}, nil
 	}
 
-	refreshToken, err := s.GenerateRefreshToken(user)
+	refreshToken, err := s.GenerateRefreshToken(userID)
 
 	if err != nil {
 		return models.TokenResponse{}, nil

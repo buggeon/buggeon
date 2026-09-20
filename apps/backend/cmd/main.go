@@ -18,8 +18,9 @@ package main
 
 import (
 	"buggeon/config"
-	"buggeon/graph"
+	"buggeon/internal/cache"
 	"buggeon/internal/db"
+	"buggeon/internal/graph"
 	"buggeon/internal/handlers"
 	"buggeon/internal/middleware"
 	"buggeon/internal/models"
@@ -80,7 +81,7 @@ func createAdmin(tokenService *services.TokenService) error {
 			CreatedAt: time.Now(),
 		}
 
-		refreshToken, err := tokenService.GenerateRefreshToken(&admin)
+		refreshToken, err := tokenService.GenerateRefreshToken(admin.ID.Hex())
 
 		if err != nil {
 			return err
@@ -146,6 +147,8 @@ func main() {
 
 	s3Storage := s3storage.NewS3Storage()
 
+	cache := cache.NewUserCache(5 * time.Minute)
+
 	userRepo := repositories.NewUserRepo()
 	projectRepo := repositories.NewProjectRepo()
 	memberRepo := repositories.NewMemberRepo()
@@ -160,16 +163,19 @@ func main() {
 	schemaService := services.NewSchemaService(projectRepo, schemaRepo, s3Storage)
 	projectService := services.NewProjectService(projectRepo, memberService, memberRepo, boardRepo, cardRepo, messageRepo, s3Storage)
 	tokenService := services.NewTokenService(config.LoadConfig())
-	userService := services.NewUserService(userRepo, tokenService)
+	userService := services.NewUserService(userRepo, tokenService, s3Storage)
 	systemService := services.NewSystemService(userRepo)
 	messageService := services.NewMessageService(messageRepo, cardRepo)
 
 	projectHandler := handlers.NewProjectHandler(projectService, schemaService, cardService, boardService, memberService, messageService)
 	userHandler := handlers.NewUserHandler(userService)
 	systemHandler := handlers.NewSystemHandler(systemService)
-	chatHandler := handlers.NewChatHandler(messageService, tokenService)
+	chatHandler := handlers.NewChatHandler(messageService, tokenService, cache)
 
 	authMiddleware := middleware.NewAuthMiddleware(tokenService)
+	loaderMiddleware := middleware.NewLoaderMiddleware(userRepo, cardRepo, boardRepo, messageRepo, memberRepo)
+
+	router.Use(loaderMiddleware.SetLoaderMiddleware())
 
 	if err := createAdmin(tokenService); err != nil {
 		fmt.Println("Failed to create admin")
@@ -222,6 +228,11 @@ func setupRoutes(
 	api := router.Group("/api")
 	api.Use(authMiddleware.AuthRequired())
 	{
+		users := api.Group("/users")
+		{
+			users.PATCH("/:user_id/avatar", userHandler.SetAvatar)
+		}
+
 		projects := api.Group("/projects")
 		{
 			projects.GET("", projectHandler.GetProjects)

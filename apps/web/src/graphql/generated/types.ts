@@ -93,6 +93,7 @@ export type Mutation = {
   updateBoard: Board;
   updateCard: Card;
   updateProject: Project;
+  updateUser: User;
 };
 
 
@@ -145,6 +146,12 @@ export type MutationUpdateCardArgs = {
 export type MutationUpdateProjectArgs = {
   input: UpdateProjectInput;
   projectId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateUserArgs = {
+  input: UpdateUserInput;
+  userId: Scalars['ID']['input'];
 };
 
 export type Project = {
@@ -265,6 +272,12 @@ export type UpdateProjectInput = {
   progress?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type UpdateUserInput = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  login?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type User = {
   __typename?: 'User';
   avatarUrl: Scalars['String']['output'];
@@ -273,5 +286,4 @@ export type User = {
   id: Scalars['ID']['output'];
   login: Scalars['String']['output'];
   name: Scalars['String']['output'];
-  role: Scalars['String']['output'];
 };

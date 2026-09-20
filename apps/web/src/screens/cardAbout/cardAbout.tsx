@@ -13,14 +13,14 @@ function CardAboutScreen() {
 
     const {cardId} = useParams()
     const user = useSelector((state : RootState) => state.user)
-    const { data } = useGetCard(cardId, ["title", "content", "messages { content, sender { id, name, role } }"])
+    const { data } = useGetCard(cardId, ["title", "content", "messages { content, sender { id , name, avatarUrl } }"])
     const [messageText, setMessageText] = useState("")
     const [liveMessages, setLiveMessages] = useState<ChatMessage[]>([])
 
     const history: ChatMessage[] = data?.card.messages.map(m => ({
         senderId: m.sender.id,
         senderName: m.sender.name,
-        senderAvatarUrl: m.sender.role,
+        senderAvatarUrl: m.sender.avatarUrl,
         content: m.content,
         id: m.id,
     })) ?? []

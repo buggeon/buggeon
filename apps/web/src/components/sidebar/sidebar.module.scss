@@ -1,5 +1,4 @@
 .sidebar{
-    background-color: #121824;
     width: 250px;
     height: 100%;
     display: flex;
@@ -23,8 +22,8 @@
         border-radius: 10px;
         display: flex;
         align-items: center;
-        justify-content: space-between;
         padding: 10px;
+        gap: 10px;
         
 
         .accountAvatar{
@@ -45,7 +44,7 @@
                 color: white;
             }
 
-            .accountRole{
+            .accountLogin{
                 color: #727b8c;
             }
 

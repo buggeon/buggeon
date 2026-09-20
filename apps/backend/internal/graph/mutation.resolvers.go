@@ -1,8 +1,9 @@
 package graph
 
 import (
-	"buggeon/graph/model"
 	"buggeon/internal/dto"
+	"buggeon/internal/graph/gqlinput"
+	"buggeon/internal/graph/gqlmodel"
 	"context"
 	"errors"
 	"time"
@@ -11,10 +12,10 @@ import (
 func (r *mutationResolver) CreateCard(
 	ctx context.Context,
 	boardID string,
-	input model.CreateCardInput,
-) (*model.Card, error) {
+	input gqlinput.CreateCardInput,
+) (*gqlmodel.Card, error) {
 
-	card, err := r.CardService.CreateCard(&dto.CreateCardDto{
+	card, err := r.CardService.CreateCard(ctx, &dto.CreateCardDto{
 		BoardID:   boardID,
 		Title:     input.Title,
 		Content:   input.Content,
@@ -23,20 +24,20 @@ func (r *mutationResolver) CreateCard(
 		Priority:  input.Priority,
 	})
 
-	return r.toGraphQLCard(context.Background(), card), err
+	return gqlmodel.NewCard(*card), err
 
 }
 
 func (r *mutationResolver) UpdateCard(
 	ctx context.Context,
 	cardID string,
-	input model.UpdateCardInput,
-) (*model.Card, error) {
+	input gqlinput.UpdateCardInput,
+) (*gqlmodel.Card, error) {
 
-	card, err := r.CardService.GetCard(cardID)
+	card, err := r.CardService.GetCard(ctx, cardID)
 
 	if err != nil {
-		return &model.Card{}, err
+		return nil, err
 	}
 
 	if input.Title != nil {
@@ -47,19 +48,12 @@ func (r *mutationResolver) UpdateCard(
 		card.Content = *input.Content
 	}
 
-	// if input.Assignees != nil {
-
-	// 	newAssignees
-
-	// 	card.Assignees = *input.Assignees
-	// }
-
 	if input.DueDate != nil {
 
 		dueDateTime, err := time.Parse("02.01.2006", *input.DueDate)
 
 		if err != nil {
-			return &model.Card{}, errors.New("Invalid dueDate format")
+			return nil, errors.New("Invalid dueDate format")
 		}
 
 		card.DueDate = dueDateTime
@@ -73,9 +67,9 @@ func (r *mutationResolver) UpdateCard(
 		card.Priority = *input.Priority
 	}
 
-	updatedCard, err := r.CardService.UpdateCard(cardID, &card)
+	updatedCard, err := r.CardService.UpdateCard(ctx, cardID, &card)
 
-	return r.toGraphQLCard(context.Background(), updatedCard), err
+	return gqlmodel.NewCard(*updatedCard), err
 
 }
 
@@ -90,10 +84,10 @@ func (r *mutationResolver) DeleteCard(
 func (r *mutationResolver) CreateBoard(
 	ctx context.Context,
 	projectID string,
-	input model.CreateBoardInput,
-) (*model.Board, error) {
+	input gqlinput.CreateBoardInput,
+) (*gqlmodel.Board, error) {
 
-	board, err := r.BoardService.CreateBoard(&dto.CreateBoardDto{
+	board, err := r.BoardService.CreateBoard(ctx, &dto.CreateBoardDto{
 		ProjectID:   projectID,
 		Name:        input.Name,
 		Direction:   input.Direction,
@@ -101,20 +95,20 @@ func (r *mutationResolver) CreateBoard(
 		ThemeColor:  *input.ThemeColor,
 	})
 
-	return r.toGraphQLBoard(context.Background(), board), err
+	return gqlmodel.NewBoard(*board), err
 
 }
 
 func (r *mutationResolver) UpdateBoard(
 	ctx context.Context,
 	boardID string,
-	input model.UpdateBoardInput,
-) (*model.Board, error) {
+	input gqlinput.UpdateBoardInput,
+) (*gqlmodel.Board, error) {
 
-	board, err := r.BoardService.GetBoard(boardID)
+	board, err := r.BoardService.GetBoard(ctx, boardID)
 
 	if err != nil {
-		return &model.Board{}, err
+		return nil, err
 	}
 
 	if input.Name != nil {
@@ -133,9 +127,9 @@ func (r *mutationResolver) UpdateBoard(
 		board.CardsStatus = *input.CardsStatus
 	}
 
-	updatedBoard, err := r.BoardService.UpdateBoard(boardID, &board)
+	updatedBoard, err := r.BoardService.UpdateBoard(ctx, boardID, &board)
 
-	return r.toGraphQLBoard(context.Background(), updatedBoard), err
+	return gqlmodel.NewBoard(*updatedBoard), err
 
 }
 
@@ -145,20 +139,20 @@ func (r *mutationResolver) DeleteBoard(
 	boardID string,
 ) (bool, error) {
 
-	return r.BoardService.DeleteBoard(projectID, boardID)
+	return r.BoardService.DeleteBoard(ctx, projectID, boardID)
 
 }
 
 func (r *mutationResolver) UpdateProject(
 	ctx context.Context,
 	projectID string,
-	input model.UpdateProjectInput,
-) (*model.Project, error) {
+	input gqlinput.UpdateProjectInput,
+) (*gqlmodel.Project, error) {
 
-	project, err := r.ProjectService.GetProject(projectID)
+	project, err := r.ProjectService.GetProject(ctx, projectID)
 
 	if err != nil {
-		return &model.Project{}, err
+		return nil, err
 	}
 
 	if input.Name != nil {
@@ -173,27 +167,25 @@ func (r *mutationResolver) UpdateProject(
 		project.Progress = int(*input.Progress)
 	}
 
-	updatedProject, err := r.ProjectService.UpdateProject(projectID, &project)
+	updatedProject, err := r.ProjectService.UpdateProject(ctx, projectID, &project)
 
-	return r.toGraphQLProject(context.Background(), updatedProject), err
+	return gqlmodel.NewProject(*updatedProject), err
 
 }
 
 func (r *mutationResolver) CreateProject(
 	ctx context.Context,
-	input model.CreateProjectInput,
-) (*model.Project, error) {
+	input gqlinput.CreateProjectInput,
+) (*gqlmodel.Project, error) {
 
-	project, err := r.ProjectService.CreateProject(&dto.CreateProjectDto{
+	project, err := r.ProjectService.CreateProject(ctx, &dto.CreateProjectDto{
 		LeadID:      input.LeadID,
 		Name:        input.Name,
 		Description: *input.Description,
 		//Members:   input.Members
 	})
 
-	projectGraph := r.toGraphQLProject(context.Background(), project)
-
-	return projectGraph, err
+	return gqlmodel.NewProject(*project), err
 
 }
 
@@ -202,6 +194,36 @@ func (r *mutationResolver) DeleteProject(
 	projectID string,
 ) (bool, error) {
 
-	return r.ProjectService.DeleteProject(projectID)
+	return r.ProjectService.DeleteProject(ctx, projectID)
+
+}
+
+func (r *mutationResolver) UpdateUser(
+	ctx context.Context,
+	userID string,
+	input gqlinput.UpdateUserInput,
+) (*gqlmodel.User, error) {
+
+	user, err := r.UserService.GetUser(ctx, userID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if input.Name != nil {
+		user.Name = *input.Name
+	}
+
+	if input.Email != nil {
+		user.Email = *input.Email
+	}
+
+	if input.Login != nil {
+		user.Login = *input.Login
+	}
+
+	updatedProject, err := r.UserService.UpdateUser(ctx, userID, &user)
+
+	return gqlmodel.NewUser(*updatedProject), err
 
 }

@@ -36,5 +36,57 @@ type mutationResolver struct {
 	*Resolver
 }
 
+type boardResolver struct {
+	*Resolver
+}
+
+type memberResolver struct {
+	*Resolver
+}
+
+type cardResolver struct {
+	*Resolver
+}
+
+type messageResolver struct {
+	*Resolver
+}
+
+type projectResolver struct {
+	*Resolver
+}
+
+type schemaResolver struct {
+	*Resolver
+}
+
+type userResolver struct {
+	*Resolver
+}
+
+func (r *Resolver) Board() BoardResolver {
+	return &boardResolver{r}
+}
+
+func (r *Resolver) Card() CardResolver {
+	return &cardResolver{r}
+}
+
+func (r *Resolver) Member() MemberResolver {
+	return &memberResolver{r}
+}
+
+func (r *Resolver) Message() MessageResolver {
+	return &messageResolver{r}
+}
+
+func (r *Resolver) Project() ProjectResolver {
+	return &projectResolver{r}
+}
+
+func (r *Resolver) Schema() SchemaResolver {
+	return &schemaResolver{r}
+}
+
 func (r *Resolver) Query() QueryResolver       { return &queryResolver{r} }
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }

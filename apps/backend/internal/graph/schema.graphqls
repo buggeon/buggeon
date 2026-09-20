@@ -6,7 +6,6 @@ type User {
     avatarUrl: String!
     login: String!
     email: String!
-    role: String!
     createdAt: String!
 }
 
@@ -30,6 +29,7 @@ type Message {
     createdAt: String!
     updatedAt: String!
     cardId: String!
+
     sender: User!
     replyTo: Message
     replies: [Message!]!
@@ -41,6 +41,7 @@ type Member {
     directions: [String!]!
     createdAt: String!
     projectId: String!
+
     user: User!
 }
 
@@ -77,9 +78,10 @@ type Schema {
     direction: String
     url: String!
     name: String!
-    author: Member!
     createdAt: String!
     updatedAt: String!
+
+    author: Member!
 }
 
 type Query {
@@ -119,6 +121,8 @@ type Mutation {
     createProject(input: CreateProjectInput!): Project!
     updateProject(projectId: ID!, input: UpdateProjectInput!): Project!
     deleteProject(projectId: ID!): Boolean!
+
+    updateUser(userId: ID!, input: UpdateUserInput!): User!
 
 }
 
@@ -165,4 +169,10 @@ input UpdateProjectInput {
     description: String
     logoUrl: String
     progress: Int
+}
+
+input UpdateUserInput {
+    name: String
+    login: String
+    email: String
 }

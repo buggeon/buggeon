@@ -20,6 +20,7 @@ import (
 	"buggeon/internal/dto"
 	"buggeon/internal/models"
 	"buggeon/internal/repositories"
+	"context"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -29,14 +30,17 @@ type MessageService struct {
 	cardRepo    *repositories.CardRepo
 }
 
-func NewMessageService(messageRepo *repositories.MessageRepo, cardRepo *repositories.CardRepo) *MessageService {
+func NewMessageService(
+	messageRepo *repositories.MessageRepo,
+	cardRepo *repositories.CardRepo,
+) *MessageService {
 	return &MessageService{
 		messageRepo: messageRepo,
 		cardRepo:    cardRepo,
 	}
 }
 
-func (s *MessageService) CreateMessage(message dto.NewMessageDto) (*models.Message, error) {
+func (s *MessageService) CreateMessage(ctx context.Context, message dto.NewMessageDto) (*models.Message, error) {
 
 	senderID, err := primitive.ObjectIDFromHex(message.SenderID)
 
@@ -58,7 +62,7 @@ func (s *MessageService) CreateMessage(message dto.NewMessageDto) (*models.Messa
 			return &models.Message{}, err
 		}
 
-		id, err := s.messageRepo.NewMessage(&models.Message{
+		id, err := s.messageRepo.NewMessage(ctx, &models.Message{
 			SenderID: senderID,
 			CardID:   cardID,
 			ReplyTo:  replyTo,
@@ -72,7 +76,7 @@ func (s *MessageService) CreateMessage(message dto.NewMessageDto) (*models.Messa
 		messageID = id
 
 	} else {
-		id, err := s.messageRepo.NewMessage(&models.Message{
+		id, err := s.messageRepo.NewMessage(ctx, &models.Message{
 			SenderID: senderID,
 			CardID:   cardID,
 			Content:  message.Content,
@@ -85,11 +89,11 @@ func (s *MessageService) CreateMessage(message dto.NewMessageDto) (*models.Messa
 		messageID = id
 	}
 
-	return &models.Message{}, s.cardRepo.AddMessage(cardID, messageID)
+	return &models.Message{}, s.cardRepo.AddMessage(ctx, cardID, messageID)
 
 }
 
-func (s *MessageService) UpdateMessage(messageID string, newMessageData *models.Message) (*models.Message, error) {
+func (s *MessageService) UpdateMessage(ctx context.Context, messageID string, newMessageData *models.Message) (*models.Message, error) {
 
 	messageObjID, err := primitive.ObjectIDFromHex(messageID)
 
@@ -97,27 +101,27 @@ func (s *MessageService) UpdateMessage(messageID string, newMessageData *models.
 		return &models.Message{}, err
 	}
 
-	return newMessageData, s.messageRepo.UpdateMessage(messageObjID, newMessageData)
+	return newMessageData, s.messageRepo.UpdateMessage(ctx, messageObjID, newMessageData)
 
 }
 
-func (s *MessageService) DeleteMessage(cardID string, userID string) {
+func (s *MessageService) DeleteMessage(ctx context.Context, cardID string, userID string) {
 
 }
 
-func (s *MessageService) GetMessages(cardID string) ([]models.Message, error) {
+func (s *MessageService) GetMessages(ctx context.Context, cardID string) ([]models.Message, error) {
 
-	messageObjID, err := primitive.ObjectIDFromHex(cardID)
+	cardObjID, err := primitive.ObjectIDFromHex(cardID)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return s.messageRepo.GetMessages(messageObjID)
+	return s.messageRepo.GetMessagesByCardID(ctx, cardObjID)
 
 }
 
-func (s *MessageService) GetMessage(messageID string) (models.Message, error) {
+func (s *MessageService) GetMessage(ctx context.Context, messageID string) (models.Message, error) {
 
 	messageObjID, err := primitive.ObjectIDFromHex(messageID)
 
@@ -125,6 +129,6 @@ func (s *MessageService) GetMessage(messageID string) (models.Message, error) {
 		return models.Message{}, nil
 	}
 
-	return s.messageRepo.GetMessage(messageObjID)
+	return s.messageRepo.GetMessage(ctx, messageObjID)
 
 }

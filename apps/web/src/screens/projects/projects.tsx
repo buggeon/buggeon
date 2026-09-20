@@ -112,12 +112,17 @@ function ProjectsScreen() {
                                                 </td>
                                                 <td>
                                                     <div className={styles.members}>
-                                                        <img src=""/>
-                                                        <img src=""/>
-                                                        <img src=""/>
-                                                        <div>
-                                                            <p>+5</p>
-                                                        </div>
+                                                        {
+                                                            project.members.slice(0, 4).map(member => (
+                                                                <img src={member.user.avatarUrl}/>
+                                                            ))
+                                                        }
+                                                        {
+                                                            project.members.length > 3 &&
+                                                            <div>
+                                                                <p>+{project.members.length - 3}</p>
+                                                            </div>
+                                                        }
                                                     </div>
                                                 </td>
                                                 <td>

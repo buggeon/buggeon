@@ -34,7 +34,7 @@ func NewSystemHandler(systemService *services.SystemService) *SystemHandler {
 
 func (h *SystemHandler) GetAllUsers(c *gin.Context) {
 
-	users, err := h.systemService.GetAllUsers()
+	users, err := h.systemService.GetAllUsers(c)
 
 	if err != nil {
 		c.Status(403)

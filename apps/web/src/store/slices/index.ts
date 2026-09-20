@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import userSlice from "./userSlice";
 import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE } from "redux-persist";
+import appearanceSlice from "./themeSlice";
 
 const storage = {
     getItem: (key: string) => {
@@ -32,12 +33,13 @@ const storage = {
 const persistConfig = {
     key: "root",
     storage,
-    whitelist: ['user'],
+    whitelist: ['user', "appearance"],
     blacklist: []
 }
 
 const rootReducer = combineReducers({
-    user: userSlice.reducer
+    user: userSlice.reducer,
+    appearance: appearanceSlice.reducer
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

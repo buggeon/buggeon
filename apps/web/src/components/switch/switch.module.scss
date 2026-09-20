@@ -1,0 +1,19 @@
+.main{
+
+    width: 44px;
+    height: 25px;
+    padding: 5px;
+    border-radius: 50px;
+    flex-shrink: 0;
+    transition: background-color 0.3s ease;
+
+    .circle{
+        width: 15px;
+        height: 15px;
+        border-radius: 100%;
+        background-color: white;
+        transition: transform 0.3s ease;
+        will-change: transform;
+    }
+
+}

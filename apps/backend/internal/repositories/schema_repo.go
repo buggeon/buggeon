@@ -42,18 +42,18 @@ func NewSchemaRepoWithDbName(dbName string) *SchemaRepo {
 	}
 }
 
-func (r *SchemaRepo) CreateSchema(schema *models.Schema) (primitive.ObjectID, error) {
+func (r *SchemaRepo) CreateSchema(ctx context.Context, schema *models.Schema) (primitive.ObjectID, error) {
 
-	_, err := r.collection.InsertOne(context.Background(), schema)
+	_, err := r.collection.InsertOne(ctx, schema)
 
 	return schema.ID, err
 
 }
 
-func (r *SchemaRepo) UpdateSchema(schemaID primitive.ObjectID, newSchemaRepo *models.Schema) error {
+func (r *SchemaRepo) UpdateSchema(ctx context.Context, schemaID primitive.ObjectID, newSchemaRepo *models.Schema) error {
 
 	_, err := r.collection.UpdateOne(
-		context.Background(),
+		ctx,
 		bson.M{"_id": schemaID},
 		bson.M{"$set": newSchemaRepo},
 	)
@@ -62,29 +62,29 @@ func (r *SchemaRepo) UpdateSchema(schemaID primitive.ObjectID, newSchemaRepo *mo
 
 }
 
-func (r *SchemaRepo) GetSchema(schemaID primitive.ObjectID) (models.Schema, error) {
+func (r *SchemaRepo) GetSchema(ctx context.Context, schemaID primitive.ObjectID) (models.Schema, error) {
 
 	var schema models.Schema
 
-	err := r.collection.FindOne(context.Background(), bson.M{"_id": schemaID}).Decode(&schema)
+	err := r.collection.FindOne(ctx, bson.M{"_id": schemaID}).Decode(&schema)
 
 	return schema, err
 
 }
 
-func (r *SchemaRepo) GetSchemas(projectID primitive.ObjectID) ([]models.Schema, error) {
+func (r *SchemaRepo) GetSchemas(ctx context.Context, projectID primitive.ObjectID) ([]models.Schema, error) {
 
 	var schemas []models.Schema
 
-	cursor, err := r.collection.Find(context.Background(), bson.M{"project_id": projectID})
+	cursor, err := r.collection.Find(ctx, bson.M{"project_id": projectID})
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer cursor.Close(context.TODO())
+	defer cursor.Close(ctx)
 
-	if err := cursor.All(context.TODO(), &schemas); err != nil {
+	if err := cursor.All(ctx, &schemas); err != nil {
 		return nil, err
 	}
 

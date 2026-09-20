@@ -45,7 +45,7 @@ func (h *UserHandler) Registration(c *gin.Context) {
 		return
 	}
 
-	tokenPair, err := h.userService.Register(&dto)
+	tokenPair, err := h.userService.Register(c, &dto)
 
 	if err != nil {
 		c.Status(403)
@@ -80,7 +80,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	response, err := h.userService.Login(&dto)
+	response, err := h.userService.Login(c, &dto)
 
 	if err != nil {
 
@@ -107,8 +107,6 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 func (h *UserHandler) RefreshAccessToken(c *gin.Context) {
 
-	fmt.Println("Начинаем обновление...")
-
 	refreshToken, err := c.Cookie("refreshToken")
 
 	if err != nil {
@@ -118,7 +116,7 @@ func (h *UserHandler) RefreshAccessToken(c *gin.Context) {
 		return
 	}
 
-	tokenPair, err := h.userService.RefreshAccessToken(refreshToken)
+	tokenPair, err := h.userService.RefreshAccessToken(c, refreshToken)
 
 	if err != nil {
 		fmt.Println(err)
@@ -141,4 +139,26 @@ func (h *UserHandler) RefreshAccessToken(c *gin.Context) {
 	http.SetCookie(c.Writer, cookie)
 
 	c.JSON(200, gin.H{"accessToken": tokenPair.AccessToken})
+}
+
+func (h *UserHandler) SetAvatar(c *gin.Context) {
+
+	avatar, err := c.FormFile("avatar")
+
+	if err != nil {
+		c.JSON(500, "Failed to upload avatar file")
+		return
+	}
+
+	userID, _ := c.Get("userID")
+
+	avatarUrl, err := h.userService.SetAvatar(c, userID.(string), avatar)
+
+	if err != nil {
+		c.Status(500)
+		return
+	}
+
+	c.JSON(200, gin.H{"avatarUrl": avatarUrl})
+
 }

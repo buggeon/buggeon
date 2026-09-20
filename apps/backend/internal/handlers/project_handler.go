@@ -88,7 +88,7 @@ func (h *ProjectHandler) SetProjectLogo(c *gin.Context) {
 		return
 	}
 
-	err = h.projectService.SetProjectLogo(projectID, file)
+	err = h.projectService.SetProjectLogo(c, projectID, file)
 
 	if err != nil {
 		c.JSON(500, "Failed to upload new logo file")
@@ -97,23 +97,11 @@ func (h *ProjectHandler) SetProjectLogo(c *gin.Context) {
 
 }
 
-func (h *ProjectHandler) SetProjectName(c *gin.Context) {
-
-}
-
-func (h *ProjectHandler) SetProjectDescription(c *gin.Context) {
-
-}
-
-func (h *ProjectHandler) SetProjectProgress(c *gin.Context) {
-
-}
-
 func (h *ProjectHandler) DeleteProject(c *gin.Context) {
 
 	projectID := c.Param("project_id")
 
-	_, err := h.projectService.DeleteProject(projectID)
+	_, err := h.projectService.DeleteProject(c, projectID)
 
 	if err != nil {
 		c.Status(403)
@@ -128,7 +116,7 @@ func (h *ProjectHandler) GetProject(c *gin.Context) {
 
 	projectID := c.Param("project_id")
 
-	if project, err := h.projectService.GetProject(projectID); err != nil {
+	if project, err := h.projectService.GetProject(c, projectID); err != nil {
 		c.Status(403)
 		c.Abort()
 		return
@@ -141,7 +129,7 @@ func (h *ProjectHandler) GetProjects(c *gin.Context) {
 
 	userID, _ := c.Get("userID")
 
-	projects, err := h.projectService.GetProjects(userID.(string))
+	projects, err := h.projectService.GetProjects(c, userID.(string))
 
 	if err != nil {
 		fmt.Println(err)
@@ -169,7 +157,7 @@ func (h *ProjectHandler) CreateBoard(c *gin.Context) {
 
 	dto.ProjectID = projectID
 
-	if _, err := h.boardService.CreateBoard(&dto); err != nil {
+	if _, err := h.boardService.CreateBoard(c, &dto); err != nil {
 
 		fmt.Println(err)
 
@@ -191,7 +179,7 @@ func (h *ProjectHandler) DeleteBoard(c *gin.Context) {
 	boardID := c.Param("board_id")
 	projectID := c.Param("project_id")
 
-	if _, err := h.boardService.DeleteBoard(projectID, boardID); err != nil {
+	if _, err := h.boardService.DeleteBoard(c, projectID, boardID); err != nil {
 		c.Status(403)
 		c.Abort()
 		return
@@ -204,7 +192,7 @@ func (h *ProjectHandler) GetBoard(c *gin.Context) {
 
 	boardID := c.Param("board_id")
 
-	if board, err := h.boardService.GetBoard(boardID); err != nil {
+	if board, err := h.boardService.GetBoard(c, boardID); err != nil {
 		c.Status(403)
 		c.Abort()
 		return
@@ -217,7 +205,7 @@ func (h *ProjectHandler) GetBoards(c *gin.Context) {
 
 	projectID := c.Param("project_id")
 
-	if boards, err := h.boardService.GetBoards(projectID); err != nil {
+	if boards, err := h.boardService.GetBoards(c, projectID); err != nil {
 		c.Status(403)
 		c.Abort()
 		return
@@ -242,7 +230,7 @@ func (h *ProjectHandler) CreateCard(c *gin.Context) {
 
 	dto.BoardID = boardID
 
-	if _, err := h.cardService.CreateCard(&dto); err != nil {
+	if _, err := h.cardService.CreateCard(c, &dto); err != nil {
 		fmt.Println(err)
 		c.Status(403)
 		c.Abort()
@@ -257,7 +245,7 @@ func (h *ProjectHandler) DeleteCard(c *gin.Context) {
 	cardID := c.Param("card_id")
 	boardID := c.Param("board_id")
 
-	if _, err := h.cardService.DeleteCard(boardID, cardID); err != nil {
+	if _, err := h.cardService.DeleteCard(c, boardID, cardID); err != nil {
 		c.Status(403)
 		c.Abort()
 		return
@@ -270,7 +258,7 @@ func (h *ProjectHandler) GetCard(c *gin.Context) {
 
 	cardID := c.Param("card_id")
 
-	if card, err := h.cardService.GetCard(cardID); err != nil {
+	if card, err := h.cardService.GetCard(c, cardID); err != nil {
 		c.Status(403)
 		c.Abort()
 		return
@@ -283,7 +271,7 @@ func (h *ProjectHandler) GetCards(c *gin.Context) {
 
 	boardID := c.Param("board_id")
 
-	if cards, err := h.cardService.GetCards(boardID); err != nil {
+	if cards, err := h.cardService.GetCards(c, boardID); err != nil {
 		c.Status(403)
 		c.Abort()
 		return
@@ -308,7 +296,7 @@ func (h *ProjectHandler) UpdateCardLocation(c *gin.Context) {
 		return
 	}
 
-	if err := h.cardService.UpdateCardLocation(cardID, oldBoardID, body.NewBoardId); err != nil {
+	if err := h.cardService.UpdateCardLocation(c, cardID, oldBoardID, body.NewBoardId); err != nil {
 		fmt.Println(err)
 		c.Status(500)
 		return
@@ -331,7 +319,7 @@ func (h *ProjectHandler) CreateMember(c *gin.Context) {
 
 	dto.ProjectID = projectID
 
-	if _, err := h.memberService.CreateMember(&dto); err != nil {
+	if _, err := h.memberService.CreateMember(c, &dto); err != nil {
 		fmt.Println(err)
 		c.Status(403)
 		c.Abort()
@@ -345,7 +333,7 @@ func (h *ProjectHandler) DeleteMember(c *gin.Context) {
 
 	memberID := c.Param("member_id")
 
-	if err := h.memberService.DeleteMember(memberID); err != nil {
+	if err := h.memberService.DeleteMember(c, memberID); err != nil {
 		c.Status(403)
 		c.Abort()
 		return
@@ -358,7 +346,7 @@ func (h *ProjectHandler) GetMember(c *gin.Context) {
 
 	memberID := c.Param("member_id")
 
-	if member, err := h.memberService.GetMember(memberID); err != nil {
+	if member, err := h.memberService.GetMember(c, memberID); err != nil {
 		c.Status(403)
 		c.Abort()
 		return
@@ -371,7 +359,7 @@ func (h *ProjectHandler) GetMembers(c *gin.Context) {
 
 	projectID := c.Param("project_id")
 
-	if members, err := h.memberService.GetMembers(projectID); err != nil {
+	if members, err := h.memberService.GetMembers(c, projectID); err != nil {
 		c.Status(403)
 		c.Abort()
 		return
@@ -397,7 +385,7 @@ func (h *ProjectHandler) NewMessage(c *gin.Context) {
 	dto.CardID = cardID
 	dto.SenderID = userID.(string)
 
-	if _, err := h.messageService.CreateMessage(dto); err != nil {
+	if _, err := h.messageService.CreateMessage(c, dto); err != nil {
 		c.Status(403)
 		c.Abort()
 		return
@@ -411,7 +399,7 @@ func (h *ProjectHandler) GetProjectSchemas(c *gin.Context) {
 
 	projectID := c.Param("project_id")
 
-	schemas, err := h.schemaService.GetSchemas(projectID)
+	schemas, err := h.schemaService.GetSchemas(c, projectID)
 
 	fmt.Println("===SCHEMAS===")
 	fmt.Println(schemas)
@@ -438,7 +426,7 @@ func (h *ProjectHandler) CreateProjectSchema(c *gin.Context) {
 
 	projectID := c.Param("project_id")
 
-	_, err := h.schemaService.CreateSchema(projectID, body.Direction, body.Url, body.Name, userID.(string))
+	_, err := h.schemaService.CreateSchema(c, projectID, body.Direction, body.Url, body.Name, userID.(string))
 
 	if err != nil {
 		c.Status(500)

@@ -42,8 +42,6 @@ function CreateProject({isModalVisible, setModalVisibility} : CreateProjectProps
 
     const handleCreateProjectButtonClick = async () => {
 
-        console.log("===CREATE PROJECT===")
-
         try {
             const result = await createProject({
                 variables: {

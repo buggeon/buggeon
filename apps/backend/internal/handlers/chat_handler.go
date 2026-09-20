@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"buggeon/internal/cache"
 	"buggeon/internal/dto"
 	"buggeon/internal/hub"
 	"buggeon/internal/services"
@@ -19,9 +20,14 @@ type ChatHandler struct {
 	messageService *services.MessageService
 	tokenService   *services.TokenService
 	upgrader       websocket.Upgrader
+	cache          *cache.UserCache
 }
 
-func NewChatHandler(messageService *services.MessageService, tokenService *services.TokenService) *ChatHandler {
+func NewChatHandler(
+	messageService *services.MessageService,
+	tokenService *services.TokenService,
+	cache *cache.UserCache,
+) *ChatHandler {
 
 	upgrader := websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool { return true },
@@ -32,6 +38,7 @@ func NewChatHandler(messageService *services.MessageService, tokenService *servi
 		hubs:           make(map[string]*hub.Hub),
 		messageService: messageService,
 		upgrader:       upgrader,
+		cache:          cache,
 	}
 }
 
@@ -40,7 +47,7 @@ func (h *ChatHandler) ServeWS(c *gin.Context) {
 	cardID := c.Param("cardId")
 	token := c.Query("token")
 
-	user, err := h.tokenService.ValidateAccessToken(token)
+	claims, err := h.tokenService.ValidateAccessToken(token)
 
 	if err != nil {
 		c.Status(401)
@@ -55,7 +62,9 @@ func (h *ChatHandler) ServeWS(c *gin.Context) {
 		return
 	}
 
-	client := hub.NewClient(conn, user.UserID, user.UserName, user.UserAvatarUrl)
+	userData := h.cache.Get(claims.UserID)
+
+	client := hub.NewClient(conn, claims.UserID, userData.Name, userData.AvatarUrl)
 
 	room := h.getOrCreateHub(cardID)
 
@@ -63,7 +72,7 @@ func (h *ChatHandler) ServeWS(c *gin.Context) {
 
 	go client.WritePump()
 	go client.ReadPump(room, func(cl *hub.Client, msg []byte) {
-		_, err := h.messageService.CreateMessage(dto.NewMessageDto{
+		_, err := h.messageService.CreateMessage(c, dto.NewMessageDto{
 			SenderID: cl.UserID,
 			CardID:   cardID,
 			Content:  string(msg),

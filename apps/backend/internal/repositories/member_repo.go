@@ -44,20 +44,20 @@ func NewMemberRepoWithDbName(dbName string) *MemberRepo {
 	}
 }
 
-func (r *MemberRepo) CreateMember(member *models.Member) (primitive.ObjectID, error) {
+func (r *MemberRepo) CreateMember(ctx context.Context, member *models.Member) (primitive.ObjectID, error) {
 
 	member.ID = primitive.NewObjectID()
 	member.CreatedAt = time.Now()
 
-	_, err := r.collection.InsertOne(context.TODO(), member)
+	_, err := r.collection.InsertOne(ctx, member)
 	return member.ID, err
 
 }
 
-func (r *MemberRepo) UpdateMember(memberID primitive.ObjectID, newMemberData *models.Member) error {
+func (r *MemberRepo) UpdateMember(ctx context.Context, memberID primitive.ObjectID, newMemberData *models.Member) error {
 
 	_, err := r.collection.UpdateOne(
-		context.Background(),
+		ctx,
 		bson.M{"_id": memberID},
 		bson.M{"$set": newMemberData},
 	)
@@ -66,9 +66,9 @@ func (r *MemberRepo) UpdateMember(memberID primitive.ObjectID, newMemberData *mo
 
 }
 
-func (r *MemberRepo) DeleteMember(memberID primitive.ObjectID) error {
+func (r *MemberRepo) DeleteMember(ctx context.Context, memberID primitive.ObjectID) error {
 
-	result, err := r.collection.DeleteOne(context.TODO(), bson.M{"_id": memberID})
+	result, err := r.collection.DeleteOne(ctx, bson.M{"_id": memberID})
 
 	if result.DeletedCount != 1 || err != nil {
 		return errors.New("Failed to delete card")
@@ -78,9 +78,9 @@ func (r *MemberRepo) DeleteMember(memberID primitive.ObjectID) error {
 
 }
 
-func (r *MemberRepo) DeleteMembers(projectID primitive.ObjectID) error {
+func (r *MemberRepo) DeleteMembers(ctx context.Context, projectID primitive.ObjectID) error {
 
-	result, err := r.collection.DeleteOne(context.TODO(), bson.M{"project_id": projectID})
+	result, err := r.collection.DeleteOne(ctx, bson.M{"project_id": projectID})
 
 	if result.DeletedCount != 1 || err != nil {
 		return errors.New("Failed to delete member")
@@ -90,29 +90,29 @@ func (r *MemberRepo) DeleteMembers(projectID primitive.ObjectID) error {
 
 }
 
-func (r *MemberRepo) GetMember(memberID primitive.ObjectID) (models.Member, error) {
+func (r *MemberRepo) GetMember(ctx context.Context, memberID primitive.ObjectID) (models.Member, error) {
 
 	var member models.Member
 
-	err := r.collection.FindOne(context.TODO(), bson.M{"_id": memberID}).Decode(&member)
+	err := r.collection.FindOne(ctx, bson.M{"_id": memberID}).Decode(&member)
 
 	return member, err
 
 }
 
-func (r *MemberRepo) GetMembers(projectID primitive.ObjectID) ([]models.Member, error) {
+func (r *MemberRepo) GetMembersByProjectID(ctx context.Context, projectID primitive.ObjectID) ([]models.Member, error) {
 
 	var members []models.Member
 
-	cursor, err := r.collection.Find(context.TODO(), bson.M{"project_id": projectID})
+	cursor, err := r.collection.Find(ctx, bson.M{"project_id": projectID})
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer cursor.Close(context.TODO())
+	defer cursor.Close(ctx)
 
-	if err := cursor.All(context.TODO(), &members); err != nil {
+	if err := cursor.All(ctx, &members); err != nil {
 		return nil, err
 	}
 
@@ -120,20 +120,51 @@ func (r *MemberRepo) GetMembers(projectID primitive.ObjectID) ([]models.Member, 
 
 }
 
-func (r *MemberRepo) GetProjectsIDsByUser(userID primitive.ObjectID) ([]primitive.ObjectID, error) {
+func (r *MemberRepo) GetMembersByIDs(ctx context.Context, memberIDs []primitive.ObjectID) ([]models.Member, error) {
 
-	filter := bson.M{"user_id": userID}
-	cursor, err := r.collection.Find(context.TODO(), filter)
+	if len(memberIDs) == 0 {
+		return []models.Member{}, nil
+	}
+
+	cursor, err := r.collection.Find(
+		ctx,
+		bson.M{
+			"_id": bson.M{
+				"$in": memberIDs,
+			},
+		},
+	)
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer cursor.Close(context.TODO())
+	defer cursor.Close(ctx)
 
 	var members []models.Member
 
-	if err := cursor.All(context.TODO(), &members); err != nil {
+	if err := cursor.All(ctx, &members); err != nil {
+		return nil, err
+	}
+
+	return members, nil
+
+}
+
+func (r *MemberRepo) GetProjectsIDsByUser(ctx context.Context, userID primitive.ObjectID) ([]primitive.ObjectID, error) {
+
+	filter := bson.M{"user_id": userID}
+	cursor, err := r.collection.Find(ctx, filter)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer cursor.Close(ctx)
+
+	var members []models.Member
+
+	if err := cursor.All(ctx, &members); err != nil {
 		return nil, err
 	}
 

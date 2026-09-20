@@ -44,21 +44,21 @@ func NewBoardRepoWithDbName(dbName string) *BoardRepo {
 	}
 }
 
-func (r *BoardRepo) CreateBoard(board *models.Board) (primitive.ObjectID, error) {
+func (r *BoardRepo) CreateBoard(ctx context.Context, board *models.Board) (primitive.ObjectID, error) {
 
 	board.ID = primitive.NewObjectID()
 	board.CreatedAt = time.Now()
 	board.UpdatedAt = time.Now()
 
-	_, err := r.collection.InsertOne(context.TODO(), board)
+	_, err := r.collection.InsertOne(ctx, board)
 	return board.ID, err
 
 }
 
-func (r *BoardRepo) UpdateBoard(boardID primitive.ObjectID, newBoardData *models.Board) error {
+func (r *BoardRepo) UpdateBoard(ctx context.Context, boardID primitive.ObjectID, newBoardData *models.Board) error {
 
 	_, err := r.collection.UpdateOne(
-		context.Background(),
+		ctx,
 		bson.M{"_id": boardID},
 		bson.M{"$set": newBoardData},
 	)
@@ -67,9 +67,9 @@ func (r *BoardRepo) UpdateBoard(boardID primitive.ObjectID, newBoardData *models
 
 }
 
-func (r *BoardRepo) DeleteBoard(boardID primitive.ObjectID) error {
+func (r *BoardRepo) DeleteBoard(ctx context.Context, boardID primitive.ObjectID) error {
 
-	result, err := r.collection.DeleteOne(context.TODO(), bson.M{"_id": boardID})
+	result, err := r.collection.DeleteOne(ctx, bson.M{"_id": boardID})
 
 	if result.DeletedCount != 1 || err != nil {
 		return errors.New("Failed to delete board")
@@ -79,9 +79,9 @@ func (r *BoardRepo) DeleteBoard(boardID primitive.ObjectID) error {
 
 }
 
-func (r *BoardRepo) DeleteBoards(projectID primitive.ObjectID) error {
+func (r *BoardRepo) DeleteBoards(ctx context.Context, projectID primitive.ObjectID) error {
 
-	result, err := r.collection.DeleteOne(context.TODO(), bson.M{"project_id": projectID})
+	result, err := r.collection.DeleteOne(ctx, bson.M{"project_id": projectID})
 
 	if result.DeletedCount != 1 || err != nil {
 		return errors.New("Failed to delete boards")
@@ -91,29 +91,29 @@ func (r *BoardRepo) DeleteBoards(projectID primitive.ObjectID) error {
 
 }
 
-func (r *BoardRepo) GetBoard(boardID primitive.ObjectID) (models.Board, error) {
+func (r *BoardRepo) GetBoard(ctx context.Context, boardID primitive.ObjectID) (models.Board, error) {
 
 	var board models.Board
 
-	err := r.collection.FindOne(context.TODO(), bson.M{"_id": boardID}).Decode(&board)
+	err := r.collection.FindOne(ctx, bson.M{"_id": boardID}).Decode(&board)
 
 	return board, err
 
 }
 
-func (r *BoardRepo) GetBoards(projectID primitive.ObjectID) ([]models.Board, error) {
+func (r *BoardRepo) GetBoardsByProjectID(ctx context.Context, projectID primitive.ObjectID) ([]models.Board, error) {
 
 	var boards []models.Board
 
-	cursor, err := r.collection.Find(context.TODO(), bson.M{"project_id": projectID})
+	cursor, err := r.collection.Find(ctx, bson.M{"project_id": projectID})
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer cursor.Close(context.TODO())
+	defer cursor.Close(ctx)
 
-	if err := cursor.All(context.TODO(), &boards); err != nil {
+	if err := cursor.All(ctx, &boards); err != nil {
 		return nil, err
 	}
 
@@ -121,23 +121,54 @@ func (r *BoardRepo) GetBoards(projectID primitive.ObjectID) ([]models.Board, err
 
 }
 
-func (r *BoardRepo) AddCard(boardID, cardID primitive.ObjectID) error {
+func (r *BoardRepo) GetBoardsByIDs(ctx context.Context, boardIDs []primitive.ObjectID) ([]models.Board, error) {
+
+	if len(boardIDs) == 0 {
+		return []models.Board{}, nil
+	}
+
+	cursor, err := r.collection.Find(
+		ctx,
+		bson.M{
+			"_id": bson.M{
+				"$in": boardIDs,
+			},
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer cursor.Close(ctx)
+
+	var boards []models.Board
+
+	if err := cursor.All(ctx, &boards); err != nil {
+		return nil, err
+	}
+
+	return boards, nil
+
+}
+
+func (r *BoardRepo) AddCard(ctx context.Context, boardID, cardID primitive.ObjectID) error {
 
 	filter := bson.M{"_id": boardID}
 	update := bson.M{"$push": bson.M{"cards": cardID}}
 
-	_, err := r.collection.UpdateOne(context.TODO(), filter, update)
+	_, err := r.collection.UpdateOne(ctx, filter, update)
 
 	return err
 
 }
 
-func (r *BoardRepo) DeleteCard(boardID, cardID primitive.ObjectID) error {
+func (r *BoardRepo) DeleteCard(ctx context.Context, boardID, cardID primitive.ObjectID) error {
 
 	filter := bson.M{"_id": boardID}
 	update := bson.M{"$pull": bson.M{"cards": cardID}}
 
-	_, err := r.collection.UpdateOne(context.TODO(), filter, update)
+	_, err := r.collection.UpdateOne(ctx, filter, update)
 
 	return err
 

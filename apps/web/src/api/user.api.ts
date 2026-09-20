@@ -4,7 +4,7 @@ import api from './api'
 
 class UserApi {
 
-    static async login(login : string, password : string) : Promise<User> {
+    async login(login : string, password : string) : Promise<User> {
         try{
             const result = await api.post(`/auth/login`, {
                 login: login,
@@ -32,7 +32,7 @@ class UserApi {
         }
     }
 
-    static async regist(login : string, password : string, email : string, name : string) : Promise<User> {
+    async regist(login : string, password : string, email : string, name : string) : Promise<User> {
 
         try{
 
@@ -49,13 +49,11 @@ class UserApi {
 
                 const userData = decodeJwt(result.data.accessToken)
 
-                console.log(userData)
-
                 return {
-                    id: userData.user_id as string,
-                    name: userData.user_name as string,
-                    login: userData.user_login as string,
-                    email: userData.user_email as string,
+                    id: userData.userId as string,
+                    name: name,
+                    login: login,
+                    email: email,
                     avatarUrl: ""
                 }
 
@@ -68,6 +66,30 @@ class UserApi {
 
     }
 
+    async setAvatar(userId : string, avatar : File) : Promise<string> {
+
+        const formData = new FormData()
+        formData.append("avatar", avatar)
+
+        try{
+
+            const response = await api.patch(`/api/users/${userId}/avatar`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            })
+
+            return response.data.avatarUrl
+
+        }
+        catch(e) {
+            throw new Error(e)
+        }
+
+    }
+
 }
 
-export default UserApi
+const userApi = new UserApi()
+
+export default userApi

@@ -63,6 +63,12 @@ import { TrashIcon } from './trash/trash'
 import { SmileIcon } from './smile/smile'
 import { SendIcon } from './send/send'
 import { MessageIcon } from './message/message'
+import { ShieldIcon } from './shield/shield'
+import { SunIcon } from './sun/sun'
+import { RefreshIcon } from './refresh/refresh'
+import { ComputerIcon } from './computer/computer'
+import { AtSignIcon } from './atsign/atsign'
+import { EditIcon } from './edit/edit'
 
 type IconProps = SVGProps<SVGSVGElement>
 
@@ -131,6 +137,12 @@ class Icons {
     static Smile(props: IconProps) { return <SmileIcon {...props} /> }
     static Send(props: IconProps) { return <SendIcon {...props} /> }
     static Message(props: IconProps) { return <MessageIcon {...props} />  }
+    static Shield(props: IconProps) { return <ShieldIcon {...props} /> }
+    static Sun(props: IconProps) { return <SunIcon {...props} /> }
+    static Refresh(props: IconProps) { return <RefreshIcon {...props} /> }
+    static Computer(props: IconProps) { return <ComputerIcon {...props} /> }
+    static AtSign(props: IconProps) { return <AtSignIcon {...props} /> }
+    static Edit(props: IconProps) { return <EditIcon {...props} /> }
 }
 
 export default Icons

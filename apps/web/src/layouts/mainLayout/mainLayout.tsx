@@ -4,11 +4,15 @@ import Sidebar from "../../components/sidebar/sidebar";
 import styles from './mainLayout.module.scss'
 import Icons from "../../assets/icons";
 import { useMemo } from "react";
+import themeDict from "../../dicts/theme";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store/slices";
 
 function MainLayout({children, title, description, isModal = false}) {
     
     const globalLocation = useLocation().pathname.split("/")[1]
     const locationParts = useLocation().pathname.split("/")
+    const appearanceState = useSelector((state : RootState) => state.appearance)
     const navigator = useNavigate()
     const { projectId } = useParams()
 
@@ -50,7 +54,7 @@ function MainLayout({children, title, description, isModal = false}) {
 
     return (
         
-        <section className={styles.app}>
+        <section className={styles.app} style={{backgroundColor: themeDict[appearanceState.theme].backgroundColor}}>
             <Sidebar tabs={globalLocation == "dashboard" ? dashboardMenuItems : projectControlPanelMenuItems} className={styles.sidebar}/>
             <section className={styles.screen}>
                 <div className={styles.header}>

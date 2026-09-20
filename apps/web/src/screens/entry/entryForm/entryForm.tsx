@@ -75,24 +75,21 @@ function EntryForm({mode, changeMode, className} : {mode : "regist" | "auth", ch
             </div>
             {
                 mode == "auth" 
-                ? <div className={styles.inputBlock}>
-                    <StandartInput isNecessary title='Login' prefixIcon={<Icons.Mail width={20} height={20} color='#FFFFFF'/>} placeholder='Enter your login ( starts with "@" )' onChange={(text => handleLoginChange(text))} value={login}/>
-                    <StandartInput isNecessary title='Password' prefixIcon={<Icons.Lock width={20} height={20} color='#FFFFFF'/>} suffixIcon={isPasswordVisible ? <Icons.EyeOff width={20} height={20} color='#FFFFFF'/> : <Icons.Eye width={20} height={20} color='#FFFFFF'/>} placeholder='Enter your password' onChange={(text => setPassword(text))} onSuffixClick={() => {
-                        setPasswordVisibility(!isPasswordVisible)
-                    }} type={!isPasswordVisible && 'password'}/>
-                </div>
-                : <div className={styles.inputBlock}>
-                    <StandartInput title='Name' prefixIcon={<Icons.PersonOutline width={20} height={20} color="#FFFFFF"/>} placeholder='Enter your name' onChange={(text) => setName(text)}/>
-                    <StandartInput title='Login' prefixIcon={<Icons.Mail width={20} height={20} color="#FFFFFF"/>} placeholder='Invite a login' onChange={(text) => setLogin(text)}/>
-                    <StandartInput title='Email' prefixIcon={<Icons.PersonOutline width={20} height={20} color="#FFFFFF"/>} placeholder='Enter your contact email' onChange={(text) => setEmail(text)} value={email}/>
-                    <StandartInput title='Password' prefixIcon={<Icons.Lock width={20} height={20} color="#FFFFFF"/>} suffixIcon={isPasswordVisible ? <Icons.EyeOff width={20} height={20} color='#FFFFFF'/> : <Icons.Eye width={20} height={20} color='#FFFFFF'/>} placeholder='Create a strong password' onSuffixClick={() => {
-                        setPasswordVisibility(!isPasswordVisible)
-                    }} type={!isPasswordVisible && 'password'} onChange={(text) => setPassword(text)}/>
-            </div>
+                    ?   <div className={styles.inputBlock}>
+                            <StandartInput isNecessary title='Login' prefixIcon={<Icons.Mail width={20} height={20} color='#FFFFFF'/>} placeholder='Enter your login ( starts with "@" )' onChange={(text => handleLoginChange(text))} value={login}/>
+                            <StandartInput isNecessary title='Password' prefixIcon={<Icons.Lock width={20} height={20} color='#FFFFFF'/>} suffixIcon={isPasswordVisible ? <Icons.EyeOff width={20} height={20} color='#FFFFFF'/> : <Icons.Eye width={20} height={20} color='#FFFFFF'/>} placeholder='Enter your password' onChange={(text => setPassword(text))} onSuffixClick={() => {
+                                setPasswordVisibility(!isPasswordVisible)
+                            }} type={!isPasswordVisible && 'password'}/>
+                        </div>
+                    :   <div className={styles.inputBlock}>
+                            <StandartInput title='Name' prefixIcon={<Icons.PersonOutline width={20} height={20} color="#FFFFFF"/>} placeholder='Enter your name' onChange={(text) => setName(text)}/>
+                            <StandartInput title='Login' prefixIcon={<Icons.Mail width={20} height={20} color="#FFFFFF"/>} placeholder='Invite a login' onChange={(text) => setLogin(text)}/>
+                            <StandartInput title='Email' prefixIcon={<Icons.PersonOutline width={20} height={20} color="#FFFFFF"/>} placeholder='Enter your contact email' onChange={(text) => setEmail(text)} value={email}/>
+                            <StandartInput title='Password' prefixIcon={<Icons.Lock width={20} height={20} color="#FFFFFF"/>} suffixIcon={isPasswordVisible ? <Icons.EyeOff width={20} height={20} color='#FFFFFF'/> : <Icons.Eye width={20} height={20} color='#FFFFFF'/>} placeholder='Create a strong password' onSuffixClick={() => {
+                                setPasswordVisibility(!isPasswordVisible)
+                            }} type={!isPasswordVisible && 'password'} onChange={(text) => setPassword(text)}/>
+                        </div>
             }
-            <div>
-
-            </div>
             <button className={styles.entryButton} onClick={async () => {
                 
                 if(mode == "auth") {
@@ -105,8 +102,9 @@ function EntryForm({mode, changeMode, className} : {mode : "regist" | "auth", ch
                                 id: result.id,
                                 name: result.name,
                                 login: result.login,
+                                email: result.email,
                                 avatarUrl: result.avatarUrl
-                            } as User))
+                            }))
                             setLoading(false)
                             navigate("/dashboard/profile")
                         }
@@ -124,6 +122,7 @@ function EntryForm({mode, changeMode, className} : {mode : "regist" | "auth", ch
                                 id: result.id,
                                 name: result.name,
                                 login: result.login,
+                                email: result.email,
                                 avatarUrl: result.avatarUrl
                             } as User))
                             setLoading(false)
