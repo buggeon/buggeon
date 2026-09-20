@@ -10,7 +10,7 @@ RUN npm run build
 
 # -------------------------------------------------------------#
 
-FROM golang:1.26.5-alpine AS builder
+FROM golang:1.26.5-alpine AS go-builder
 
 RUN apk add --no-cache \
     git \
