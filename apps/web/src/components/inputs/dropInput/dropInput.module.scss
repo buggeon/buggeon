@@ -8,7 +8,7 @@
 
     .subtitle {
         font-size: 14px;
-        color: var(--dark-grey)
+        color: var(--color-text)
     }
 
     .title {
@@ -28,7 +28,7 @@
         }
 
         .necessaryPrompt {
-            color: var(--dark-grey);
+            color: var(--color-text);
             font-size: 12px;
             margin: 0;
         }
@@ -42,7 +42,7 @@
         padding: 0 12px;
         border-radius: 10px;
         background-color: transparent;
-        border: 1px solid var(--dark-grey);
+        border: 1px solid var(--color-text);
         gap: 10px;
         transition: border-color 0.2s;
         min-height: 40px;
@@ -72,7 +72,7 @@
             min-height: 40px;
 
             &::placeholder {
-                color: var(--dark-grey);
+                color: var(--color-text);
             }
         }
     }
@@ -82,9 +82,8 @@
         top: calc(75% + 4px);
         left: 0;
         right: 0;
-        background-color: var(--dark-foreground);
         border-radius: 10px;
-        border: 1px solid var(--dark-grey);
+        border: 1px solid var(--color-text);
         max-height: 200px;
         overflow-y: auto;
         z-index: 1000;
@@ -106,7 +105,7 @@
         .emptyState {
             padding: 10px 16px;
             text-align: center;
-            color: var(--dark-grey);
+            color: var(--color-text);
         }
     }
 }

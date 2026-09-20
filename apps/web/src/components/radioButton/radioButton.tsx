@@ -15,7 +15,7 @@ function RadioButton({value, onChange} : RadioButtonProps) {
             backgroundColor: value ? "white" : "transparent",
             borderStyle: "solid",
             borderWidth: value ? 5 : 0.5,
-            borderColor: value ? "var(--foreground-purple)" : "var(--light-grey)",
+            borderColor: value ? "var(--color-accent)" : "var(--color-bg)",
             cursor: 'pointer',
             transition: 'none',
             transform: 'none',

@@ -2,7 +2,7 @@
     display: flex;
     width: 100%;
     height: 100%;
-    background-color: var(--dark-background);
+    background-color: var(--color-bg);
     overflow-y: hidden;
 
     .sidebar{
@@ -56,7 +56,7 @@
                     gap: 10px;
 
                     button{
-                        background-color: #0f1725;
+                        background-color: var(--color-bg-elevated);
                         border: none;
                         display: flex;
                         justify-content: center;
@@ -64,6 +64,10 @@
                         width: 40px;
                         height: 40px;
                         border-radius: 10px;
+
+                        svg{
+                            color: var(--color-text)
+                        }
                     }
                 }
             }

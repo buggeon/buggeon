@@ -18,17 +18,17 @@ function MainLayout({children, title, description, isModal = false}) {
 
     const projectControlPanelMenuItems = useMemo<ISidebarMenuItem[]>(() => [
         {
-            icon: <Icons.HomeOutline width={20} height={20} color="#FFFFFF"/>,
+            icon: <Icons.HomeOutline width={20} height={20} color="var(--color-text"/>,
             label: "Overview",
             path: `/project/${projectId}/overview`
         },
         {
-            icon: <Icons.BoardOutline width={20} height={20} color="#FFFFFF"/>,
+            icon: <Icons.BoardOutline width={20} height={20} color="var(--color-text"/>,
             label: "Boards",
             path: `/project/${projectId}/boards`
         },
         {
-            icon: <Icons.SettingsOutline width={20} height={20} color="#FFFFFF"/>,
+            icon: <Icons.SettingsOutline width={20} height={20} color="var(--color-text"/>,
             label: "Settings",
             path: `/project/${projectId}/settings`
         },
@@ -36,17 +36,17 @@ function MainLayout({children, title, description, isModal = false}) {
 
     const dashboardMenuItems =  useMemo<ISidebarMenuItem[]>(() => [
             {
-                icon: <Icons.HomeOutline width={20} height={20} color="#FFFFFF"/>,
+                icon: <Icons.HomeOutline width={20} height={20} color="var(--color-text"/>,
                 label: "Profile",
                 path: "/dashboard/profile"
             },
             {
-                icon: <Icons.FoldersOutline width={20} height={20} color="#FFFFFF"/>,
+                icon: <Icons.FoldersOutline width={20} height={20} color="var(--color-text"/>,
                 label: "Projects",
                 path: "/dashboard/projects"
             },
             {
-                icon: <Icons.SettingsOutline width={20} height={20} color="#FFFFFF"/>,
+                icon: <Icons.SettingsOutline width={20} height={20} color="var(--color-text"/>,
                 label: "Settings",
                 path: "/dashboard/settings"
             },
@@ -54,7 +54,7 @@ function MainLayout({children, title, description, isModal = false}) {
 
     return (
         
-        <section className={styles.app} style={{backgroundColor: themeDict[appearanceState.theme].backgroundColor}}>
+        <section className={styles.app}>
             <Sidebar tabs={globalLocation == "dashboard" ? dashboardMenuItems : projectControlPanelMenuItems} className={styles.sidebar}/>
             <section className={styles.screen}>
                 <div className={styles.header}>
@@ -78,9 +78,8 @@ function MainLayout({children, title, description, isModal = false}) {
                         </div>
                     </div>
                     <h1>{title}</h1>
-                    <p style={{color: "var(--light-grey)"}}>{description}</p>
+                    <p style={{color: "var(--color-text)"}}>{description}</p>
                 </div>
-                {/* <Outlet/> */}
                 {children}
             </section>
         </section>

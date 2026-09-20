@@ -14,7 +14,7 @@ function SidebarMenuItem({itemData, selected = false} : {itemData : ISidebarMenu
     return(
         <div className={`${styles.item} ${selected && styles.selected}`} onClick={() => navigate(itemData.path)}>
             {itemData.icon}
-            <p className={styles.label}>{itemData.label}</p>
+            <p>{itemData.label}</p>
         </div>
     )
 }

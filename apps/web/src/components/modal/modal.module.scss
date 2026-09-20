@@ -8,7 +8,7 @@
     z-index: 100;
 
     .form{
-        background-color: var(--dark-foreground);
+        background-color: var(--color-bg);
         border-radius: 10px;
         display: flex;
         flex-direction: column;
@@ -23,6 +23,10 @@
 
             p{
                 font-weight: 500;
+            }
+
+            svg{
+                color: var(--color-text)
             }
 
             .cross:hover{
@@ -40,7 +44,6 @@
             button{
                 padding-left: 15px;
                 padding-right: 15px;
-                color: white;
                 height: 35px;
                 border-width: 0;
                 border-radius: 5px;
@@ -49,12 +52,14 @@
                 &:first-child{
                     background-color: transparent;
                     border-width: 0.5px;
-                    border-color: var(--dark-grey);
+                    border-color: var(--color-text);
                     border-style: solid;
+                    color: var(--color-text);
                 }
 
                 &:last-child{
-                    background-color: var(--foreground-purple);
+                    background-color: var(--color-accent);
+                    color: var(--color-bg);
                 }
             }
         }

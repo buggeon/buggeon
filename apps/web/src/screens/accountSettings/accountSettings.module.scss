@@ -8,6 +8,7 @@
         padding: 20px;
         width: 100%;
         border-radius: 10px;
+        background-color: var(--color-bg-elevated);
 
         header{
             display: flex;
@@ -26,7 +27,7 @@
                     }
 
                     .description{
-                        color: var(--light-grey);
+                        color: var(--color-text);
                     }
                 }
             }
@@ -42,6 +43,8 @@
             padding-right: 15px;
             font-size: 16px;
             font-weight: 500;
+            background-color: var(--color-accent);
+            color: white;
         }
 
         .avatar{
@@ -70,14 +73,11 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background-color: var(--dark-background);
+                background-color: var(--color-accent);
                 border-radius: 100%;
                 padding: 5px;
                 bottom: 0;
                 right: 0;
-                border-style: solid;
-                border-width: 1px;
-                border-color: var(--light-grey);
             }
         }
 
@@ -122,7 +122,6 @@
                         }
 
                         .notificationSettingsItemDescription{
-                            color: var(--light-grey);
                             font-size: 14px;
                         }
                     }
@@ -147,9 +146,8 @@
 
                 .themeItem{
                     border-radius: 10px;
-                    border-color: var(--dark-grey);
                     border-style: solid;
-                    border-width: 0.5px;
+                    border-width: 2px;
                     width: 100%;
                     height: 80px;
                     padding: 10px;
@@ -189,14 +187,14 @@
     .securityBlock{
 
         .changePasswordButton{
-            border-width: 0.5px;
-            border-style: solid;
+            border: none;
             border-radius: 10px;
-            background-color: transparent;
+            background-color: var(--color-accent);
             padding-left: 15px;
             padding-right: 15px;
             font-size: 16px;
             font-weight: 500;
+            color: white;
         }
 
         display: flex;
@@ -222,7 +220,6 @@
                         font-weight: 700;
                     }
                     p:last-of-type{
-                        color: var(--light-grey);
                         font-size: 14px;   
                     }
                 }

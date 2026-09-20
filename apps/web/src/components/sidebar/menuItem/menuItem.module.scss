@@ -10,7 +10,15 @@
 
 
     &.selected{
-        background-color: #4034a0;
+        background-color: var(--color-accent);
+
+        svg{
+            color: white;
+        }
+
+        p{
+            color: white;
+        }
 
         &:hover{
             cursor: pointer;
@@ -18,13 +26,9 @@
     }
 
     &:not(.selected):hover{
-        background-color: #5b4ae24b;
+        background-color: var(--color-fade-accent);
         cursor: pointer;
     }
-}
-
-.label{
-    color: white;
 }
 
 .icon{
