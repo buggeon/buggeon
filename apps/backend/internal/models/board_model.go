@@ -29,7 +29,6 @@ type Board struct {
 	CardsStatus string               `bson:"cards_status" json:"cardsStatus"`
 	ProjectID   primitive.ObjectID   `bson:"project_id" json:"projectId"`
 	Direction   string               `bson:"direction" json:"direction"`
-	ThemeColor  string               `bson:"theme_color" json:"themeColor"`
 	CreatedAt   time.Time            `bson:"created_at" json:"createdAt"`
 	UpdatedAt   time.Time            `bson:"updated_at" json:"updatedAt"`
 }

@@ -1,8 +1,9 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { refreshAccessToken } from "../utils/resreshToken";
+import API_URL from '../../config'
 
 const api = axios.create({
-    baseURL: `http://${import.meta.env.VITE_API_URL}`,
+    baseURL: API_URL,
     withCredentials: true
 })
 

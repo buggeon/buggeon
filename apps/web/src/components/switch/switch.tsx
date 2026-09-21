@@ -10,13 +10,11 @@ export interface SwitchProps {
 
 function Switch({enabled, onChange} : SwitchProps) {
 
-    const appearanceState = useSelector((state : RootState) => state.appearance)
-
     return(
 
         <div
             className={styles.main}
-            style={{backgroundColor: enabled ? appearanceState.accentColor : themeDict[appearanceState.theme].backgroundColor}}
+            style={{backgroundColor: enabled ? "var(--color-accent)" : "var(--color-bg-elevated)"}}
             onClick={onChange}
         >
             <div    

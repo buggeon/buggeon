@@ -11,12 +11,11 @@ function Sidebar({tabs, className} : {tabs : ISidebarMenuItem[], className? : st
 
     const location = useLocation().pathname
     const user = useSelector((state : RootState) => state.user)
-    const appearanceState = useSelector((state : RootState) => state.appearance)
-
+    
     return(
-        <section className={`${styles.sidebar} ${className}`} style={{backgroundColor: themeDict[appearanceState.theme].foregroundColor}}>
+        <section className={`${styles.sidebar} ${className}`}>
             <header>
-                <LogoIcon width={30} height={30}/>
+                <LogoIcon width={30} height={30} color="var(--color-accent)"/>
                 <h2>Buggeon</h2>
             </header>
             <ul>
@@ -29,10 +28,10 @@ function Sidebar({tabs, className} : {tabs : ISidebarMenuItem[], className? : st
                 }
             </ul>
 
-            <section className={styles.account} style={{backgroundColor: themeDict[appearanceState.theme].backgroundColor}}>
+            <section className={styles.account}>
                 <img src={user.avatarUrl} className={styles.accountAvatar}/>
                 <div className={styles.accountPersonalInfo}>
-                    <p className={styles.accountName}>{user.name}</p>
+                    <p>{user.name}</p>
                     <p className={styles.accountLogin}>{user.login}</p>
                 </div>
             </section>

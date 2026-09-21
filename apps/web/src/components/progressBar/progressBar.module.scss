@@ -3,7 +3,7 @@
 
     .emptyProgressBar{  
         margin: 0;
-        background-color: #192135;
+        background-color: var(--color-bg);
         height: 5px;
         border-radius: 10px;
         border-style: none;

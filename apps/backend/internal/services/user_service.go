@@ -48,22 +48,22 @@ func NewUserService(
 	}
 }
 
-func (s *UserService) Register(ctx context.Context, dto *dto.UserRegistrationDto) (models.TokenResponse, error) {
+func (s *UserService) Register(ctx context.Context, loginDto *dto.UserRegistrationDto) (dto.UserAuthResponseDto, error) {
 
-	passwordHash, err := security.HashPassword(dto.Password)
+	passwordHash, err := security.HashPassword(loginDto.Password)
 
 	if err != nil {
-		return models.TokenResponse{}, err
+		return dto.UserAuthResponseDto{}, err
 	}
 
 	userID := primitive.NewObjectID()
 
 	user := &models.User{
 		ID:        userID,
-		Name:      dto.Name,
-		Email:     dto.Email,
+		Name:      loginDto.Name,
+		Email:     loginDto.Email,
 		AvatarUrl: "",
-		Login:     dto.Login,
+		Login:     loginDto.Login,
 		Password:  passwordHash,
 		Role:      "user",
 	}
@@ -71,40 +71,52 @@ func (s *UserService) Register(ctx context.Context, dto *dto.UserRegistrationDto
 	tokenPair, err := s.tokenService.GenerateTokensPair(userID.Hex())
 
 	if err != nil {
-		return models.TokenResponse{}, err
+		return dto.UserAuthResponseDto{}, err
 	}
 
 	user.RefreshTokens = []string{tokenPair.RefreshToken}
 
 	s.userRepo.CreateUser(ctx, user)
 
-	return tokenPair, nil
+	return dto.UserAuthResponseDto{
+		Tokens:    tokenPair,
+		Name:      user.Name,
+		Login:     user.Login,
+		Email:     user.Email,
+		AvatarUrl: user.AvatarUrl,
+	}, nil
 
 }
 
-func (s *UserService) Login(ctx context.Context, dto *dto.UserLoginDto) (models.TokenResponse, error) {
+func (s *UserService) Login(ctx context.Context, loginDto *dto.UserLoginDto) (dto.UserAuthResponseDto, error) {
 
-	user, err := s.userRepo.GetByLogin(ctx, dto.Login)
+	user, err := s.userRepo.GetByLogin(ctx, loginDto.Login)
 
 	if err != nil {
-		return models.TokenResponse{}, err
+		return dto.UserAuthResponseDto{}, err
 	}
 
-	verificationResult, _ := security.VerifyPassword(dto.Password, user.Password)
+	verificationResult, _ := security.VerifyPassword(loginDto.Password, user.Password)
 
 	if verificationResult == true {
 
 		tokensPair, err := s.tokenService.GenerateTokensPair(user.ID.Hex())
 
 		if err != nil {
-			return models.TokenResponse{}, err
+			return dto.UserAuthResponseDto{}, err
 		}
 
-		return tokensPair, s.userRepo.AddRefreshToken(ctx, user.ID, tokensPair.RefreshToken)
+		return dto.UserAuthResponseDto{
+			Tokens:    tokensPair,
+			Name:      user.Name,
+			Login:     user.Login,
+			Email:     user.Email,
+			AvatarUrl: user.AvatarUrl,
+		}, s.userRepo.AddRefreshToken(ctx, user.ID, tokensPair.RefreshToken)
 
 	}
 
-	return models.TokenResponse{}, errors.New("Unathorized")
+	return dto.UserAuthResponseDto{}, errors.New("Unathorized")
 
 }
 

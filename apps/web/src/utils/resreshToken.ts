@@ -1,4 +1,5 @@
 import axios from 'axios'
+import API_URL from '../../config'
 
 let isRefreshing = false
 let failedQueue: Array<{
@@ -27,7 +28,7 @@ export const refreshAccessToken = (): Promise<string> => {
         isRefreshing = true
 
         axios.post(
-            `http://${import.meta.env.VITE_API_URL}/auth/refreshtoken`,
+            `${API_URL}/auth/refreshtoken`,
             {},
             { withCredentials: true }
         )

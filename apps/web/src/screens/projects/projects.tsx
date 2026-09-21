@@ -132,7 +132,7 @@ function ProjectsScreen() {
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <p>{project.progress}%</p>
+                                                    <p style={{marginBottom: 5}}>{project.progress}%</p>
                                                     <ProgressBar progress={project.progress} color="var(--foreground-blue)" className={styles.progressBar}/>
                                                 </td>
                                                 <td>
@@ -149,7 +149,7 @@ function ProjectsScreen() {
                                 <Icons.Arrow width={20} height={20} color="#b7becc"/>
                             </button>
                             <div className={styles.pagNumber}>
-                                <p>{page}</p>
+                                <p style={{color: "white"}}>{page}</p>
                             </div>
                             <button>
                                 <Icons.Arrow width={20} height={20} color="#b7becc"/>

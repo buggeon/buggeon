@@ -3,10 +3,9 @@
 package gqlinput
 
 type CreateBoardInput struct {
-	Name        string  `json:"name"`
-	Direction   string  `json:"direction"`
-	ThemeColor  *string `json:"themeColor,omitempty"`
-	CardsStatus string  `json:"cardsStatus"`
+	Name        string `json:"name"`
+	Direction   string `json:"direction"`
+	CardsStatus string `json:"cardsStatus"`
 }
 
 type CreateCardInput struct {

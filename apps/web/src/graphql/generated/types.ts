@@ -7,7 +7,6 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
-  Upload: { input: unknown; output: unknown; }
 };
 
 export type Board = {
@@ -19,7 +18,6 @@ export type Board = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   projectId: Scalars['String']['output'];
-  themeColor: Scalars['String']['output'];
   updatedAt: Scalars['String']['output'];
 };
 
@@ -42,7 +40,6 @@ export type CreateBoardInput = {
   cardsStatus: Scalars['String']['input'];
   direction: Scalars['String']['input'];
   name: Scalars['String']['input'];
-  themeColor?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CreateCardInput = {

@@ -9,7 +9,7 @@ html, body{
     button{
         font-family: "Inter", sans-serif;
         transition: transform 0.2s ease;
-        color: white;
+        color: var(--color-text);
 
         &:hover{
             cursor: pointer;
@@ -50,7 +50,7 @@ html, body{
 
     h1, h2, h3, h4, h5, h6, p{
         margin: 0;
-        color: white;
+        color: var(--color-text);
     }
 }
 

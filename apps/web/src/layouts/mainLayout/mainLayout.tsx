@@ -5,8 +5,9 @@ import styles from './mainLayout.module.scss'
 import Icons from "../../assets/icons";
 import { useMemo } from "react";
 import themeDict from "../../dicts/theme";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../store/slices";
+import { setAppearance } from "../../store/slices/themeSlice";
 
 function MainLayout({children, title, description, isModal = false}) {
     
@@ -15,38 +16,39 @@ function MainLayout({children, title, description, isModal = false}) {
     const appearanceState = useSelector((state : RootState) => state.appearance)
     const navigator = useNavigate()
     const { projectId } = useParams()
+    const dispatch = useDispatch()
 
     const projectControlPanelMenuItems = useMemo<ISidebarMenuItem[]>(() => [
         {
-            icon: <Icons.HomeOutline width={20} height={20} color="#FFFFFF"/>,
+            icon: <Icons.HomeOutline width={20} height={20} color="var(--color-text"/>,
             label: "Overview",
             path: `/project/${projectId}/overview`
         },
         {
-            icon: <Icons.BoardOutline width={20} height={20} color="#FFFFFF"/>,
+            icon: <Icons.BoardOutline width={20} height={20} color="var(--color-text"/>,
             label: "Boards",
             path: `/project/${projectId}/boards`
         },
         {
-            icon: <Icons.SettingsOutline width={20} height={20} color="#FFFFFF"/>,
+            icon: <Icons.SettingsOutline width={20} height={20} color="var(--color-text"/>,
             label: "Settings",
             path: `/project/${projectId}/settings`
         },
     ], [projectId]);
 
-    const dashboardMenuItems =  useMemo<ISidebarMenuItem[]>(() => [
+    const dashboardMenuItems = useMemo<ISidebarMenuItem[]>(() => [
             {
-                icon: <Icons.HomeOutline width={20} height={20} color="#FFFFFF"/>,
+                icon: <Icons.HomeOutline width={20} height={20} color="var(--color-text"/>,
                 label: "Profile",
                 path: "/dashboard/profile"
             },
             {
-                icon: <Icons.FoldersOutline width={20} height={20} color="#FFFFFF"/>,
+                icon: <Icons.FoldersOutline width={20} height={20} color="var(--color-text"/>,
                 label: "Projects",
                 path: "/dashboard/projects"
             },
             {
-                icon: <Icons.SettingsOutline width={20} height={20} color="#FFFFFF"/>,
+                icon: <Icons.SettingsOutline width={20} height={20} color="var(--color-text"/>,
                 label: "Settings",
                 path: "/dashboard/settings"
             },
@@ -54,7 +56,7 @@ function MainLayout({children, title, description, isModal = false}) {
 
     return (
         
-        <section className={styles.app} style={{backgroundColor: themeDict[appearanceState.theme].backgroundColor}}>
+        <section className={styles.app}>
             <Sidebar tabs={globalLocation == "dashboard" ? dashboardMenuItems : projectControlPanelMenuItems} className={styles.sidebar}/>
             <section className={styles.screen}>
                 <div className={styles.header}>
@@ -72,15 +74,26 @@ function MainLayout({children, title, description, isModal = false}) {
                             <button>
                                 <Icons.BellOutline width={20} height={20} color="#ffffff"/>
                             </button>
-                            <button>
-                                <Icons.MoonOutline width={20} height={20} color="#ffffff"/>
+                            <button onClick={() => dispatch(setAppearance({theme: appearanceState.theme == "dark" ? "light" : "dark", accentColor: appearanceState.accentColor}))}>
+                                {
+                                    appearanceState.theme == "light"
+                                        ?   <Icons.MoonOutline
+                                                width={20}
+                                                height={20}
+                                                color="#ffffff"
+                                            />
+                                        :   <Icons.Sun
+                                                width={20}
+                                                height={20}
+                                                color="#ffffff"
+                                            />
+                                }
                             </button>
                         </div>
                     </div>
                     <h1>{title}</h1>
-                    <p style={{color: "var(--light-grey)"}}>{description}</p>
+                    <p style={{color: "var(--color-text)"}}>{description}</p>
                 </div>
-                {/* <Outlet/> */}
                 {children}
             </section>
         </section>

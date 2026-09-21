@@ -13,16 +13,18 @@ class UserApi {
 
             if(result.status == 200) {
 
+                console.log(result)
+
                 localStorage.setItem("accessToken", result.data.accessToken)
 
-                const userData = decodeJwt(result.data.accessToken)
+                const userId = decodeJwt(result.data.accessToken).userId
 
                 return {
-                    id: userData.user_id as string,
-                    name: userData.user_name as string,
-                    login: userData.user_login as string,
-                    email: userData.user_email as string,
-                    avatarUrl: ""
+                    id: userId as string,
+                    name: result.data.userData.name as string,
+                    login: result.data.userData.login as string,
+                    email: result.data.userData.email as string,
+                    avatarUrl: result.data.userData.avatarUrl as string
                 }
 
             }
@@ -45,16 +47,18 @@ class UserApi {
 
             if(result.status == 200) {
 
+                console.log(result)
+
                 localStorage.setItem("accessToken", result.data.accessToken)
 
-                const userData = decodeJwt(result.data.accessToken)
+                const userId = decodeJwt(result.data.accessToken).userId
 
                 return {
-                    id: userData.userId as string,
-                    name: name,
-                    login: login,
-                    email: email,
-                    avatarUrl: ""
+                    id: userId as string,
+                    name: result.data.userData.name,
+                    login: result.data.userData.login,
+                    email: result.data.userData.email,
+                    avatarUrl: result.data.userData.avatarUrl
                 }
 
             }
@@ -73,7 +77,7 @@ class UserApi {
 
         try{
 
-            const response = await api.patch(`/api/users/${userId}/avatar`, formData, {
+            const response = await api.patch(`/users/${userId}/avatar`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 }

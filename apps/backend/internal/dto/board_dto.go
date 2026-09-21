@@ -21,7 +21,6 @@ type CreateBoardDto struct {
 	Direction   string `json:"direction" binding:"required"`
 	CardsStatus string `json:"cardsStatus" binding:"required"`
 	ProjectID   string `json:"projectId"`
-	ThemeColor  string `json:"themeColor"`
 }
 
 type GetBoardDto struct {

@@ -203,7 +203,7 @@ func main() {
 		port = "8080"
 	}
 	log.Printf("Server starting on :%s", port)
-	router.Run(":" + port)
+	router.Run(":9187")
 }
 
 func setupRoutes(
@@ -218,69 +218,83 @@ func setupRoutes(
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	router.POST("/auth/register", userHandler.Registration)
-	router.POST("/auth/login", userHandler.Login)
-	router.POST("/auth/refreshtoken", userHandler.RefreshAccessToken)
 	router.GET("/test", handlers.Test)
 	router.GET("/ws/:cardId", chatHandler.ServeWS)
 
+	router.Static("/assets", "static/assets")
+	router.NoRoute(func(c *gin.Context) {
+		c.File("static/index.html")
+	})
+
 	api := router.Group("/api")
-	api.Use(authMiddleware.AuthRequired())
 	{
-		users := api.Group("/users")
+		api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+		auth := api.Group("/auth")
 		{
-			users.PATCH("/:user_id/avatar", userHandler.SetAvatar)
+			auth.POST("/register", userHandler.Registration)
+			auth.POST("/login", userHandler.Login)
+			auth.POST("/refreshtoken", userHandler.RefreshAccessToken)
 		}
 
-		projects := api.Group("/projects")
+		protected := api.Group("")
+		protected.Use(authMiddleware.AuthRequired())
 		{
-			projects.GET("", projectHandler.GetProjects)
-			projects.GET("/:project_id", projectHandler.GetProject)
-			projects.POST("", projectHandler.CreateProject)
-			projects.DELETE("/:project_id", projectHandler.DeleteProject)
-			projects.PATCH("/:project_id/logo", projectHandler.SetProjectLogo)
-
-			schemas := projects.Group("/:project_id/schemas")
+			users := protected.Group("/users")
 			{
-				schemas.POST("", projectHandler.CreateProjectSchema)
-				schemas.GET("", projectHandler.GetProjectSchemas)
+				users.PATCH("/:user_id/avatar", userHandler.SetAvatar)
 			}
 
-			members := projects.Group("/:project_id/members")
+			projects := protected.Group("/projects")
 			{
-				members.GET("", projectHandler.GetMembers)
-				members.GET("/:member_id", projectHandler.GetMember)
-				members.POST("", projectHandler.CreateMember)
-				members.DELETE("/:member_id", projectHandler.DeleteMember)
-			}
+				projects.GET("", projectHandler.GetProjects)
+				projects.GET("/:project_id", projectHandler.GetProject)
+				projects.POST("", projectHandler.CreateProject)
+				projects.DELETE("/:project_id", projectHandler.DeleteProject)
+				projects.PATCH("/:project_id/logo", projectHandler.SetProjectLogo)
 
-			boards := projects.Group("/:project_id/boards")
-			{
-				boards.GET("", projectHandler.GetBoards)
-				boards.GET("/:board_id", projectHandler.GetBoard)
-				boards.POST("", projectHandler.CreateBoard)
-				boards.DELETE("/:board_id", projectHandler.DeleteBoard)
-
-				cards := boards.Group("/:board_id/cards")
+				schemas := projects.Group("/:project_id/schemas")
 				{
-					cards.GET("", projectHandler.GetCards)
-					cards.GET("/:card_id", projectHandler.GetCard)
-					cards.POST("", projectHandler.CreateCard)
-					cards.DELETE("/:card_id", projectHandler.DeleteCard)
-					cards.PUT("/:card_id/updatelocation", projectHandler.UpdateCardLocation)
+					schemas.POST("", projectHandler.CreateProjectSchema)
+					schemas.GET("", projectHandler.GetProjectSchemas)
+				}
 
-					messages := cards.Group("/:card_id/messages")
+				members := projects.Group("/:project_id/members")
+				{
+					members.GET("", projectHandler.GetMembers)
+					members.GET("/:member_id", projectHandler.GetMember)
+					members.POST("", projectHandler.CreateMember)
+					members.DELETE("/:member_id", projectHandler.DeleteMember)
+				}
+
+				boards := projects.Group("/:project_id/boards")
+				{
+					boards.GET("", projectHandler.GetBoards)
+					boards.GET("/:board_id", projectHandler.GetBoard)
+					boards.POST("", projectHandler.CreateBoard)
+					boards.DELETE("/:board_id", projectHandler.DeleteBoard)
+
+					cards := boards.Group("/:board_id/cards")
 					{
-						messages.POST("", projectHandler.NewMessage)
+						cards.GET("", projectHandler.GetCards)
+						cards.GET("/:card_id", projectHandler.GetCard)
+						cards.POST("", projectHandler.CreateCard)
+						cards.DELETE("/:card_id", projectHandler.DeleteCard)
+						cards.PUT("/:card_id/updatelocation", projectHandler.UpdateCardLocation)
+
+						messages := cards.Group("/:card_id/messages")
+						{
+							messages.POST("", projectHandler.NewMessage)
+						}
 					}
 				}
 			}
+
+			queryGroup := protected.Group("/query")
+			queryGroup.POST("", gin.WrapH(gqlHandler))
+
+			protected.GET("/users", systemHandler.GetAllUsers)
 		}
-
-		queryGroup := api.Group("/query")
-		queryGroup.POST("", gin.WrapH(gqlHandler))
-
-		api.GET("/users", systemHandler.GetAllUsers)
 	}
+
 }

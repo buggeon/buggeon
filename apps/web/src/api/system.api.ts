@@ -5,7 +5,7 @@ class SystemApi {
 
     static async getAllUsers() : Promise<User[]> {
         try{
-            const result = (await api.get("/api/users"))
+            const result = (await api.get("/users"))
 
             if(result.status == 200) {
 

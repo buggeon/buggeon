@@ -16,12 +16,11 @@ export interface BoardItemProps {
     id : string
     name : string
     cards : any
-    themeColor : string
     projectId : string
 
 }
 
-function BoardItem({id, themeColor, name, cards, projectId} : BoardItemProps) {
+function BoardItem({id, name, cards, projectId} : BoardItemProps) {
 
     const [isNewCardModalVisible, setNewCardModalVisibility] = useState(false)
     const [isDeleteBoardAlertModalVisible, seteleteBoardAlertModalVisibility] = useState(false)
@@ -83,7 +82,7 @@ function BoardItem({id, themeColor, name, cards, projectId} : BoardItemProps) {
             <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
                 {
                     cards.map(card => (
-                        <CardItem key={card.id} boardId={id} id={card.id} title={card.title} priority={card.priority} themeColor={themeColor == "" ? priorityDict[card.priority].foregroundColor : themeColor} status={card.status}/>
+                        <CardItem key={card.id} boardId={id} id={card.id} title={card.title} priority={card.priority} status={card.status}/>
                     ))
                 }
                 <button className={styles.addBoard} onClick={() => {

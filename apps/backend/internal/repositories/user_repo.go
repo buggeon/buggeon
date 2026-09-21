@@ -130,7 +130,7 @@ func (r *UserRepo) GetUsersByIDs(ctx context.Context, userIDs []primitive.Object
 
 	var users []models.User
 
-	if err := cursor.All(ctx, users); err != nil {
+	if err := cursor.All(ctx, &users); err != nil {
 		return nil, err
 	}
 

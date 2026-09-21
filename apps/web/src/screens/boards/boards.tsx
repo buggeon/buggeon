@@ -130,7 +130,6 @@ function BoardsScreen() {
                                                 id={board.id}
                                                 name={board.name}
                                                 cards={board.cards}
-                                                themeColor={board.themeColor}
                                                 projectId={projectId}
                                             />
                                         ))
@@ -152,7 +151,6 @@ function BoardsScreen() {
                         <CardPreview
                             title={activeCard.title}
                             priority={activeCard.priority}
-                            themeColor={activeCard.boardThemeColor == "" ? priorityDict[activeCard.priority].foregroundColor : activeCard.boardThemeColor}
                             boardId={activeCard.boardId}
                             cardId={activeCard.id}
                             status={activeCard.status}

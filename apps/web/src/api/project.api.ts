@@ -11,7 +11,7 @@ class ProjectApi {
         formData.append("logo", logo)
 
         try {
-            await api.patch(`/api/projects/${projectId}/logo`, formData, {
+            await api.patch(`/projects/${projectId}/logo`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 }
@@ -27,7 +27,7 @@ class ProjectApi {
 
         try{
 
-            const result = await api.put(`/api/projects/${projectId}/boards/${oldBoardId}/cards/${cardId}/updatelocation`, { newBoardId })
+            const result = await api.put(`/projects/${projectId}/boards/${oldBoardId}/cards/${cardId}/updatelocation`, { newBoardId })
 
             if(result.status != 200) {
                 throw new Error("Failed to update card location")

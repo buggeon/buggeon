@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import StandartInput from "../../components/inputs/standartInput/standartInput";
 import styles from './accountSettings.module.scss'
 import { dateFormat } from "../../utils/dateFormat";
@@ -19,7 +19,7 @@ import StandartButton from "../../components/standartButton/standartButton";
 import { setAppearance } from "../../store/slices/themeSlice";
 import themeDict from "../../dicts/theme";
 
-type AccentColor = "blue" | "red" | "orange" | "purple" | "green"
+type AccentColor = "#4774fa" | "#eb5940" | "#ef6f1d" | "#715bc5" | "#4da592" | "#6bb919"
 
 type NotificationSettingsType = {
     newComments : boolean
@@ -52,7 +52,7 @@ function AccountSettingsScreen() {
         mentions: true,
         weeklyDigest: false,
     })
-    const ACCENTS = ["purple", "green", "blue", "red", "orange"] as const
+    const ACCENTS = ["#715bc5", "#4da592", "#4774fa", "#eb5940", "#ef6f1d", "#6bb919"] as const
 
     console.log(appearanceState)
 
@@ -72,7 +72,7 @@ function AccountSettingsScreen() {
             icon: <Icons.Message
                 width={25}
                 height={25}
-                color="var(--light-grey)"
+                color="var(--color-text)"
             />,
             title: "New comments",
             description: "Notifications for new comments on your issues"
@@ -82,7 +82,7 @@ function AccountSettingsScreen() {
             icon: <Icons.Refresh
                 width={25}
                 height={25}
-                color="var(--light-grey)"
+                color="var(--color-text)"
             />,
             title: "Status changes and assignments",
             description: "Notifications for new comments on your issues"
@@ -92,7 +92,7 @@ function AccountSettingsScreen() {
             icon: <Icons.AtSign
                 width={25}
                 height={25}
-                color="var(--light-grey)"
+                color="var(--color-text)"
             />,
             title: "Mentions",
             description: "When someone mentions you"
@@ -102,7 +102,7 @@ function AccountSettingsScreen() {
             icon: <Icons.Mail
                 width={25}
                 height={25}
-                color="var(--light-grey)"
+                color="var(--color-text)"
             />,
             title: "Weekly digest",
             description: "Summary of activity (once a week)"
@@ -204,10 +204,13 @@ function AccountSettingsScreen() {
 
         }
 
-        console.log(appearanceSettings.accentColor)
-        console.log(appearanceSettings.theme)
-
     }
+
+    useEffect(() => {
+
+        console.log(appearanceState.theme)
+        
+    }, [appearanceState])
 
 
     return(
@@ -216,7 +219,7 @@ function AccountSettingsScreen() {
             description="Manage your account, preferenses and workspace settings"
         >
             <section className={styles.main}>
-                <section className={styles.accountBlock} style={{backgroundColor: themeDict[appearanceState.theme].foregroundColor}}>
+                <section className={styles.accountBlock}>
                     <header>
                         <div className={styles.headerTitleBlock}>
                             <div>
@@ -248,7 +251,7 @@ function AccountSettingsScreen() {
                                 <Icons.Edit
                                     width={20}
                                     height={20}
-                                    color="var(--light-grey)"
+                                    color="white"
                                 />
                             </div>
                         </div>
@@ -275,13 +278,13 @@ function AccountSettingsScreen() {
                     </div>
                 </section>
                 <div className={styles.notificationAndAppearanceBlock}>
-                    <section className={styles.notificationBlock} style={{backgroundColor: themeDict[appearanceState.theme].foregroundColor}}>
+                    <section className={styles.notificationBlock}>
                         <header>
                             <div className={styles.headerTitleBlock}>
                                 <Icons.BellOutline
                                     width={40}
                                     height={40}
-                                    color="var(--foreground-blue)"
+                                    color="var(--color-accent)"
                                 />
                                 <div>
                                     <p className={styles.title}>Notifications</p>
@@ -311,13 +314,13 @@ function AccountSettingsScreen() {
                             ))
                         }
                     </section>
-                    <section className={styles.appearanceBlock} style={{backgroundColor: themeDict[appearanceState.theme].foregroundColor}}>
+                    <section className={styles.appearanceBlock}>
                         <header>
                             <div className={styles.headerTitleBlock}>
                                 <Icons.Palette
                                     width={40}
                                     height={40}
-                                    color="var(--foreground-blue)"
+                                    color="var(--color-accent)"
                                 />
                                 <div>
                                     <p className={styles.title}>Appearance</p>
@@ -326,7 +329,7 @@ function AccountSettingsScreen() {
                             </div>
                         </header>
                         <p>Theme</p>
-                        <div className={styles.themeBlock} style={{backgroundColor: themeDict[appearanceState.theme].foregroundColor}}>
+                        <div className={styles.themeBlock}>
                             {
                                 [
                                     {
@@ -342,7 +345,7 @@ function AccountSettingsScreen() {
                                         icon: <Icons.Computer width={20} height={20} color="var(--light-grey)"/>
                                     }
                                 ].map(theme => (
-                                    <div className={styles.themeItem} onClick={() => setAppearanceSettings(prev => ({...prev, theme: theme.name as "dark" | "light" | "system"}))}>
+                                    <div className={styles.themeItem} style={{borderColor: appearanceSettings.theme == theme.name ? "var(--color-accent" : "var(--color-bg)"}} onClick={() => setAppearanceSettings(prev => ({...prev, theme: theme.name as "dark" | "light" | "system"}))}>
                                         {theme.icon}
                                         <div>
                                             <p>{theme.name}</p>
@@ -373,13 +376,13 @@ function AccountSettingsScreen() {
                         </div>
                     </section>
                 </div>
-                <section className={styles.securityBlock} style={{backgroundColor: themeDict[appearanceState.theme].foregroundColor}}>
+                <section className={styles.securityBlock}>
                     <header>
                         <div className={styles.headerTitleBlock}>
                             <Icons.Shield
                                 width={40}
                                 height={40}
-                                color="var(--foreground-blue)"
+                                color="var(--color-accent)"
                             />
                             <div>
                                 <p className={styles.title}>Security</p>
@@ -389,10 +392,9 @@ function AccountSettingsScreen() {
                     </header>
                     <div className={styles.securitySettingsItem}>
                         <div className={styles.securitySettingsItemTitleBlock}>
-                            <Icons.Lock
-                                width={25}
+                            <Icons.Lock                                width={25}
                                 height={25}
-                                color="white"
+                                color="var(--color-text)"
                             />
                             <div>
                                 <p>Change password</p>
@@ -402,19 +404,6 @@ function AccountSettingsScreen() {
                         <button className={styles.changePasswordButton}>
                             Change password
                         </button>
-                    </div>
-                    <div className={styles.securitySettingsItem} style={{backgroundColor: themeDict[appearanceState.theme].foregroundColor}}>
-                        <div className={styles.securitySettingsItemTitleBlock}>
-                            <Icons.KeyOutline
-                                width={25}
-                                height={25}
-                                color="white"
-                            />
-                            <div>
-                                <p>Two-factor authentification</p>
-                                <p>Add an extra layer of security to your account</p>
-                            </div>
-                        </div>
                     </div>
                 </section>
             </section>

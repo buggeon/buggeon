@@ -61,7 +61,6 @@ func NewBoard(board models.Board) *Board {
 		CreatedAt:   board.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:   board.UpdatedAt.Format(time.RFC3339),
 		ProjectID:   board.ProjectID.Hex(),
-		ThemeColor:  board.ThemeColor,
 		CardsStatus: board.CardsStatus,
 	}
 }

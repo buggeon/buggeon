@@ -37,15 +37,15 @@ func NewUserHandler(userService *services.UserService) *UserHandler {
 
 func (h *UserHandler) Registration(c *gin.Context) {
 
-	var dto dto.UserRegistrationDto
+	var registData dto.UserRegistrationDto
 
-	if err := c.ShouldBindJSON(&dto); err != nil {
+	if err := c.ShouldBindJSON(&registData); err != nil {
 		c.Status(403)
 		c.Abort()
 		return
 	}
 
-	tokenPair, err := h.userService.Register(c, &dto)
+	result, err := h.userService.Register(c, &registData)
 
 	if err != nil {
 		c.Status(403)
@@ -55,7 +55,7 @@ func (h *UserHandler) Registration(c *gin.Context) {
 
 	cookie := &http.Cookie{
 		Name:   "refreshToken",
-		Value:  tokenPair.RefreshToken,
+		Value:  result.Tokens.RefreshToken,
 		MaxAge: 60 * 60 * 24 * 30,
 		Path:   "auth/refreshtoken",
 		Domain: "localhost",
@@ -66,21 +66,26 @@ func (h *UserHandler) Registration(c *gin.Context) {
 
 	http.SetCookie(c.Writer, cookie)
 
-	c.JSON(200, gin.H{"accessToken": tokenPair.AccessToken})
+	c.JSON(200, gin.H{"accessToken": result.Tokens.AccessToken, "userData": dto.UserAuthResponseDto{
+		Name:      result.Name,
+		Email:     result.Email,
+		Login:     result.Login,
+		AvatarUrl: result.AvatarUrl,
+	}})
 
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
 
-	var dto dto.UserLoginDto
+	var loginDto dto.UserLoginDto
 
-	if err := c.ShouldBindJSON(&dto); err != nil {
+	if err := c.ShouldBindJSON(&loginDto); err != nil {
 		c.Status(403)
 		c.Abort()
 		return
 	}
 
-	response, err := h.userService.Login(c, &dto)
+	result, err := h.userService.Login(c, &loginDto)
 
 	if err != nil {
 
@@ -89,7 +94,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 	} else {
 		cookie := &http.Cookie{
 			Name:   "refreshToken",
-			Value:  response.RefreshToken,
+			Value:  result.Tokens.RefreshToken,
 			MaxAge: 60 * 60 * 24 * 30,
 			Path:   "auth/refreshtoken",
 			Domain: "localhost",
@@ -100,7 +105,12 @@ func (h *UserHandler) Login(c *gin.Context) {
 
 		http.SetCookie(c.Writer, cookie)
 
-		c.JSON(200, gin.H{"accessToken": response.AccessToken})
+		c.JSON(200, gin.H{"accessToken": result.Tokens.AccessToken, "userData": dto.UserAuthResponseDto{
+			Name:      result.Name,
+			Login:     result.Login,
+			Email:     result.Email,
+			AvatarUrl: result.AvatarUrl,
+		}})
 	}
 
 }
