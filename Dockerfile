@@ -45,8 +45,12 @@ RUN apk add --no-cache \
 
 WORKDIR /app
 
-COPY --from=go-builder /app/bin/buggeon /app/buggeon
+COPY --from=go-builder /app/bin/buggeon /app/
 COPY --from=go-builder /app/bin/static  /app/static
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+RUN chown -R appuser:appgroup /app
 
 USER appuser
 
