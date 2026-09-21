@@ -31,7 +31,7 @@ func NewUserLoader(repo *repositories.UserRepo) *UserLoader {
 				}
 			}
 
-			return results
+			return results	
 		}
 
 		usersByID := make(

@@ -3,6 +3,7 @@ import { HttpLink } from '@apollo/client/link/http';
 import { ErrorLink } from '@apollo/client/link/error';
 import { ServerError } from '@apollo/client/errors';
 import { refreshAccessToken } from '../utils/resreshToken';
+import API_URL from '../../config';
 
 const errorLink = new ErrorLink(({ error, operation, forward }) => {
     if (ServerError.is(error) && error.statusCode === 401) {
@@ -36,7 +37,7 @@ const authLink = new ApolloLink((operation, forward) => {
 });
 
 const httpLink = new HttpLink({
-    uri:  `http://localhost:9187/api/query`,
+    uri:  `${API_URL}/query`,
 });
 
 export const client = new ApolloClient({

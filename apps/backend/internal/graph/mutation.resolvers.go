@@ -92,7 +92,6 @@ func (r *mutationResolver) CreateBoard(
 		Name:        input.Name,
 		Direction:   input.Direction,
 		CardsStatus: input.CardsStatus,
-		ThemeColor:  *input.ThemeColor,
 	})
 
 	return gqlmodel.NewBoard(*board), err
@@ -117,10 +116,6 @@ func (r *mutationResolver) UpdateBoard(
 
 	if input.Direction != nil {
 		board.Direction = *input.Direction
-	}
-
-	if input.ThemeColor != nil {
-		board.ThemeColor = *input.ThemeColor
 	}
 
 	if input.CardsStatus != nil {

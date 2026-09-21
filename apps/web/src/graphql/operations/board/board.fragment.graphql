@@ -4,7 +4,6 @@ fragment BoardDetails on Board {
     direction
     createdAt
     updatedAt
-    themeColor
     cardsStatus
     cards {
         ...CardDetails

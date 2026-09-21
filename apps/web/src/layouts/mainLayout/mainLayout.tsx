@@ -5,8 +5,9 @@ import styles from './mainLayout.module.scss'
 import Icons from "../../assets/icons";
 import { useMemo } from "react";
 import themeDict from "../../dicts/theme";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../store/slices";
+import { setAppearance } from "../../store/slices/themeSlice";
 
 function MainLayout({children, title, description, isModal = false}) {
     
@@ -15,6 +16,7 @@ function MainLayout({children, title, description, isModal = false}) {
     const appearanceState = useSelector((state : RootState) => state.appearance)
     const navigator = useNavigate()
     const { projectId } = useParams()
+    const dispatch = useDispatch()
 
     const projectControlPanelMenuItems = useMemo<ISidebarMenuItem[]>(() => [
         {
@@ -34,7 +36,7 @@ function MainLayout({children, title, description, isModal = false}) {
         },
     ], [projectId]);
 
-    const dashboardMenuItems =  useMemo<ISidebarMenuItem[]>(() => [
+    const dashboardMenuItems = useMemo<ISidebarMenuItem[]>(() => [
             {
                 icon: <Icons.HomeOutline width={20} height={20} color="var(--color-text"/>,
                 label: "Profile",
@@ -72,8 +74,20 @@ function MainLayout({children, title, description, isModal = false}) {
                             <button>
                                 <Icons.BellOutline width={20} height={20} color="#ffffff"/>
                             </button>
-                            <button>
-                                <Icons.MoonOutline width={20} height={20} color="#ffffff"/>
+                            <button onClick={() => dispatch(setAppearance({theme: appearanceState.theme == "dark" ? "light" : "dark", accentColor: appearanceState.accentColor}))}>
+                                {
+                                    appearanceState.theme == "light"
+                                        ?   <Icons.MoonOutline
+                                                width={20}
+                                                height={20}
+                                                color="#ffffff"
+                                            />
+                                        :   <Icons.Sun
+                                                width={20}
+                                                height={20}
+                                                color="#ffffff"
+                                            />
+                                }
                             </button>
                         </div>
                     </div>

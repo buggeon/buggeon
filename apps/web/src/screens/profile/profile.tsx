@@ -9,61 +9,11 @@ import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import ProgressBar from '../../components/progressBar/progressBar';
 import { useGetProjects } from '../../hooks/useGetProjects';
 
-function Icon({icon, backgroundColor} : {icon : React.ReactNode, backgroundColor : string}) {
-    return(
-        <div style={{backgroundColor: backgroundColor}} className={styles.infoCardIcon}>
-            {icon}
-        </div>
-    )
-}
 
 function ProfileScreen() {
 
     const user = useSelector((state : RootState) => state.user)
     const { data } = useGetProjects(user.id)
-
-    const infoCards : IInfoCard[] = [
-        {
-            title: "My Projects",
-            value: "7",
-            additionalInfo: "+2 from last month",
-            additionalInfoTextColor: "var(--foreground-blue)",
-            icon: Icon({
-                icon: <Icons.FoldersFilled width={30} height={30} color="var(--foreground-blue)"/>,
-                backgroundColor: "var(--background-blue)"
-            })
-        },
-        {
-            title: "Open Issues",
-            value: "3",
-            additionalInfo: "+1 from last week",
-            additionalInfoTextColor: "var(--foreground-red)",
-            icon: Icon({
-                icon: <Icons.BugFilled width={30} height={30} color="var(--foreground-red)"/>,
-                backgroundColor: "var(--background-red)"
-            })
-        },
-        {
-            title: "Total Tasks",
-            value: "12",
-            additionalInfo: "+3 from this month",
-            additionalInfoTextColor: "var(--foreground-purple)",
-            icon: Icon({
-                icon: <Icons.TaskFilled width={30} height={30} color="var(--foreground-purple)"/>,
-                backgroundColor: "var(--background-purple)"
-            })
-        },
-        {
-            title: "Completed Tasks",
-            value: "72%",
-            additionalInfo: "+8 from last week",
-            additionalInfoTextColor: "var(--foreground-green)",
-            icon: Icon({
-                icon: <Icons.CompletedTaskFilled width={30} height={30} color="var(--foreground-green)"/>,
-                backgroundColor: "#183033"
-            })
-        },
-    ]
 
     return(
         <MainLayout
@@ -71,13 +21,6 @@ function ProfileScreen() {
             description="Here's what's happening with your projects today."
         >
             <section className={styles.main}>
-                <section className={styles.infoCardBlock}>
-                    {
-                        infoCards.map(card => (
-                            <InfoCard {...card}/>
-                        ))
-                    }
-                </section>
                 <section className={styles.statisticAndProgress}>
                     <section className={styles.card}>
                         <header>

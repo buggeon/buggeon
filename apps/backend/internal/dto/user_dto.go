@@ -16,6 +16,8 @@
 
 package dto
 
+import "buggeon/internal/models"
+
 type UserRegistrationDto struct {
 	Name     string `json:"name" binding:"required"`
 	Login    string `json:"login" binding:"required"`
@@ -26,4 +28,12 @@ type UserRegistrationDto struct {
 type UserLoginDto struct {
 	Login    string `json:"login" binding:"required"`
 	Password string `json:"password" binding:"required"`
+}
+
+type UserAuthResponseDto struct {
+	Tokens    models.TokenResponse `json:"-"`
+	Name      string               `json:"name"`
+	Login     string               `json:"login"`
+	Email     string               `json:"email"`
+	AvatarUrl string               `json:"avatarUrl"`
 }

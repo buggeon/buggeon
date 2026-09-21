@@ -6,7 +6,7 @@
     .addBoard{
         width: 250px;
         height: 400px;
-        background-color: #0f131a;
+        background-color: var(--color-bg-elevated);
         border-radius: 10px;
         display: flex;
         justify-content: center;

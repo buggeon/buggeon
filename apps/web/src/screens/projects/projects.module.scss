@@ -126,7 +126,7 @@
                     }
 
                     td{
-                        background-color: #0f1725;
+                        background-color: var(--color-bg-elevated);
                         padding-top: 25px;
                         padding-bottom: 25px;
 
@@ -248,21 +248,21 @@
 
     .pagSwitch{
         margin-top: 30px;
+        width: 100%;
         display: flex;
-        align-self: flex-end;
+        justify-content: flex-end;
         gap: 10px;
 
         .pagNumber{
-            background-color: #4830ca;
+            background-color: var(--color-accent);
         }
 
         button{
+            background-color: var(--color-bg-elevated);
             &:first-child{
-                background-color: #0f1725;
                 transform: rotate(90deg);
             }
             &:last-child{
-                background-color: #0f1725;
                 transform: rotate(-90deg);
             }
         }

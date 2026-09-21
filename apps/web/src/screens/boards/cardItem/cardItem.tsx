@@ -7,11 +7,10 @@ interface CardItemProps {
     title : string;
     priority : string;
     boardId : string;
-    themeColor : string;
     status : string
 }
 
-function CardItem({id, title, priority, boardId, themeColor, status} : CardItemProps) {
+function CardItem({id, title, priority, boardId, status} : CardItemProps) {
 
     console.log(status)
 
@@ -29,7 +28,6 @@ function CardItem({id, title, priority, boardId, themeColor, status} : CardItemP
             priority: priority,
             id: id,
             boardId: boardId,
-            themeColor: themeColor,
             status: status
         },
     });
@@ -51,7 +49,6 @@ function CardItem({id, title, priority, boardId, themeColor, status} : CardItemP
             <CardPreview
                 title={title}
                 priority={priority}
-                themeColor={themeColor}
                 cardId={id}
                 boardId={boardId}
                 status={status}

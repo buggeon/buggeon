@@ -29,8 +29,6 @@ function CreateBoard({isVisible, setVisibility, direction} : CreateBoardProps) {
     const { projectId } = useParams()
     //const [findName, setFindName] = useState("")
     const { refetch } = useGetBoards(projectId)
-    const [cardColorSchemeType, setCardColorSchemeType] = useState<"priority" | "fixed">("priority")
-    const [boardThemeColor, setBoardThemeColor] = useState("#715bc5")
     const [newBoardData, setNewBoardData] = useState<INewBoardData>({name: "", direction: "", cardsStatus: "In progress"})
     const [createBoard, { loading, error }] = useMutation(CreateBoardDocument)
 
@@ -55,7 +53,6 @@ function CreateBoard({isVisible, setVisibility, direction} : CreateBoardProps) {
                     projectId: projectId,
                     input: {
                         ...newBoardData,
-                        themeColor: cardColorSchemeType == "priority" ? "" : boardThemeColor
                     }
                 }
             })
@@ -111,74 +108,6 @@ function CreateBoard({isVisible, setVisibility, direction} : CreateBoardProps) {
                         </div>
                     )}
                 />
-                <div>
-                    <p className={styles.chooseCardColorSchemeTitle}>Card Color Scheme</p>
-                    <p className={styles.chooseCardColorSchemeDescription}>Choose how cards are color-coded on this board</p>
-                </div>
-                <div className={styles.cardColorSchemeVariantsBlock}>
-                    <section onClick={() => setCardColorSchemeType('priority')} style={cardColorSchemeType == "priority" ? {borderStyle: "solid", borderColor: "var(--foreground-purple)", borderWidth: 0.5} : {}}>
-                        <div className={styles.chooseCardColorSchemeVariantHeader}>
-                            <div className={styles.chooseCardColorSchemeVariantTitleBlock}>
-                                <RadioButton value={cardColorSchemeType == "priority"} onChange={() => {
-                                    setCardColorSchemeType("priority")
-                                }}/>
-                                <p>By Priority</p>
-                            </div>
-                            <p>Cards are colored based on priority lavel</p>
-                        </div>
-                        <div style={{display: "flex", justifyContent: "space-between", width: "100%", gap: 10}}>
-                            {
-                                Object.entries(priorityDict).map(([title, colors]) => (
-                                    <div style={{display: "flex", gap: 5, alignItems: "center"}}>
-                                        <div style={{width: 10, height: 10, borderRadius: 50, backgroundColor: colors.foregroundColor}}></div>
-                                        <p>{title}</p>
-                                    </div>
-                                ))
-                            }
-                        </div>
-                    </section>
-                    <section onClick={() => setCardColorSchemeType('fixed')} style={cardColorSchemeType == "fixed" ? {borderStyle: "solid", borderColor: "var(--foreground-purple)", borderWidth: 0.5} : {}}>
-                        <div className={styles.chooseCardColorSchemeVariantHeader}>
-                            <div className={styles.chooseCardColorSchemeVariantTitleBlock}>
-                                <RadioButton value={cardColorSchemeType == "fixed"} onChange={() => {
-                                    setCardColorSchemeType("fixed")
-                                }}/>
-                                <p>Fixed Color</p>
-                            </div>
-                            <p>All cards use the same color</p>
-                        </div>
-                        <div style={{borderRadius: 10, width: "100%", backgroundColor: boardThemeColor, height: 10}}></div>
-                    </section>
-                </div>
-                {
-                    cardColorSchemeType == "fixed" &&
-                        <div>
-                            <p className={styles.chooseCardColorSchemeTitle}>Board Color</p>
-                            <p className={styles.chooseCardColorSchemeDescription}>Choose the theme color for this board</p>
-                        </div>
-                }
-                {
-                    cardColorSchemeType == "fixed" &&
-                        <div style={{display: "flex", gap: 15}}>
-                            {
-                                ["#715bc5", "#4da592", "#4774fa", "#eb5940", "#ef6f1d", "#a0abbd"].map(color => (
-                                    <div style={{
-                                        backgroundColor: color,
-                                        borderRadius: 5,
-                                        width: 30,
-                                        height: 30,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center"
-                                    }} onClick={() => setBoardThemeColor(color)}>
-                                        {
-                                            boardThemeColor == color && <Icons.CompletedOutline width={20} height={20} color='white'/>
-                                        }
-                                    </div>
-                                ))
-                            }
-                        </div>
-                }
             </section>
         </Modal>
     )

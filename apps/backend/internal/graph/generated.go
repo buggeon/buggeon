@@ -52,7 +52,6 @@ type ComplexityRoot struct {
 		ID          func(childComplexity int) int
 		Name        func(childComplexity int) int
 		ProjectID   func(childComplexity int) int
-		ThemeColor  func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 	}
 
@@ -127,6 +126,7 @@ type ComplexityRoot struct {
 		Messages func(childComplexity int, cardID string) int
 		Project  func(childComplexity int, projectID string) int
 		Projects func(childComplexity int, userID string) int
+		User     func(childComplexity int, userID string) int
 	}
 
 	Schema struct {
@@ -196,6 +196,7 @@ type QueryResolver interface {
 	Cards(ctx context.Context, boardID string) ([]*gqlmodel.Card, error)
 	Member(ctx context.Context, memberID string) (*gqlmodel.Member, error)
 	Members(ctx context.Context, projectID string) ([]*gqlmodel.Member, error)
+	User(ctx context.Context, userID string) (*gqlmodel.User, error)
 }
 type SchemaResolver interface {
 	Author(ctx context.Context, obj *gqlmodel.Schema) (*gqlmodel.Member, error)
@@ -261,12 +262,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Board.ProjectID(childComplexity), true
-	case "Board.themeColor":
-		if e.ComplexityRoot.Board.ThemeColor == nil {
-			break
-		}
-
-		return e.ComplexityRoot.Board.ThemeColor(childComplexity), true
 	case "Board.updatedAt":
 		if e.ComplexityRoot.Board.UpdatedAt == nil {
 			break
@@ -710,6 +705,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.Projects(childComplexity, args["userId"].(string)), true
+	case "Query.user":
+		if e.ComplexityRoot.Query.User == nil {
+			break
+		}
+
+		args, err := ec.field_Query_user_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.User(childComplexity, args["userId"].(string)), true
 
 	case "Schema.author":
 		if e.ComplexityRoot.Schema.Author == nil {
@@ -914,8 +920,6 @@ func (ec *executionContext) childFields_Board(ctx context.Context, field graphql
 		return ec.fieldContext_Board_updatedAt(ctx, field)
 	case "projectId":
 		return ec.fieldContext_Board_projectId(ctx, field)
-	case "themeColor":
-		return ec.fieldContext_Board_themeColor(ctx, field)
 	case "cardsStatus":
 		return ec.fieldContext_Board_cardsStatus(ctx, field)
 	case "cards":
@@ -1510,6 +1514,20 @@ func (ec *executionContext) field_Query_projects_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_user_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "userId",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNID2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["userId"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field___Directive_args_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1705,29 +1723,6 @@ func (ec *executionContext) _Board_projectId(ctx context.Context, field graphql.
 	)
 }
 func (ec *executionContext) fieldContext_Board_projectId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	return graphql.NewScalarFieldContext("Board", field, false, false, errors.New("field of type String does not have child fields"))
-}
-
-func (ec *executionContext) _Board_themeColor(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Board) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return ec.fieldContext_Board_themeColor(ctx, field)
-		},
-		func(ctx context.Context) (any, error) {
-			return obj.ThemeColor, nil
-		},
-		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
-			return ec.marshalNString2string(ctx, selections, v)
-		},
-		true,
-		true,
-	)
-}
-func (ec *executionContext) fieldContext_Board_themeColor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("Board", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
@@ -3552,6 +3547,50 @@ func (ec *executionContext) fieldContext_Query_members(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_user(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_user(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().User(ctx, fc.Args["userId"].(string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *gqlmodel.User) graphql.Marshaler {
+			return ec.marshalNUser2ᚖbuggeonᚋinternalᚋgraphᚋgqlmodelᚐUser(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_User(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_user_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -3720,38 +3759,6 @@ func (ec *executionContext) fieldContext_Schema_name(_ context.Context, field gr
 	return graphql.NewScalarFieldContext("Schema", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
-func (ec *executionContext) _Schema_author(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Schema) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return ec.fieldContext_Schema_author(ctx, field)
-		},
-		func(ctx context.Context) (any, error) {
-			return ec.Resolvers.Schema().Author(ctx, obj)
-		},
-		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v *gqlmodel.Member) graphql.Marshaler {
-			return ec.marshalNMember2ᚖbuggeonᚋinternalᚋgraphᚋgqlmodelᚐMember(ctx, selections, v)
-		},
-		true,
-		true,
-	)
-}
-func (ec *executionContext) fieldContext_Schema_author(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Schema",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return ec.childFields_Member(ctx, field)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Schema_createdAt(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Schema) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -3796,6 +3803,38 @@ func (ec *executionContext) _Schema_updatedAt(ctx context.Context, field graphql
 }
 func (ec *executionContext) fieldContext_Schema_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("Schema", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _Schema_author(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Schema) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Schema_author(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Schema().Author(ctx, obj)
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *gqlmodel.Member) graphql.Marshaler {
+			return ec.marshalNMember2ᚖbuggeonᚋinternalᚋgraphᚋgqlmodelᚐMember(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Schema_author(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Schema",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Member(ctx, field)
+		},
+	}
+	return fc, nil
 }
 
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.User) (ret graphql.Marshaler) {
@@ -5006,7 +5045,7 @@ func (ec *executionContext) unmarshalInputCreateBoardInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "direction", "themeColor", "cardsStatus"}
+	fieldsInOrder := [...]string{"name", "direction", "cardsStatus"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5027,13 +5066,6 @@ func (ec *executionContext) unmarshalInputCreateBoardInput(ctx context.Context, 
 				return it, err
 			}
 			it.Direction = data
-		case "themeColor":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("themeColor"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ThemeColor = data
 		case "cardsStatus":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cardsStatus"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -5413,11 +5445,6 @@ func (ec *executionContext) _Board(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "projectId":
 			out.Values[i] = ec._Board_projectId(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "themeColor":
-			out.Values[i] = ec._Board_themeColor(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -6440,6 +6467,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "user":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_user(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -6507,6 +6556,16 @@ func (ec *executionContext) _Schema(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "createdAt":
+			out.Values[i] = ec._Schema_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "updatedAt":
+			out.Values[i] = ec._Schema_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "author":
 			field := field
 
@@ -6545,16 +6604,6 @@ func (ec *executionContext) _Schema(ctx context.Context, sel ast.SelectionSet, o
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-		case "createdAt":
-			out.Values[i] = ec._Schema_createdAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
-		case "updatedAt":
-			out.Values[i] = ec._Schema_updatedAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

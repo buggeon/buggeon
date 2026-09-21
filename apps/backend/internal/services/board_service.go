@@ -54,18 +54,11 @@ func (s *BoardService) CreateBoard(ctx context.Context, dto *dto.CreateBoardDto)
 		return &models.Board{}, err
 	}
 
-	themeColor := ""
-
-	if dto.ThemeColor != "" {
-		themeColor = dto.ThemeColor
-	}
-
 	board := &models.Board{
 		Name:        dto.Name,
 		CardsStatus: dto.CardsStatus,
 		ProjectID:   projectID,
 		Direction:   dto.Direction,
-		ThemeColor:  themeColor,
 		Cards:       []primitive.ObjectID{},
 	}
 
