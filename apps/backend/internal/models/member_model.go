@@ -23,10 +23,11 @@ import (
 )
 
 type Member struct {
-	ID         primitive.ObjectID `bson:"_id" json:"id"`
-	UserID     primitive.ObjectID `bson:"user_id" json:"user_id"`
-	Role       string             `bson:"role" json:"role"`
-	ProjectID  primitive.ObjectID `bson:"project_id" json:"project_id"`
-	Directions []string           `bson:"directions" json:"directions"`
-	CreatedAt  time.Time          `bson:"created_at" json:"created_at"`
+	ID          primitive.ObjectID `bson:"_id" json:"id"`
+	UserID      primitive.ObjectID `bson:"user_id" json:"user_id"`
+	Role        string             `bson:"role" json:"role"`
+	Permissions []string           `bson:"permissions" json:"-"`
+	ProjectID   primitive.ObjectID `bson:"project_id" json:"project_id"`
+	Directions  []string           `bson:"directions" json:"directions"`
+	CreatedAt   time.Time          `bson:"created_at" json:"created_at"`
 }
