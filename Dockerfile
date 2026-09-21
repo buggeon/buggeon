@@ -6,6 +6,7 @@ COPY apps/web/package*.json ./
 RUN npm ci
 
 COPY apps/web/ ./
+RUN ls
 RUN npm run build
 
 # -------------------------------------------------------------#
@@ -25,12 +26,16 @@ RUN go mod download
 
 COPY apps/backend/ ./
 
+RUN ls
+
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
     -ldflags="-w -s -X main.version=$(cat VERSION 2>/dev/null || echo 'dev')" \
     -o /app/bin/buggeon \
     ./cmd/main.go
 
 COPY --from=web-builder /app/web/dist /app/bin/static
+
+RUN ls
 
 #--------------------------------------------------------------#
 
@@ -47,6 +52,8 @@ WORKDIR /app
 
 COPY --from=go-builder /app/bin/buggeon /app/
 COPY --from=go-builder /app/bin/static  /app/static
+
+RUN ls
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
