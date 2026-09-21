@@ -61,6 +61,6 @@ RUN chown -R appuser:appgroup /app
 
 USER appuser
 
-EXPOSE 9090
+EXPOSE 9187
 
 CMD [ "./buggeon" ]
