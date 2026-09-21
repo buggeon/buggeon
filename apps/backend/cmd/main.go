@@ -221,6 +221,7 @@ func setupRoutes(
 	router.GET("/test", handlers.Test)
 	router.GET("/ws/:cardId", chatHandler.ServeWS)
 
+	router.Static("/assets", "static/assets")
 	router.NoRoute(func(c *gin.Context) {
 		c.File("static/index.html")
 	})
