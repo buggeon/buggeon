@@ -2,7 +2,7 @@ import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { refreshAccessToken } from "../utils/resreshToken";
 
 const api = axios.create({
-    baseURL: `http://${import.meta.env.VITE_API_URL}`,
+    baseURL: `http://localhost:9187`,
     withCredentials: true
 })
 

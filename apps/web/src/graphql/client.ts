@@ -36,7 +36,7 @@ const authLink = new ApolloLink((operation, forward) => {
 });
 
 const httpLink = new HttpLink({
-    uri:  `http://${import.meta.env.VITE_API_URL}/api/query`,
+    uri:  `http://localhost:9187/api/query`,
 });
 
 export const client = new ApolloClient({

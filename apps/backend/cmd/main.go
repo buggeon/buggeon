@@ -203,7 +203,7 @@ func main() {
 		port = "8080"
 	}
 	log.Printf("Server starting on :%s", port)
-	router.Run(":" + port)
+	router.Run(":9187")
 }
 
 func setupRoutes(
