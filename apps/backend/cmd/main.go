@@ -36,7 +36,6 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	swaggerFiles "github.com/swaggo/files"
@@ -133,38 +132,7 @@ func main() {
 	}
 	defer db.Close()
 
-	corsConfig := cors.New(cors.Config{
-		AllowOrigins: []string{
-			"http://localhost:5173",
-		},
-		AllowMethods: []string{
-			"GET",
-			"POST",
-			"PUT",
-			"PATCH",
-			"OPTIONS",
-			"HEAD",
-		},
-		AllowHeaders: []string{
-			"Origin",
-			"Content-Type",
-			"Accept",
-			"Authorization",
-			"X-Requested-With",
-			"Access-Control-Request-Method",
-			"Access-Control-Request-Headers",
-		},
-		ExposeHeaders: []string{
-			"Content-Length",
-			"Access-Control-Allow-Origin",
-			"Access-Control-Allow-Headers",
-		},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	})
-
 	router := gin.Default()
-	router.Use(corsConfig)
 
 	s3Storage := s3storage.NewS3Storage()
 
