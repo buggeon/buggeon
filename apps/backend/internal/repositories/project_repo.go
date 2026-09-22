@@ -144,10 +144,10 @@ func (r *ProjectRepo) AddLead(ctx context.Context, projectID, leadID primitive.O
 
 }
 
-func (r *ProjectRepo) SetProjectLogoUrl(ctx context.Context, projectID primitive.ObjectID, logoUrl string) error {
+func (r *ProjectRepo) SetProjectLogoUrl(ctx context.Context, projectID primitive.ObjectID, logoKey string) error {
 
 	filter := bson.M{"_id": projectID}
-	update := bson.M{"$set": bson.M{"logo_url": logoUrl}}
+	update := bson.M{"$set": bson.M{"logo_key": logoKey}}
 
 	_, err := r.collection.UpdateOne(ctx, filter, update)
 

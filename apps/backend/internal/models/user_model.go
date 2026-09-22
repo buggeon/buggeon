@@ -26,7 +26,7 @@ type User struct {
 	ID            primitive.ObjectID `bson:"_id" json:"id"`
 	Name          string             `bson:"name" json:"name"`
 	Login         string             `bson:"login" json:"login"`
-	AvatarUrl     string             `bson:"avatar_url" json:"avatarUrl"`
+	AvatarKey     string             `bson:"avatar_key" json:"avatarKey"`
 	Password      string             `bson:"password" json:"-"`
 	Email         string             `bson:"email" json:"email"`
 	RefreshTokens []string           `bson:"refresh_tokens" json:"-"`

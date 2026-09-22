@@ -94,7 +94,7 @@ func (h *ChatHandler) ServeWS(c *gin.Context) {
 		return
 	}
 
-	client := hub.NewClient(conn, claims.UserID, userData.Name, userData.AvatarUrl)
+	client := hub.NewClient(conn, claims.UserID, userData.Name, userData.AvatarKey)
 
 	room := h.getOrCreateHub(cardID)
 

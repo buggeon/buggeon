@@ -24,14 +24,14 @@ import (
 
 type Project struct {
 	ID          primitive.ObjectID   `bson:"_id" json:"id"`
-	CreatedAt   time.Time            `bson:"created_at" json:"created_at"`
-	UpdatedAt   time.Time            `bson:"updated_at" json:"updated_at"`
-	LeadID      primitive.ObjectID   `bson:"lead_id" json:"lead_id"`
+	CreatedAt   time.Time            `bson:"created_at" json:"createdAt"`
+	UpdatedAt   time.Time            `bson:"updated_at" json:"updatedAt"`
+	LeadID      primitive.ObjectID   `bson:"lead_id" json:"leadId"`
 	Name        string               `bson:"name" json:"name"`
 	Description string               `bson:"description" json:"description"`
 	Schemas     []string             `bson:"schemas" json:"schemas"`
 	Members     []primitive.ObjectID `bson:"members" json:"members"`
 	Boards      []primitive.ObjectID `bson:"boards" json:"boards"`
-	LogoUrl     string               `bson:"logo_url" json:"logo_url"`
+	LogoKey     string               `bson:"logo_key" json:"logoKey"`
 	Progress    int                  `bson:"progress" json:"progress"`
 }

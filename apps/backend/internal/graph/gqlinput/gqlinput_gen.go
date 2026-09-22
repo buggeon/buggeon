@@ -48,7 +48,6 @@ type UpdateCardInput struct {
 type UpdateProjectInput struct {
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
-	LogoURL     *string `json:"logoUrl,omitempty"`
 	Progress    *int32  `json:"progress,omitempty"`
 }
 

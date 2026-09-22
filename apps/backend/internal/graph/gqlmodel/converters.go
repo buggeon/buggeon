@@ -35,7 +35,7 @@ func NewProject(project models.Project) *Project {
 		ID:        project.ID.Hex(),
 		CreatedAt: project.CreatedAt.Format(time.RFC3339),
 		UpdatedAt: project.UpdatedAt.Format(time.RFC3339),
-		LogoURL:   project.LogoUrl,
+		LogoKey:   project.LogoKey,
 		Progress:  int32(project.Progress),
 	}
 }

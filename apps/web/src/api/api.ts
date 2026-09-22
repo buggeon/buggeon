@@ -1,6 +1,6 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { refreshAccessToken } from "../utils/resreshToken";
-import API_URL from '../../config'
+import { API_URL } from '../../config'
 
 const api = axios.create({
     baseURL: API_URL,

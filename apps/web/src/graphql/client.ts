@@ -3,7 +3,7 @@ import { HttpLink } from '@apollo/client/link/http';
 import { ErrorLink } from '@apollo/client/link/error';
 import { ServerError } from '@apollo/client/errors';
 import { refreshAccessToken } from '../utils/resreshToken';
-import API_URL from '../../config';
+import { API_URL } from '../../config';
 
 const errorLink = new ErrorLink(({ error, operation, forward }) => {
     if (ServerError.is(error) && error.statusCode === 401) {

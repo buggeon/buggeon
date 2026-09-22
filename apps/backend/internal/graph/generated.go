@@ -108,7 +108,7 @@ type ComplexityRoot struct {
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Lead        func(childComplexity int) int
-		LogoURL     func(childComplexity int) int
+		LogoKey     func(childComplexity int) int
 		Members     func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Progress    func(childComplexity int) int
@@ -140,7 +140,7 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		AvatarUrl func(childComplexity int) int
+		AvatarKey func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
 		Email     func(childComplexity int) int
 		ID        func(childComplexity int) int
@@ -563,12 +563,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Project.Lead(childComplexity), true
-	case "Project.logoUrl":
-		if e.ComplexityRoot.Project.LogoURL == nil {
+	case "Project.logoKey":
+		if e.ComplexityRoot.Project.LogoKey == nil {
 			break
 		}
 
-		return e.ComplexityRoot.Project.LogoURL(childComplexity), true
+		return e.ComplexityRoot.Project.LogoKey(childComplexity), true
 	case "Project.members":
 		if e.ComplexityRoot.Project.Members == nil {
 			break
@@ -760,12 +760,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.Schema.Url(childComplexity), true
 
-	case "User.avatarUrl":
-		if e.ComplexityRoot.User.AvatarUrl == nil {
+	case "User.avatarKey":
+		if e.ComplexityRoot.User.AvatarKey == nil {
 			break
 		}
 
-		return e.ComplexityRoot.User.AvatarUrl(childComplexity), true
+		return e.ComplexityRoot.User.AvatarKey(childComplexity), true
 	case "User.createdAt":
 		if e.ComplexityRoot.User.CreatedAt == nil {
 			break
@@ -1008,8 +1008,8 @@ func (ec *executionContext) childFields_Project(ctx context.Context, field graph
 		return ec.fieldContext_Project_name(ctx, field)
 	case "description":
 		return ec.fieldContext_Project_description(ctx, field)
-	case "logoUrl":
-		return ec.fieldContext_Project_logoUrl(ctx, field)
+	case "logoKey":
+		return ec.fieldContext_Project_logoKey(ctx, field)
 	case "progress":
 		return ec.fieldContext_Project_progress(ctx, field)
 	case "lead":
@@ -1028,8 +1028,8 @@ func (ec *executionContext) childFields_User(ctx context.Context, field graphql.
 		return ec.fieldContext_User_id(ctx, field)
 	case "name":
 		return ec.fieldContext_User_name(ctx, field)
-	case "avatarUrl":
-		return ec.fieldContext_User_avatarUrl(ctx, field)
+	case "avatarKey":
+		return ec.fieldContext_User_avatarKey(ctx, field)
 	case "login":
 		return ec.fieldContext_User_login(ctx, field)
 	case "email":
@@ -2965,16 +2965,16 @@ func (ec *executionContext) fieldContext_Project_description(_ context.Context, 
 	return graphql.NewScalarFieldContext("Project", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
-func (ec *executionContext) _Project_logoUrl(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Project) (ret graphql.Marshaler) {
+func (ec *executionContext) _Project_logoKey(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.Project) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
 		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return ec.fieldContext_Project_logoUrl(ctx, field)
+			return ec.fieldContext_Project_logoKey(ctx, field)
 		},
 		func(ctx context.Context) (any, error) {
-			return obj.LogoURL, nil
+			return obj.LogoKey, nil
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
@@ -2984,7 +2984,7 @@ func (ec *executionContext) _Project_logoUrl(ctx context.Context, field graphql.
 		true,
 	)
 }
-func (ec *executionContext) fieldContext_Project_logoUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Project_logoKey(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("Project", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
@@ -3883,16 +3883,16 @@ func (ec *executionContext) fieldContext_User_name(_ context.Context, field grap
 	return graphql.NewScalarFieldContext("User", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
-func (ec *executionContext) _User_avatarUrl(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_avatarKey(ctx context.Context, field graphql.CollectedField, obj *gqlmodel.User) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
 		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return ec.fieldContext_User_avatarUrl(ctx, field)
+			return ec.fieldContext_User_avatarKey(ctx, field)
 		},
 		func(ctx context.Context) (any, error) {
-			return obj.AvatarUrl, nil
+			return obj.AvatarKey, nil
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
@@ -3902,7 +3902,7 @@ func (ec *executionContext) _User_avatarUrl(ctx context.Context, field graphql.C
 		true,
 	)
 }
-func (ec *executionContext) fieldContext_User_avatarUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_avatarKey(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("User", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
@@ -5314,7 +5314,7 @@ func (ec *executionContext) unmarshalInputUpdateProjectInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "description", "logoUrl", "progress"}
+	fieldsInOrder := [...]string{"name", "description", "progress"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5335,13 +5335,6 @@ func (ec *executionContext) unmarshalInputUpdateProjectInput(ctx context.Context
 				return it, err
 			}
 			it.Description = data
-		case "logoUrl":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("logoUrl"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.LogoURL = data
 		case "progress":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("progress"))
 			data, err := ec.unmarshalOInt2ᚖint32(ctx, v)
@@ -6082,8 +6075,8 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "logoUrl":
-			out.Values[i] = ec._Project_logoUrl(ctx, field, obj)
+		case "logoKey":
+			out.Values[i] = ec._Project_logoKey(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -6647,8 +6640,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "avatarUrl":
-			out.Values[i] = ec._User_avatarUrl(ctx, field, obj)
+		case "avatarKey":
+			out.Values[i] = ec._User_avatarKey(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

@@ -35,5 +35,5 @@ type UserAuthResponseDto struct {
 	Name      string               `json:"name"`
 	Login     string               `json:"login"`
 	Email     string               `json:"email"`
-	AvatarUrl string               `json:"avatarUrl"`
+	AvatarKey string               `json:"avatarKey"`
 }

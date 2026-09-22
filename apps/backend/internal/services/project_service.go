@@ -67,6 +67,7 @@ func (s *ProjectService) CreateProject(ctx context.Context, projectData *dto.Cre
 		Name:        projectData.Name,
 		Description: projectData.Description,
 		Members:     []primitive.ObjectID{},
+		LogoKey:     "",
 		Boards:      []primitive.ObjectID{},
 		Schemas:     []string{},
 		Progress:    projectData.Progress,
@@ -213,13 +214,15 @@ func (s *ProjectService) SetProjectLogo(ctx context.Context, projectID string, l
 		return err
 	}
 
-	url, err := s.s3Storage.Upload(context.Background(), fmt.Sprintf("projects/%s/logo/%s", projectID, logo.Filename), src, logo.Header.Get("Content-Type"))
+	key := fmt.Sprintf("projects/%s/logo/%s", projectID, logo.Filename)
+
+	err = s.s3Storage.Upload(context.Background(), fmt.Sprintf("projects/%s/logo/%s", projectID, logo.Filename), src, logo.Header.Get("Content-Type"))
 
 	if err != nil {
 		return err
 	}
 
-	s.projectRepo.SetProjectLogoUrl(ctx, projectObjID, url)
+	s.projectRepo.SetProjectLogoUrl(ctx, projectObjID, fmt.Sprintf("buggeon/%s", key))
 
 	return nil
 

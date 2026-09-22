@@ -76,7 +76,7 @@ func createAdmin(tokenService *services.TokenService) error {
 			Name:      admin_name,
 			Login:     admin_login,
 			Password:  admin_password,
-			AvatarUrl: "",
+			AvatarKey: "",
 			Email:     admin_email,
 			Role:      "admin",
 			CreatedAt: time.Now(),
