@@ -27,19 +27,14 @@ export function useCardChat({ cardId, onMessage }: UseCardChatOptions) {
     useEffect(() => {
         const token = localStorage.getItem('accessToken')
         if (!token) {
-            console.warn('[ws] no access token, skipping connection')
             return
         }
 
-        const apiUrl = import.meta.env.VITE_API_URL as string
-        const host = apiUrl.replace(/^https?:\/\//, '')   // защита от http://
-        const url = `ws://${host}/ws/${cardId}?token=${encodeURIComponent(token)}`
-
-        console.log('[ws] connecting to', url)
+        const apiUrl = import.meta.env.WS_URL as string
+        const url = `${apiUrl}/${cardId}?token=${encodeURIComponent(token)}`
 
         const ws = new WebSocket(url)
         wsRef.current = ws
-        setReadyState('connecting')
 
         ws.onopen = () => {
             console.log('[ws] connected to', cardId)

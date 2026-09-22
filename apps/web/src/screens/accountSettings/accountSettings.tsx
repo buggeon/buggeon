@@ -65,6 +65,8 @@ function AccountSettingsScreen() {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string>(buildLink(user.avatarKey))
     
+    console.log(avatarPreviewUrl)
+
     const notificationSettingsItems = [
         {
             id: "newComments",

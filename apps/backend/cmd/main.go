@@ -259,6 +259,8 @@ func setupRoutes(
 		c.File("static/index.html")
 	})
 
+	router.Any("/files/*path", handlers.S3ProxyHandler(os.Getenv("S3_ENDPOINT")))
+
 	api := router.Group("/api")
 	{
 		api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
