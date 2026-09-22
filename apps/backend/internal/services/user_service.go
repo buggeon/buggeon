@@ -66,7 +66,7 @@ func (s *UserService) Register(ctx context.Context, loginDto *dto.UserRegistrati
 		ID:        userID,
 		Name:      loginDto.Name,
 		Email:     loginDto.Email,
-		AvatarUrl: "",
+		AvatarKey: "",
 		Login:     loginDto.Login,
 		Password:  passwordHash,
 		Role:      "user",
@@ -87,7 +87,7 @@ func (s *UserService) Register(ctx context.Context, loginDto *dto.UserRegistrati
 		Name:      user.Name,
 		Login:     user.Login,
 		Email:     user.Email,
-		AvatarUrl: user.AvatarUrl,
+		AvatarKey: user.AvatarKey,
 	}, nil
 
 }
@@ -115,7 +115,7 @@ func (s *UserService) Login(ctx context.Context, loginDto *dto.UserLoginDto) (dt
 			Name:      user.Name,
 			Login:     user.Login,
 			Email:     user.Email,
-			AvatarUrl: user.AvatarUrl,
+			AvatarKey: user.AvatarKey,
 		}, s.userRepo.AddRefreshToken(ctx, user.ID, tokensPair.RefreshToken)
 
 	}
@@ -174,7 +174,9 @@ func (s *UserService) SetAvatar(ctx context.Context, userID string, avatar *mult
 		return "", err
 	}
 
-	url, err := s.s3Storage.Upload(context.TODO(), fmt.Sprintf("users/%s/avatar/%s", userID, avatar.Filename), src, avatar.Header.Get("Content-Type"))
+	key := fmt.Sprintf("users/%s/avatar/%s", userID, avatar.Filename)
+
+	err = s.s3Storage.Upload(context.TODO(), key, src, avatar.Header.Get("Content-Type"))
 
 	if err != nil {
 		return "", err
@@ -186,6 +188,6 @@ func (s *UserService) SetAvatar(ctx context.Context, userID string, avatar *mult
 		return "", err
 	}
 
-	return url, s.userRepo.SetAvatar(ctx, userObjID, url)
+	return fmt.Sprintf("buggeon/%s", key), s.userRepo.SetAvatar(ctx, userObjID, fmt.Sprintf("buggeon/%s", key))
 
 }

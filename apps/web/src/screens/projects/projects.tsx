@@ -17,6 +17,7 @@ import DropInput from "../../components/inputs/dropInput/dropInput";
 import SystemApi from "../../api/system.api";
 import type { User } from "../../store/types/user.interface";
 import CreateProject from "./createProject/createProject";
+import buildLink from "../../utils/buildLink";
 
 interface ProjectInfo {
     name : string
@@ -34,6 +35,8 @@ function ProjectsScreen() {
 
     const { data, refetch } = useGetProjects(user.id)
     const [isModalVisible, setModalVisibility] = useState(false)
+
+    console.log(data)
 
     return(
         <MainLayout
@@ -97,7 +100,7 @@ function ProjectsScreen() {
                                             }} key={project.id}>
                                                 <td>
                                                     <div className={styles.projectAbout}>
-                                                        <img src={project.logoUrl}/>
+                                                        <img src={buildLink(project.logoKey)}/>
                                                         <div className={styles.projectNameAndDescription}>
                                                             <p>{project.name}</p>
                                                             <p>{project.description}</p>
@@ -106,7 +109,7 @@ function ProjectsScreen() {
                                                 </td>
                                                 <td>
                                                     <div className={styles.leadInfo}>
-                                                        <img src={project.logoUrl}/>
+                                                        <img src={buildLink(project.logoKey)}/>
                                                         <p>{project.lead.user.name}</p>
                                                     </div>
                                                 </td>
@@ -114,7 +117,7 @@ function ProjectsScreen() {
                                                     <div className={styles.members}>
                                                         {
                                                             project.members.slice(0, 4).map(member => (
-                                                                <img src={member.user.avatarUrl}/>
+                                                                <img src={buildLink(member.user.avatarKey)}/>
                                                             ))
                                                         }
                                                         {

@@ -103,7 +103,7 @@ function EntryForm({mode, changeMode, className} : {mode : "regist" | "auth", ch
                                 name: result.name,
                                 login: result.login,
                                 email: result.email,
-                                avatarUrl: result.avatarUrl
+                                avatarKey: result.avatarKey
                             }))
                             setLoading(false)
                             navigate("/dashboard/profile")
@@ -123,7 +123,7 @@ function EntryForm({mode, changeMode, className} : {mode : "regist" | "auth", ch
                                 name: result.name,
                                 login: result.login,
                                 email: result.email,
-                                avatarUrl: result.avatarUrl
+                                avatarKey: result.avatarKey
                             } as User))
                             setLoading(false)
                             navigate("/dashboard/profile")

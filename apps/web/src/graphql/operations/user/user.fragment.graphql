@@ -4,5 +4,5 @@ fragment UserDetails on User {
     email
     login
     createdAt
-    avatarUrl
+    avatarKey
 }

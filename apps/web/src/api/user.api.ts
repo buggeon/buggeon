@@ -24,7 +24,7 @@ class UserApi {
                     name: result.data.userData.name as string,
                     login: result.data.userData.login as string,
                     email: result.data.userData.email as string,
-                    avatarUrl: result.data.userData.avatarUrl as string
+                    avatarKey: result.data.userData.avatarKey as string
                 }
 
             }
@@ -58,7 +58,7 @@ class UserApi {
                     name: result.data.userData.name,
                     login: result.data.userData.login,
                     email: result.data.userData.email,
-                    avatarUrl: result.data.userData.avatarUrl
+                    avatarKey: result.data.userData.avatarKey
                 }
 
             }
@@ -83,7 +83,7 @@ class UserApi {
                 }
             })
 
-            return response.data.avatarUrl
+            return response.data.avatarKey
 
         }
         catch(e) {

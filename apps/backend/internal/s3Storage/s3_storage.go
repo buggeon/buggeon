@@ -117,10 +117,10 @@ func (s *S3Storage) putPublicPolicy(ctx context.Context) error {
 	return nil
 }
 
-func (s *S3Storage) Upload(ctx context.Context, key string, body io.Reader, contentType string) (string, error) {
+func (s *S3Storage) Upload(ctx context.Context, key string, body io.Reader, contentType string) error {
 
 	if key == "" {
-		return "", fmt.Errorf("Key cannot be empty")
+		return fmt.Errorf("Key cannot be empty")
 	}
 
 	if contentType == "" {
@@ -137,10 +137,10 @@ func (s *S3Storage) Upload(ctx context.Context, key string, body io.Reader, cont
 	_, err := s.client.PutObject(ctx, input)
 
 	if err != nil {
-		return "", fmt.Errorf("Failed to upload file: %w", err)
+		return fmt.Errorf("Failed to upload file: %w", err)
 	}
 
-	return s.GetUrl(s.bucket, key), nil
+	return nil
 
 }
 
@@ -160,11 +160,5 @@ func (s *S3Storage) Download(ctx context.Context, key string) ([]byte, error) {
 	defer result.Body.Close()
 
 	return io.ReadAll(result.Body)
-
-}
-
-func (s *S3Storage) GetUrl(bucket, key string) string {
-
-	return s.endpoint + "/" + bucket + "/" + key
 
 }

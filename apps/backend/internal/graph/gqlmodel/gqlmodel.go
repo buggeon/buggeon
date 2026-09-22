@@ -31,7 +31,7 @@ type Project struct {
 	ID        string
 	CreatedAt string
 	UpdatedAt string
-	LogoURL   string
+	LogoKey   string
 	Progress  int32
 }
 

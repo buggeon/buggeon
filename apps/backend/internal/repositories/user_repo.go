@@ -187,9 +187,9 @@ func (r *UserRepo) AddRefreshToken(ctx context.Context, userID primitive.ObjectI
 
 }
 
-func (r *UserRepo) SetAvatar(ctx context.Context, userID primitive.ObjectID, avatarUrl string) error {
+func (r *UserRepo) SetAvatar(ctx context.Context, userID primitive.ObjectID, avatarKey string) error {
 
-	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": userID}, bson.M{"$set": bson.M{"avatar_url": avatarUrl}})
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": userID}, bson.M{"$set": bson.M{"avatar_key": avatarKey}})
 
 	return err
 

@@ -81,7 +81,7 @@ func (h *UserHandler) Registration(c *gin.Context) {
 			Name:      result.Name,
 			Email:     result.Email,
 			Login:     result.Login,
-			AvatarUrl: result.AvatarUrl,
+			AvatarKey: result.AvatarKey,
 		},
 	})
 }
@@ -131,7 +131,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 			Name:      result.Name,
 			Login:     result.Login,
 			Email:     result.Email,
-			AvatarUrl: result.AvatarUrl,
+			AvatarKey: result.AvatarKey,
 		},
 	})
 }
@@ -202,12 +202,12 @@ func (h *UserHandler) SetAvatar(c *gin.Context) {
 
 	userID, _ := c.Get("userID")
 
-	avatarUrl, err := h.userService.SetAvatar(c, userID.(string), avatar)
+	avatarKey, err := h.userService.SetAvatar(c, userID.(string), avatar)
 
 	if err != nil {
 		c.Status(500)
 		return
 	}
 
-	c.JSON(200, gin.H{"avatarUrl": avatarUrl})
+	c.JSON(200, gin.H{"avatarKey": avatarKey})
 }

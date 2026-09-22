@@ -6,7 +6,7 @@ const initialState : User = {
     email: "",
     login: "",
     id: "",
-    avatarUrl: ""
+    avatarKey: ""
 }
 
 const userSlice = createSlice({
@@ -18,13 +18,13 @@ const userSlice = createSlice({
             state.id = action.payload.id,
             state.login = action.payload.login,
             state.email = action.payload.email,
-            state.avatarUrl = action.payload.avatarUrl
+            state.avatarKey = action.payload.avatarKey
         },
         clearUser: (state, action : PayloadAction<User>) => {
             state.name = "",
             state.id = "",
             state.login = "",
-            state.avatarUrl = "",
+            state.avatarKey = "",
             state.email = ""
         },
     }

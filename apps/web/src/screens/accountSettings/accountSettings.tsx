@@ -18,6 +18,7 @@ import RadioButton from "../../components/radioButton/radioButton";
 import StandartButton from "../../components/standartButton/standartButton";
 import { setAppearance } from "../../store/slices/themeSlice";
 import themeDict from "../../dicts/theme";
+import buildLink from "../../utils/buildLink";
 
 type AccentColor = "#4774fa" | "#eb5940" | "#ef6f1d" | "#715bc5" | "#4da592" | "#6bb919"
 
@@ -54,8 +55,6 @@ function AccountSettingsScreen() {
     })
     const ACCENTS = ["#715bc5", "#4da592", "#4774fa", "#eb5940", "#ef6f1d", "#6bb919"] as const
 
-    console.log(appearanceState)
-
     const [appearanceSettings, setAppearanceSettings] = useState<AppearanceSettingsType>(appearanceState)
     const [accountSettings, setAccountSettings] = useState<AccountSettingsType>({
         avatar : null,
@@ -64,7 +63,7 @@ function AccountSettingsScreen() {
         email: user.email
     })
     const fileInputRef = useRef<HTMLInputElement>(null)
-    const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string>(user.avatarUrl)
+    const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string>(buildLink(user.avatarKey))
     
     const notificationSettingsItems = [
         {
@@ -175,7 +174,7 @@ function AccountSettingsScreen() {
                     name: updatedUserData.name,
                     login: updatedUserData.login,
                     email: updatedUserData.email,
-                    avatarUrl: user.avatarUrl
+                    avatarKey: user.avatarKey
                 }))
 
             }
@@ -188,14 +187,14 @@ function AccountSettingsScreen() {
 
             try{
 
-                const avatarUrl = await userApi.setAvatar(user.id, accountSettings.avatar)
+                const avatarKey = await userApi.setAvatar(user.id, accountSettings.avatar)
 
                 dispatch(setUser({
                     id: user.id,
                     name: user.name,
                     login: user.login,
                     email: user.email,
-                    avatarUrl: avatarUrl
+                    avatarKey: avatarKey
                 }))
             }
             catch(e) {

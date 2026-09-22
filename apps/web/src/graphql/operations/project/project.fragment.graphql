@@ -2,7 +2,7 @@ fragment ProjectDetails on Project {
     id
     name
     description
-    logoUrl
+    logoKey
     progress
     createdAt
     updatedAt

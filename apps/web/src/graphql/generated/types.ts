@@ -158,7 +158,7 @@ export type Project = {
   description: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   lead: Member;
-  logoUrl: Scalars['String']['output'];
+  logoKey: Scalars['String']['output'];
   members: Array<Member>;
   name: Scalars['String']['output'];
   progress: Scalars['Int']['output'];
@@ -264,7 +264,6 @@ export type UpdateCardInput = {
 
 export type UpdateProjectInput = {
   description?: InputMaybe<Scalars['String']['input']>;
-  logoUrl?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   progress?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -277,7 +276,7 @@ export type UpdateUserInput = {
 
 export type User = {
   __typename?: 'User';
-  avatarUrl: Scalars['String']['output'];
+  avatarKey: Scalars['String']['output'];
   createdAt: Scalars['String']['output'];
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];

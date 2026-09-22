@@ -6,6 +6,7 @@ import { LogoIcon } from "../../assets/logo/logo";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/slices";
 import themeDict from "../../dicts/theme";
+import buildLink from "../../utils/buildLink";
 
 function Sidebar({tabs, className} : {tabs : ISidebarMenuItem[], className? : string}) {
 
@@ -29,7 +30,7 @@ function Sidebar({tabs, className} : {tabs : ISidebarMenuItem[], className? : st
             </ul>
 
             <section className={styles.account}>
-                <img src={user.avatarUrl} className={styles.accountAvatar}/>
+                <img src={buildLink(user.avatarKey)} className={styles.accountAvatar}/>
                 <div className={styles.accountPersonalInfo}>
                     <p>{user.name}</p>
                     <p className={styles.accountLogin}>{user.login}</p>

@@ -1,7 +1,7 @@
 type User {
     id: ID!
     name: String!
-    avatarUrl: String!
+    avatarKey: String!
     login: String!
     email: String!
     createdAt: String!
@@ -13,7 +13,7 @@ type Project {
     updatedAt: String!
     name: String!
     description: String!
-    logoUrl: String!
+    logoKey: String!
     progress: Int!
 
     lead: Member!
@@ -165,7 +165,6 @@ input CreateProjectInput {
 input UpdateProjectInput {
     name: String
     description: String
-    logoUrl: String
     progress: Int
 }
 
