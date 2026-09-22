@@ -8,6 +8,7 @@ import { useCardChat } from '../../hooks/useCardChat';
 import type { ChatMessage } from '../../hooks/useCardChat';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store/slices';
+import buildLink from '../../utils/buildLink';
 
 function CardAboutScreen() {
 
@@ -20,7 +21,7 @@ function CardAboutScreen() {
     const history: ChatMessage[] = data?.card.messages.map(m => ({
         senderId: m.sender.id,
         senderName: m.sender.name,
-        senderAvatarUrl: m.sender.avatarUrl,
+        senderAvatarUrl: buildLink(m.sender.avatarKey),
         content: m.content,
         id: m.id,
     })) ?? []
