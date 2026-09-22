@@ -1,4 +1,1241 @@
+basePath: /api
+definitions:
+  buggeon_internal_dto.CreateBoardDto:
+    properties:
+      cardsStatus:
+        type: string
+      direction:
+        type: string
+      name:
+        type: string
+      projectId:
+        type: string
+    required:
+    - cardsStatus
+    - direction
+    - name
+    type: object
+  buggeon_internal_dto.CreateCardDto:
+    properties:
+      assignees:
+        items:
+          type: string
+        type: array
+      boardId:
+        type: string
+      content:
+        type: string
+      dueDate:
+        type: string
+      priority:
+        type: string
+      title:
+        type: string
+    required:
+    - assignees
+    - content
+    - priority
+    - title
+    type: object
+  buggeon_internal_dto.CreateMemberDto:
+    properties:
+      directions:
+        items:
+          type: string
+        type: array
+      projectId:
+        type: string
+      rights:
+        items:
+          type: string
+        type: array
+      role:
+        type: string
+      userId:
+        type: string
+    required:
+    - directions
+    - rights
+    - role
+    - userId
+    type: object
+  buggeon_internal_dto.CreateProjectDto:
+    properties:
+      description:
+        type: string
+      leadId:
+        type: string
+      logo:
+        $ref: '#/definitions/graphql.Upload'
+      members:
+        items:
+          $ref: '#/definitions/buggeon_internal_dto.MemberDto'
+        type: array
+      name:
+        type: string
+      progress:
+        type: integer
+    required:
+    - leadId
+    - name
+    type: object
+  buggeon_internal_dto.CreateSchemaDto:
+    properties:
+      direction:
+        type: string
+      name:
+        type: string
+      url:
+        type: string
+    required:
+    - name
+    - url
+    type: object
+  buggeon_internal_dto.MemberDto:
+    properties:
+      directions:
+        items:
+          type: string
+        type: array
+      role:
+        type: string
+      userId:
+        type: string
+    required:
+    - directions
+    - role
+    - userId
+    type: object
+  buggeon_internal_dto.NewMessageDto:
+    properties:
+      cardId:
+        type: string
+      content:
+        type: string
+      replyTo:
+        type: string
+      senderId:
+        type: string
+    required:
+    - content
+    type: object
+  buggeon_internal_dto.UserLoginDto:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  buggeon_internal_dto.UserRegistrationDto:
+    properties:
+      email:
+        type: string
+      login:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - login
+    - name
+    - password
+    type: object
+  buggeon_internal_models.Board:
+    properties:
+      cards:
+        items:
+          type: string
+        type: array
+      cardsStatus:
+        type: string
+      createdAt:
+        type: string
+      direction:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      projectId:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  buggeon_internal_models.Card:
+    properties:
+      assignees:
+        items:
+          type: string
+        type: array
+      boardId:
+        type: string
+      content:
+        type: string
+      createdAt:
+        type: string
+      dueDate:
+        type: string
+      id:
+        type: string
+      messages:
+        items:
+          type: string
+        type: array
+      priority:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  buggeon_internal_models.Member:
+    properties:
+      created_at:
+        type: string
+      directions:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      project_id:
+        type: string
+      role:
+        type: string
+      user_id:
+        type: string
+    type: object
+  buggeon_internal_models.Project:
+    properties:
+      boards:
+        items:
+          type: string
+        type: array
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      lead_id:
+        type: string
+      logo_url:
+        type: string
+      members:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      progress:
+        type: integer
+      schemas:
+        items:
+          type: string
+        type: array
+      updated_at:
+        type: string
+    type: object
+  buggeon_internal_models.Schema:
+    properties:
+      authorId:
+        type: string
+      createdAt:
+        type: string
+      direction:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      projectId:
+        type: string
+      updatedAt:
+        type: string
+      url:
+        type: string
+    type: object
+  buggeon_internal_models.User:
+    properties:
+      avatarUrl:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      login:
+        type: string
+      name:
+        type: string
+    type: object
+  graphql.Upload:
+    properties:
+      contentType:
+        type: string
+      file: {}
+      filename:
+        type: string
+      size:
+        format: int64
+        type: integer
+    type: object
+host: localhost:9090
 info:
-  contact: {}
-paths: {}
+  contact:
+    email: support@buggeon.com
+    name: Buggeon Support
+    url: https://buggeon.com/support
+  description: Self-hosted bug and task tracking service.
+  license:
+    name: AGPL-3.0
+    url: https://www.gnu.org/licenses/agpl-3.0.html
+  termsOfService: https://buggeon.com/terms
+  title: Buggeon API
+  version: 0.1.0
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authentification by password and login
+      parameters:
+      - description: Entry data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/buggeon_internal_dto.UserLoginDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: accessToken and userData
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Invalid credentials
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: System entry
+      tags:
+      - auth
+  /auth/refreshtoken:
+    post:
+      description: Refresh access token by refresh token from httpOnly cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: accessToken
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Invalid credentials
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Access token refreshing
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account and return access token
+      parameters:
+      - description: Registration data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/buggeon_internal_dto.UserRegistrationDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: accessToken and userData
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: User already exists
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: User registration
+      tags:
+      - auth
+  /projects:
+    get:
+      description: Get all projects of the current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/buggeon_internal_models.Project'
+            type: array
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List projects
+      tags:
+      - projects
+    post:
+      consumes:
+      - application/json
+      description: Create a new project with the current user as lead
+      parameters:
+      - description: Project data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/buggeon_internal_dto.CreateProjectDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created project
+          schema:
+            $ref: '#/definitions/buggeon_internal_models.Project'
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a project
+      tags:
+      - projects
+  /projects/{project_id}:
+    delete:
+      description: Delete a project by its ID
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a project
+      tags:
+      - projects
+    get:
+      description: Get a project by its ID
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/buggeon_internal_models.Project'
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a project
+      tags:
+      - projects
+  /projects/{project_id}/boards:
+    get:
+      description: Get all boards of the project
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/buggeon_internal_models.Board'
+            type: array
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List boards
+      tags:
+      - boards
+    post:
+      consumes:
+      - application/json
+      description: Create a new board inside the project
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Board data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/buggeon_internal_dto.CreateBoardDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a board
+      tags:
+      - boards
+  /projects/{project_id}/boards/{board_id}:
+    delete:
+      description: Delete a board from the project
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Board ID
+        in: path
+        name: board_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a board
+      tags:
+      - boards
+    get:
+      description: Get a board by its ID
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Board ID
+        in: path
+        name: board_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/buggeon_internal_models.Board'
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a board
+      tags:
+      - boards
+  /projects/{project_id}/boards/{board_id}/cards:
+    get:
+      description: Get all cards of the board
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Board ID
+        in: path
+        name: board_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/buggeon_internal_models.Card'
+            type: array
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List cards
+      tags:
+      - cards
+    post:
+      consumes:
+      - application/json
+      description: Create a new card inside the board
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Board ID
+        in: path
+        name: board_id
+        required: true
+        type: string
+      - description: Card data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/buggeon_internal_dto.CreateCardDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a card
+      tags:
+      - cards
+  /projects/{project_id}/boards/{board_id}/cards/{card_id}:
+    delete:
+      description: Delete a card from the board
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Board ID
+        in: path
+        name: board_id
+        required: true
+        type: string
+      - description: Card ID
+        in: path
+        name: card_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a card
+      tags:
+      - cards
+    get:
+      description: Get a card by its ID
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Board ID
+        in: path
+        name: board_id
+        required: true
+        type: string
+      - description: Card ID
+        in: path
+        name: card_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/buggeon_internal_models.Card'
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a card
+      tags:
+      - cards
+  /projects/{project_id}/boards/{board_id}/cards/{card_id}/messages:
+    post:
+      consumes:
+      - application/json
+      description: Post a new message to the card
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Board ID
+        in: path
+        name: board_id
+        required: true
+        type: string
+      - description: Card ID
+        in: path
+        name: card_id
+        required: true
+        type: string
+      - description: Message data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/buggeon_internal_dto.NewMessageDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Send a message
+      tags:
+      - messages
+  /projects/{project_id}/boards/{board_id}/cards/{card_id}/updatelocation:
+    put:
+      consumes:
+      - application/json
+      description: Update the board a card belongs to
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Old board ID
+        in: path
+        name: board_id
+        required: true
+        type: string
+      - description: Card ID
+        in: path
+        name: card_id
+        required: true
+        type: string
+      - description: New board
+        in: body
+        name: input
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to move card
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Move a card to another board
+      tags:
+      - cards
+  /projects/{project_id}/logo:
+    patch:
+      consumes:
+      - multipart/form-data
+      description: Upload a new logo file for the project
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: New logo file
+        in: formData
+        name: logo
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: New logo file was not provided
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to upload new logo file
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Set project logo
+      tags:
+      - projects
+  /projects/{project_id}/members:
+    get:
+      description: Get all members of the project
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/buggeon_internal_models.Member'
+            type: array
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List members
+      tags:
+      - members
+    post:
+      consumes:
+      - application/json
+      description: Add a new member to the project
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Member data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/buggeon_internal_dto.CreateMemberDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Add a member
+      tags:
+      - members
+  /projects/{project_id}/members/{member_id}:
+    delete:
+      description: Remove a member from the project
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Member ID
+        in: path
+        name: member_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Remove a member
+      tags:
+      - members
+    get:
+      description: Get a member by ID
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Member ID
+        in: path
+        name: member_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/buggeon_internal_models.Member'
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a member
+      tags:
+      - members
+  /projects/{project_id}/schemas:
+    get:
+      description: Get all schemas attached to the project
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/buggeon_internal_models.Schema'
+            type: array
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List project schemas
+      tags:
+      - schemas
+    post:
+      consumes:
+      - application/json
+      description: Attach a new schema to the project
+      parameters:
+      - description: Project ID
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Schema data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/buggeon_internal_dto.CreateSchemaDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a project schema
+      tags:
+      - schemas
+  /users:
+    get:
+      description: Get all users of the system (admin only)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/buggeon_internal_models.User'
+            type: array
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List all users
+      tags:
+      - users
+  /users/{user_id}/avatar:
+    patch:
+      consumes:
+      - multipart/form-data
+      description: Upload a new avatar file for the current user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: New avatar file
+        in: formData
+        name: avatar
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: avatarUrl
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to upload avatar
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Set user avatar
+      tags:
+      - users
+  /ws/{cardId}:
+    get:
+      description: Opens a WebSocket connection to receive and send messages in a
+        card. Token is passed as a query parameter because browsers cannot set custom
+        headers on WebSocket connections.
+      parameters:
+      - description: Card ID
+        in: path
+        name: cardId
+        required: true
+        type: string
+      - description: Access token (JWT)
+        in: query
+        name: token
+        required: true
+        type: string
+      responses:
+        "101":
+          description: Switching Protocols
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to upgrade connection
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: WebSocket chat for a card
+      tags:
+      - websocket
+securityDefinitions:
+  BearerAuth:
+    description: Введи "Bearer <token>"
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

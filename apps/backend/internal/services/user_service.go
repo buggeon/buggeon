@@ -17,6 +17,7 @@
 package services
 
 import (
+	"buggeon/internal/cache"
 	"buggeon/internal/dto"
 	"buggeon/internal/models"
 	"buggeon/internal/repositories"
@@ -34,17 +35,20 @@ type UserService struct {
 	userRepo     *repositories.UserRepo
 	tokenService *TokenService
 	s3Storage    *s3storage.S3Storage
+	cache        *cache.UserCache
 }
 
 func NewUserService(
 	userRepo *repositories.UserRepo,
 	tokenService *TokenService,
 	s3Storage *s3storage.S3Storage,
+	cache *cache.UserCache,
 ) *UserService {
 	return &UserService{
 		userRepo:     userRepo,
 		tokenService: tokenService,
 		s3Storage:    s3Storage,
+		cache:        cache,
 	}
 }
 
