@@ -168,7 +168,8 @@ func main() {
 
 	s3Storage := s3storage.NewS3Storage()
 
-	cache := cache.NewUserCache(5 * time.Minute)
+	userCache := cache.NewUserCache(5 * time.Minute)
+	permissionsCache := cache.NewPermissionCache(5 * time.Minute)
 
 	userRepo := repositories.NewUserRepo()
 	projectRepo := repositories.NewProjectRepo()
@@ -184,7 +185,7 @@ func main() {
 	schemaService := services.NewSchemaService(projectRepo, schemaRepo, s3Storage)
 	projectService := services.NewProjectService(projectRepo, memberService, memberRepo, boardRepo, cardRepo, messageRepo, s3Storage)
 	tokenService := services.NewTokenService(config.LoadConfig())
-	userService := services.NewUserService(userRepo, tokenService, s3Storage)
+	userService := services.NewUserService(userRepo, tokenService, s3Storage, userCache)
 	systemService := services.NewSystemService(userRepo)
 	messageService := services.NewMessageService(messageRepo, cardRepo)
 
@@ -194,6 +195,7 @@ func main() {
 	chatHandler := handlers.NewChatHandler(messageService, tokenService, userService)
 
 	authMiddleware := middleware.NewAuthMiddleware(tokenService)
+	permissionsMiddleware := middleware.NewPermissionsMiddleware(permissionsCache)
 	loaderMiddleware := middleware.NewLoaderMiddleware(userRepo, cardRepo, boardRepo, messageRepo, memberRepo)
 
 	router.Use(loaderMiddleware.SetLoaderMiddleware())
@@ -217,7 +219,16 @@ func main() {
 		),
 	)
 
-	setupRoutes(router, projectHandler, userHandler, systemHandler, chatHandler, authMiddleware, gqlHandler)
+	setupRoutes(
+		router,
+		projectHandler,
+		userHandler,
+		systemHandler,
+		chatHandler,
+		authMiddleware,
+		permissionsMiddleware,
+		gqlHandler,
+	)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -234,6 +245,7 @@ func setupRoutes(
 	systemHandler *handlers.SystemHandler,
 	chatHandler *handlers.ChatHandler,
 	authMiddleware *middleware.AuthMiddleware,
+	permissionsMiddleware *middleware.PermissionsMiddleware,
 	gqlHandler *handler.Server,
 ) {
 	router.GET("/health", func(c *gin.Context) {
