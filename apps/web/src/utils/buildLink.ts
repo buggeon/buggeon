@@ -1,8 +1,8 @@
-import { RUSTFS_URL } from "../../config";
+import { FILES_URL } from "../../config"
 
 function buildLink(key : string) {
 
-    return `${RUSTFS_URL}/${key}`
+    return `${FILES_URL}/${key}`
 
 }
 
