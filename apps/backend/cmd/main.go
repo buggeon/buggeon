@@ -18,6 +18,7 @@ package main
 
 import (
 	"buggeon/config"
+	_ "buggeon/docs"
 	"buggeon/internal/cache"
 	"buggeon/internal/db"
 	"buggeon/internal/graph"
@@ -98,6 +99,26 @@ func createAdmin(tokenService *services.TokenService) error {
 
 }
 
+// @title           Buggeon API
+// @version         0.1.0
+// @description     Self-hosted bug and task tracking service.
+// @termsOfService  https://buggeon.com/terms
+
+// @contact.name   Buggeon Support
+// @contact.url    https://buggeon.com/support
+// @contact.email  support@buggeon.com
+
+// @license.name  AGPL-3.0
+// @license.url   https://www.gnu.org/licenses/agpl-3.0.html
+
+// @host      localhost:9090
+// @BasePath  /api
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Введи "Bearer <token>"
+
 func main() {
 
 	godotenv.Load()
@@ -170,7 +191,7 @@ func main() {
 	projectHandler := handlers.NewProjectHandler(projectService, schemaService, cardService, boardService, memberService, messageService)
 	userHandler := handlers.NewUserHandler(userService)
 	systemHandler := handlers.NewSystemHandler(systemService)
-	chatHandler := handlers.NewChatHandler(messageService, tokenService, cache)
+	chatHandler := handlers.NewChatHandler(messageService, tokenService, userService)
 
 	authMiddleware := middleware.NewAuthMiddleware(tokenService)
 	loaderMiddleware := middleware.NewLoaderMiddleware(userRepo, cardRepo, boardRepo, messageRepo, memberRepo)

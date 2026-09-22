@@ -17,6 +17,7 @@
 package handlers
 
 import (
+	_ "buggeon/internal/models"
 	"buggeon/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -32,6 +33,15 @@ func NewSystemHandler(systemService *services.SystemService) *SystemHandler {
 	}
 }
 
+// GetAllUsers godoc
+// @Summary      List all users
+// @Description  Get all users of the system (admin only)
+// @Tags         users
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {array}   models.User
+// @Failure      403  {object}  map[string]string  "Forbidden"
+// @Router       /users [get]
 func (h *SystemHandler) GetAllUsers(c *gin.Context) {
 
 	users, err := h.systemService.GetAllUsers(c)

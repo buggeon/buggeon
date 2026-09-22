@@ -35,6 +35,17 @@ func NewUserHandler(userService *services.UserService) *UserHandler {
 	}
 }
 
+// Registration godoc
+// @Summary      User registration
+// @Description  Create a new user account and return access token
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        input  body      dto.UserRegistrationDto  true  "Registration data"
+// @Success      200    {object}  map[string]string  "accessToken and userData"
+// @Failure      400    {object}  map[string]string  "Invalid input"
+// @Failure      409    {object}  map[string]string  "User already exists"
+// @Router       /auth/register [post]
 func (h *UserHandler) Registration(c *gin.Context) {
 
 	var registData dto.UserRegistrationDto
@@ -54,27 +65,38 @@ func (h *UserHandler) Registration(c *gin.Context) {
 	}
 
 	cookie := &http.Cookie{
-		Name:   "refreshToken",
-		Value:  result.Tokens.RefreshToken,
-		MaxAge: 60 * 60 * 24 * 30,
-		Path:   "auth/refreshtoken",
-		Domain: "localhost",
-		//Secure:   true,
+		Name:     "refreshToken",
+		Value:    result.Tokens.RefreshToken,
+		MaxAge:   60 * 60 * 24 * 30,
+		Path:     "/api/auth/refreshtoken",
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	}
 
 	http.SetCookie(c.Writer, cookie)
 
-	c.JSON(200, gin.H{"accessToken": result.Tokens.AccessToken, "userData": dto.UserAuthResponseDto{
-		Name:      result.Name,
-		Email:     result.Email,
-		Login:     result.Login,
-		AvatarUrl: result.AvatarUrl,
-	}})
-
+	c.JSON(200, gin.H{
+		"accessToken": result.Tokens.AccessToken,
+		"userData": dto.UserAuthResponseDto{
+			Name:      result.Name,
+			Email:     result.Email,
+			Login:     result.Login,
+			AvatarUrl: result.AvatarUrl,
+		},
+	})
 }
 
+// Login godoc
+// @Summary      System entry
+// @Description  Authentification by password and login
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        input  body      dto.UserLoginDto  true  "Entry data"
+// @Success      200    {object}  map[string]string  "accessToken and userData"
+// @Failure      400    {object}  map[string]string  "Invalid input"
+// @Failure      401    {object}  map[string]string  "Invalid credentials"
+// @Router       /auth/login [post]
 func (h *UserHandler) Login(c *gin.Context) {
 
 	var loginDto dto.UserLoginDto
@@ -88,33 +110,40 @@ func (h *UserHandler) Login(c *gin.Context) {
 	result, err := h.userService.Login(c, &loginDto)
 
 	if err != nil {
-
 		c.JSON(401, gin.H{"message": "Invalid credentials"})
+		return
+	}
 
-	} else {
-		cookie := &http.Cookie{
-			Name:   "refreshToken",
-			Value:  result.Tokens.RefreshToken,
-			MaxAge: 60 * 60 * 24 * 30,
-			Path:   "auth/refreshtoken",
-			Domain: "localhost",
-			//Secure:   true,
-			HttpOnly: true,
-			SameSite: http.SameSiteLaxMode,
-		}
+	cookie := &http.Cookie{
+		Name:     "refreshToken",
+		Value:    result.Tokens.RefreshToken,
+		MaxAge:   60 * 60 * 24 * 30,
+		Path:     "/api/auth/refreshtoken",
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	}
 
-		http.SetCookie(c.Writer, cookie)
+	http.SetCookie(c.Writer, cookie)
 
-		c.JSON(200, gin.H{"accessToken": result.Tokens.AccessToken, "userData": dto.UserAuthResponseDto{
+	c.JSON(200, gin.H{
+		"accessToken": result.Tokens.AccessToken,
+		"userData": dto.UserAuthResponseDto{
 			Name:      result.Name,
 			Login:     result.Login,
 			Email:     result.Email,
 			AvatarUrl: result.AvatarUrl,
-		}})
-	}
-
+		},
+	})
 }
 
+// RefreshAccessToken godoc
+// @Summary      Access token refreshing
+// @Description  Refresh access token by refresh token from httpOnly cookie
+// @Tags         auth
+// @Produce      json
+// @Success      200  {object}  map[string]string  "accessToken"
+// @Failure      401  {object}  map[string]string  "Invalid credentials"
+// @Router       /auth/refreshtoken [post]
 func (h *UserHandler) RefreshAccessToken(c *gin.Context) {
 
 	refreshToken, err := c.Cookie("refreshToken")
@@ -136,12 +165,10 @@ func (h *UserHandler) RefreshAccessToken(c *gin.Context) {
 	}
 
 	cookie := &http.Cookie{
-		Name:   "refreshToken",
-		Value:  tokenPair.RefreshToken,
-		MaxAge: 60 * 60 * 24 * 30,
-		Path:   "auth/refreshtoken",
-		Domain: "localhost",
-		//Secure:   true,
+		Name:     "refreshToken",
+		Value:    tokenPair.RefreshToken,
+		MaxAge:   60 * 60 * 24 * 30,
+		Path:     "/api/auth/refreshtoken",
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	}
@@ -151,6 +178,19 @@ func (h *UserHandler) RefreshAccessToken(c *gin.Context) {
 	c.JSON(200, gin.H{"accessToken": tokenPair.AccessToken})
 }
 
+// SetAvatar godoc
+// @Summary      Set user avatar
+// @Description  Upload a new avatar file for the current user
+// @Tags         users
+// @Accept       multipart/form-data
+// @Produce      json
+// @Security     BearerAuth
+// @Param        user_id  path      string  true  "User ID"
+// @Param        avatar   formData  file    true  "New avatar file"
+// @Success      200      {object}  map[string]string  "avatarUrl"
+// @Failure      401      {object}  map[string]string  "Unauthorized"
+// @Failure      500      {object}  map[string]string  "Failed to upload avatar"
+// @Router       /users/{user_id}/avatar [patch]
 func (h *UserHandler) SetAvatar(c *gin.Context) {
 
 	avatar, err := c.FormFile("avatar")
@@ -170,5 +210,4 @@ func (h *UserHandler) SetAvatar(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"avatarUrl": avatarUrl})
-
 }
