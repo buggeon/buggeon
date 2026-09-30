@@ -54,6 +54,25 @@ func (r *queryResolver) User(ctx context.Context, userID string) (*gqlmodel.User
 
 }
 
+func (r *queryResolver) Users(ctx context.Context) ([]*gqlmodel.User, error) {
+
+	users, err := r.UserService.GetUsers(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*gqlmodel.User, len(users))
+
+	for i, p := range users {
+
+		result[i] = gqlmodel.NewUser(p)
+	}
+
+	return result, nil
+
+}
+
 func (r *queryResolver) Board(ctx context.Context, boardID string) (*gqlmodel.Board, error) {
 
 	board, err := r.BoardService.GetBoard(ctx, boardID)

@@ -211,3 +211,31 @@ func (h *UserHandler) SetAvatar(c *gin.Context) {
 
 	c.JSON(200, gin.H{"avatarKey": avatarKey})
 }
+
+func (h *UserHandler) GetUser(c *gin.Context) {
+
+	userID := c.Param("user_id")
+
+	user, err := h.userService.GetUser(c, userID)
+
+	if err != nil {
+		c.Status(400)
+		return
+	}
+
+	c.JSON(200, user)
+
+}
+
+func (h *UserHandler) GetUsers(c *gin.Context) {
+
+	users, err := h.userService.GetUsers(c)
+
+	if err != nil {
+		c.Status(400)
+		return
+	}
+
+	c.JSON(200, users)
+
+}
