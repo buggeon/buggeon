@@ -8,6 +8,7 @@ import { useCardChat } from '../../hooks/useCardChat';
 import type { ChatMessage } from '../../hooks/useCardChat';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store/slices';
+import buildLink from '../../utils/buildLink';
 
 function CardAboutScreen() {
 

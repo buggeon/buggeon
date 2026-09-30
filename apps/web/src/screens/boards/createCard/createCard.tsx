@@ -77,7 +77,7 @@ function CreateCard({isVisible, setVisibility, boardId} : CreateCardProps) {
                     onChange={(text) => {setNewCardData(prev => ({...prev, title: text}))}}
                 />
                 <DropInput
-                    value={data?.members?.filter(m => newCardData.assignees.includes(m.id)).map(m => m.user.name)}
+                    value={membersData?.members?.filter(m => newCardData.assignees.includes(m.id)).map(m => m.user.name)}
                     title='Assignees'
                     placeholder='Select assignees...'
                     onChange={(text) => { console.log(text); setNewCardData(prev => ({...prev, assignees: [...prev.assignees, text]}))}}
