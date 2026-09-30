@@ -17,14 +17,7 @@ import DropInput from "../../components/inputs/dropInput/dropInput";
 import SystemApi from "../../api/system.api";
 import type { User } from "../../store/types/user.interface";
 import CreateProject from "./createProject/createProject";
-import buildLink from "../../utils/buildLink";
-
-interface ProjectInfo {
-    name : string
-    description : string
-    leadId : string
-    logo : File
-}
+import AvatarImage from "../../components/avatarImage/avatarImage";
 
 function ProjectsScreen() {
 
@@ -96,11 +89,11 @@ function ProjectsScreen() {
                                     {
                                         data.projects.filter(project => project.name.toLowerCase().includes(findName.toLowerCase()) || project.description.toLowerCase().includes(findName.toLowerCase())).map(project => (
                                             <tr onClick={() => {
-                                                navigate(`/project/${project.id}`)
+                                                navigate(`/projects/${project.id}`)
                                             }} key={project.id}>
                                                 <td>
                                                     <div className={styles.projectAbout}>
-                                                        <img src={buildLink(project.logoKey)}/>
+                                                        <AvatarImage imageKey={project.logoKey} title={project.name}/>
                                                         <div className={styles.projectNameAndDescription}>
                                                             <p>{project.name}</p>
                                                             <p>{project.description}</p>
@@ -109,7 +102,7 @@ function ProjectsScreen() {
                                                 </td>
                                                 <td>
                                                     <div className={styles.leadInfo}>
-                                                        <img src={buildLink(project.logoKey)}/>
+                                                        <AvatarImage imageKey={project.lead.user.avatarKey} title={project.lead.user.name}/>
                                                         <p>{project.lead.user.name}</p>
                                                     </div>
                                                 </td>
@@ -117,7 +110,7 @@ function ProjectsScreen() {
                                                     <div className={styles.members}>
                                                         {
                                                             project.members.slice(0, 4).map(member => (
-                                                                <img src={buildLink(member.user.avatarKey)}/>
+                                                                <AvatarImage imageKey={member.user.avatarKey} title={member.user.name}/>
                                                             ))
                                                         }
                                                         {

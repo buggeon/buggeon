@@ -69,6 +69,9 @@ import { RefreshIcon } from './refresh/refresh'
 import { ComputerIcon } from './computer/computer'
 import { AtSignIcon } from './atsign/atsign'
 import { EditIcon } from './edit/edit'
+import { CopyIcon } from './copy/copy'
+import { ChainIcon } from './chain/chain'
+import { CheckIcon } from './check/check'
 
 type IconProps = SVGProps<SVGSVGElement>
 
@@ -143,6 +146,9 @@ class Icons {
     static Computer(props: IconProps) { return <ComputerIcon {...props} /> }
     static AtSign(props: IconProps) { return <AtSignIcon {...props} /> }
     static Edit(props: IconProps) { return <EditIcon {...props} /> }
+    static Copy(props: IconProps) { return <CopyIcon {...props} /> }
+    static Chain(props: IconProps) { return <ChainIcon {...props} /> }
+    static Check(props: IconProps) { return <CheckIcon {...props} /> }
 }
 
 export default Icons

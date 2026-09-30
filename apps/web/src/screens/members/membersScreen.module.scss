@@ -1,0 +1,141 @@
+.main{
+
+    header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+
+        &::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 1px;
+            background-color: var(--green);
+        }
+
+        .rolesList {
+            display: flex;
+            gap: 10px;
+            align-self: flex-end;
+            z-index: 100;
+
+            div {
+                cursor: pointer;
+                border-bottom: 3px solid transparent;
+                transition: border-color 0.2s ease;
+                padding-bottom: 15px;;
+
+                &.active {
+                    border-bottom-color: var(--color-accent);
+                }
+            }
+        }
+
+        button {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px 16px;
+            background-color: var(--color-accent);
+            border: none;
+            border-radius: 10px;
+            align-self: center;
+
+            p {
+                font-size: 16px;
+            }
+        }
+    }
+
+    .table{
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 0;
+        table-layout: fixed;
+
+        thead{
+
+            th{
+                padding-top: 20px;
+                padding-bottom: 20px;
+                color: #b7becc;
+                text-align: left;
+
+                &:nth-child(1) { width: 32%; }
+                &:nth-child(2) { width: 12%; }
+                &:nth-child(3) { width: 20%; }
+                &:nth-child(4) { width: 10%; }
+                &:nth-child(5) { width: 10%; }
+                &:nth-child(6) { width: 12%; }
+                &:nth-child(7) { width: 4%; }
+
+            }
+        }
+
+        tbody{
+
+            margin-top: 20px;
+
+            tr{
+
+                &:hover{
+                    cursor: pointer;
+                }
+
+                td{
+                    background-color: var(--color-bg-elevated);
+                    padding-top: 25px;
+                    padding-bottom: 25px;
+
+                    &:first-child {
+                        border-top-left-radius: 10px;
+                        border-bottom-left-radius: 10px;
+                        padding-left: 25px;
+                    }
+                    &:last-child {
+                        border-top-right-radius: 10px;
+                        border-bottom-right-radius: 10px;
+                        padding-right: 25px;
+                    }
+
+                    .personalInfo{
+                        display: flex;
+                        gap: 10px;
+                        align-items: center;
+
+                        img{
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 100%;
+                        }
+                    }
+
+                    .role{
+                        width: 50px;
+                    }
+
+                    .status{
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+
+                        div{
+                            width: 12px;
+                            height: 12px;
+                            border-radius: 100%;
+                        }
+                    }
+
+                    .options{
+                        display: flex;
+                        width: 100%;
+                        justify-content: flex-end;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -7,6 +7,10 @@
     flex-shrink: 0;
     transition: background-color 0.3s ease;
 
+    &:hover{
+        cursor: pointer;
+    }
+
     .circle{
         width: 15px;
         height: 15px;

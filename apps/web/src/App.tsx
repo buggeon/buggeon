@@ -10,6 +10,9 @@ import BoardsScreen from './screens/boards/boards'
 import CardAboutScreen from './screens/cardAbout/cardAbout'
 import SettingsScreen from './screens/accountSettings/accountSettings'
 import AccountSettingsScreen from './screens/accountSettings/accountSettings'
+import ProjectSettingsScreen from './screens/projectSettings/projectSettings'
+import MembersScreen from './screens/members/membersScreen'
+import MemberAboutScreen from './screens/members/memberAbout/memberAbout'
 
 function App() {
 
@@ -34,12 +37,13 @@ function App() {
             </Route>
             <Route path="/auth" element={<EntryScreen/>}/>
 
-            <Route path="/project/:projectId">
+            <Route path="/projects/:projectId">
                 <Route index element={<Navigate to="overview" replace/>}/>
                 <Route path="overview" element={<MainLayout title="" description=""><></></MainLayout>}/>
-                <Route path="settings" element={<SettingsScreen/>}/>
+                <Route path="settings" element={<ProjectSettingsScreen/>}/>
+                <Route path="members" element={<MembersScreen/>}/>
                 <Route path="boards" element={<BoardsScreen/>}/>
-
+                <Route path="members/:memberId" element={<MemberAboutScreen/>}/>
                 <Route path='boards/:boardId/cards/:cardId' element={<CardAboutScreen/>}>
 
                 </Route>

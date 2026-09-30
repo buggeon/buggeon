@@ -18,7 +18,9 @@ import RadioButton from "../../components/radioButton/radioButton";
 import StandartButton from "../../components/standartButton/standartButton";
 import { setAppearance } from "../../store/slices/themeSlice";
 import themeDict from "../../dicts/theme";
-import buildLink from "../../utils/buildLink";
+import Sidebar from "../../components/sidebar/sidebar";
+import InlineSidebar from "../../components/inlineSidebar/inlineSidebar";
+import AvatarImage from "../../components/avatarImage/avatarImage";
 
 type AccentColor = "#4774fa" | "#eb5940" | "#ef6f1d" | "#715bc5" | "#4da592" | "#6bb919"
 
@@ -47,6 +49,7 @@ function AccountSettingsScreen() {
     const [updateUser, { loading, error }] = useMutation(UpdateUserDocument)
     const user = useSelector((state : RootState) => state.user)
     const appearanceState = useSelector((state : RootState) => state.appearance)
+    const [currentTabLabel, setCurrentTabLabel] = useState("Global")
     const [notificationSettings, setNotificationSettings] = useState<NotificationSettingsType>({
         newComments: true,
         issueUpdates: true,
@@ -63,10 +66,9 @@ function AccountSettingsScreen() {
         email: user.email
     })
     const fileInputRef = useRef<HTMLInputElement>(null)
-    const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string>(buildLink(user.avatarKey))
+    const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string>(user.avatarKey)
+    const [isUserIdCopied, setUserIdCopied] = useState(false)
     
-    console.log(avatarPreviewUrl)
-
     const notificationSettingsItems = [
         {
             id: "newComments",
@@ -209,204 +211,233 @@ function AccountSettingsScreen() {
 
     useEffect(() => {
 
-        console.log(appearanceState.theme)
-        
-    }, [appearanceState])
+        if(!isUserIdCopied) return
 
+        const id = setTimeout(() => {
+            setUserIdCopied(false)
+        }, 1000)
+
+        return () => clearTimeout(id)
+
+    }, [isUserIdCopied])
 
     return(
         <MainLayout
             title="Settings"
             description="Manage your account, preferenses and workspace settings"
         >
-            <section className={styles.main}>
-                <section className={styles.accountBlock}>
-                    <header>
-                        <div className={styles.headerTitleBlock}>
-                            <div>
-                                <p className={styles.title}>Account</p>
-                                <p className={styles.description}>Update your personal information and account settings</p>
-                            </div>
-                        </div>
-                        <button className={styles.saveChangesButton} onClick={handleSaveChanges}>Save changes</button>
-                    </header>
-                    <div style={{display: "flex"}}>
-                        <div className={styles.avatar} onClick={handleAvatarClick} style={avatarPreviewUrl == "" && !accountSettings.avatar ? {borderWidth: 1, borderColor: "var(--light-grey)", borderStyle: "solid"} : {}}>
-                            {avatarPreviewUrl != ""
-                                ?   <img src={avatarPreviewUrl}/>
-                                :   avatarPreviewUrl != "" ? <img src={avatarPreviewUrl}/>
-                                :    <Icons.PersonOutline
-                                        width={30}
-                                        height={30}
-                                        color="var(--light-grey)"
-                                    />
-                            }
-                            <input
-                                type='file'
-                                style={{display: "none"}}
-                                accept="image/png,image/jpeg,image/svg+xml"
-                                ref={fileInputRef}
-                                onChange={handleFileSelect}
-                            />
-                            <div className={styles.edit}>
-                                <Icons.Edit
-                                    width={20}
-                                    height={20}
-                                    color="white"
-                                />
-                            </div>
-                        </div>
-                        <div className={styles.inputBlock}>
-                            <StandartInput
-                                title="Name"
-                                placeholder="Name"
-                                value={accountSettings.name}
-                                onChange={(text) => setAccountSettings(prev => ({...prev, name: text}))}
-                            />
-                            <StandartInput
-                                title="Email"
-                                placeholder="Email"
-                                value={accountSettings.email}
-                                onChange={(text) => setAccountSettings(prev => ({...prev, email: text}))}
-                            />
-                            <StandartInput
-                                title="Login"
-                                placeholder="Login"
-                                value={accountSettings.login}
-                                onChange={(text) => setAccountSettings(prev => ({...prev, login: text}))}
-                            />
-                        </div>
-                    </div>
-                </section>
-                <div className={styles.notificationAndAppearanceBlock}>
-                    <section className={styles.notificationBlock}>
+            <section className={styles.screen}>
+                <main className={styles.main}>
+                    <section className={styles.accountBlock}>
                         <header>
                             <div className={styles.headerTitleBlock}>
-                                <Icons.BellOutline
-                                    width={40}
-                                    height={40}
-                                    color="var(--color-accent)"
-                                />
                                 <div>
-                                    <p className={styles.title}>Notifications</p>
-                                    <p className={styles.description}>Choose what you want to be notified about</p>
+                                    <p className={styles.title}>Account</p>
+                                    <p className={styles.description}>Update your personal information and account settings</p>
                                 </div>
                             </div>
+                            <button className={styles.saveChangesButton} onClick={handleSaveChanges}>Save changes</button>
                         </header>
-                        {
-                            notificationSettingsItems.map(setting => (
-                                <div className={styles.notificationSettingsItem}>
+                        <div style={{display: "flex"}}>
+                            <div className={styles.avatar} onClick={handleAvatarClick} style={avatarPreviewUrl == "" && !accountSettings.avatar ? {borderWidth: 1, borderColor: "var(--light-grey)", borderStyle: "solid"} : {}}>
+                                {avatarPreviewUrl != ""
+                                    ?   <AvatarImage size={70} imageKey={avatarPreviewUrl} title={user.name}/>
+                                    :    <Icons.PersonOutline
+                                            width={30}
+                                            height={30}
+                                            color="var(--light-grey)"
+                                        />
+                                }
+                                <input
+                                    type='file'
+                                    style={{display: "none"}}
+                                    accept="image/png,image/jpeg,image/svg+xml"
+                                    ref={fileInputRef}
+                                    onChange={handleFileSelect}
+                                />
+                                <div className={styles.edit}>
+                                    <Icons.Edit
+                                        width={20}
+                                        height={20}
+                                        color="white"
+                                    />
+                                </div>
+                            </div>
+                            <div className={styles.inputBlock}>
+                                <StandartInput
+                                    title="Name"
+                                    placeholder="Name"
+                                    value={accountSettings.name}
+                                    onChange={(text) => setAccountSettings(prev => ({...prev, name: text}))}
+                                />
+                                <StandartInput
+                                    title="Email"
+                                    placeholder="Email"
+                                    value={accountSettings.email}
+                                    onChange={(text) => setAccountSettings(prev => ({...prev, email: text}))}
+                                />
+                                <StandartInput
+                                    title="Login"
+                                    placeholder="Login"
+                                    value={accountSettings.login}
+                                    onChange={(text) => setAccountSettings(prev => ({...prev, login: text}))}
+                                />
+                                <div className={styles.userIdBlock}>
+                                    <h5>User ID</h5>
                                     <div>
-                                        {setting.icon}
-                                        <div className={styles.notificationSettingsItemNamingBlock}>
-                                            <p className={styles.notificationSettingsItemTitle}>
-                                                {setting.title}
-                                            </p>
-                                            <p className={styles.notificationSettingsItemDescription}>
-                                                {setting.description}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <Switch
-                                        onChange={() => setNotificationSettings(prev => ({...prev, [setting.id]: !prev[setting.id]}))}
-                                        enabled={notificationSettings[setting.id]}
-                                    />
-                                </div>
-                            ))
-                        }
-                    </section>
-                    <section className={styles.appearanceBlock}>
-                        <header>
-                            <div className={styles.headerTitleBlock}>
-                                <Icons.Palette
-                                    width={40}
-                                    height={40}
-                                    color="var(--color-accent)"
-                                />
-                                <div>
-                                    <p className={styles.title}>Appearance</p>
-                                    <p className={styles.description}>Customize how Buggeon looks for you</p>
-                                </div>
-                            </div>
-                        </header>
-                        <p>Theme</p>
-                        <div className={styles.themeBlock}>
-                            {
-                                [
-                                    {
-                                        name: "light",
-                                        icon: <Icons.Sun width={20} height={20} color="var(--light-grey)"/>
-                                    },
-                                    {
-                                        name: "dark",
-                                        icon: <Icons.MoonOutline width={20} height={20} color="var(--light-grey)"/>
-                                    },
-                                    {
-                                        name: "system",
-                                        icon: <Icons.Computer width={20} height={20} color="var(--light-grey)"/>
-                                    }
-                                ].map(theme => (
-                                    <div className={styles.themeItem} style={{borderColor: appearanceSettings.theme == theme.name ? "var(--color-accent" : "var(--color-bg)"}} onClick={() => setAppearanceSettings(prev => ({...prev, theme: theme.name as "dark" | "light" | "system"}))}>
-                                        {theme.icon}
-                                        <div>
-                                            <p>{theme.name}</p>
-                                            <RadioButton
-                                                value={appearanceSettings.theme == theme.name}
-                                                onChange={() => setAppearanceSettings(prev => ({...prev, theme: theme.name as "dark" | "light" | "system"}))}
-                                            />
-                                        </div>
-                                    </div>
-                                ))
-                            }
-                        </div>
-                        <p>Accent color</p>
-                        <div style={{display: "flex", gap: 15}}>
-                            {
-                                ACCENTS.map(color => (
-                                    <div className={styles.accentColorItem} style={{
-                                        backgroundColor: color
-                                    }} onClick={() => {
-                                        setAppearanceSettings(prev => ({...prev, accentColor: color}))
-                                    }}>
+                                        <p>{user.id}</p>
                                         {
-                                            appearanceSettings.accentColor == color && <Icons.CompletedOutline width={20} height={20} color="white"/>
+                                            isUserIdCopied
+                                                ?   <Icons.Check
+                                                        color="var(--color-text)"
+                                                        width={20}
+                                                        height={20}
+                                                    />
+                                                :   <Icons.Copy
+                                                        color="var(--color-text)"
+                                                        width={20}
+                                                        height={20}
+                                                        onClick={async () => {
+                                                            await navigator.clipboard.writeText(user.id)
+                                                            setUserIdCopied(true)
+                                                        }}
+                                                    />
                                         }
                                     </div>
-                                ))
-                            }
+                                </div>
+                            </div>
                         </div>
                     </section>
-                </div>
-                <section className={styles.securityBlock}>
-                    <header>
-                        <div className={styles.headerTitleBlock}>
-                            <Icons.Shield
-                                width={40}
-                                height={40}
-                                color="var(--color-accent)"
-                            />
-                            <div>
-                                <p className={styles.title}>Security</p>
-                                <p className={styles.description}>Kepp your account safe</p>
+                    <div className={styles.notificationAndAppearanceBlock}>
+                        <section className={styles.notificationBlock}>
+                            <header>
+                                <div className={styles.headerTitleBlock}>
+                                    <Icons.BellOutline
+                                        width={40}
+                                        height={40}
+                                        color="var(--color-accent)"
+                                    />
+                                    <div>
+                                        <p className={styles.title}>Notifications</p>
+                                        <p className={styles.description}>Choose what you want to be notified about</p>
+                                    </div>
+                                </div>
+                            </header>
+                            {
+                                notificationSettingsItems.map(setting => (
+                                    <div className={styles.notificationSettingsItem}>
+                                        <div>
+                                            {setting.icon}
+                                            <div className={styles.notificationSettingsItemNamingBlock}>
+                                                <p className={styles.notificationSettingsItemTitle}>
+                                                    {setting.title}
+                                                </p>
+                                                <p className={styles.notificationSettingsItemDescription}>
+                                                    {setting.description}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Switch
+                                            onChange={() => setNotificationSettings(prev => ({...prev, [setting.id]: !prev[setting.id]}))}
+                                            enabled={notificationSettings[setting.id]}
+                                        />
+                                    </div>
+                                ))
+                            }
+                        </section>
+                        <section className={styles.appearanceBlock}>
+                            <header>
+                                <div className={styles.headerTitleBlock}>
+                                    <Icons.Palette
+                                        width={40}
+                                        height={40}
+                                        color="var(--color-accent)"
+                                    />
+                                    <div>
+                                        <p className={styles.title}>Appearance</p>
+                                        <p className={styles.description}>Customize how Buggeon looks for you</p>
+                                    </div>
+                                </div>
+                            </header>
+                            <p>Theme</p>
+                            <div className={styles.themeBlock}>
+                                {
+                                    [
+                                        {
+                                            name: "light",
+                                            icon: <Icons.Sun width={20} height={20} color="var(--light-grey)"/>
+                                        },
+                                        {
+                                            name: "dark",
+                                            icon: <Icons.MoonOutline width={20} height={20} color="var(--light-grey)"/>
+                                        },
+                                        {
+                                            name: "system",
+                                            icon: <Icons.Computer width={20} height={20} color="var(--light-grey)"/>
+                                        }
+                                    ].map(theme => (
+                                        <div className={styles.themeItem} style={{borderColor: appearanceSettings.theme == theme.name ? "var(--color-accent" : "var(--color-bg)"}} onClick={() => setAppearanceSettings(prev => ({...prev, theme: theme.name as "dark" | "light" | "system"}))}>
+                                            {theme.icon}
+                                            <div>
+                                                <p>{theme.name}</p>
+                                                <RadioButton
+                                                    value={appearanceSettings.theme == theme.name}
+                                                    onChange={() => setAppearanceSettings(prev => ({...prev, theme: theme.name as "dark" | "light" | "system"}))}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))
+                                }
                             </div>
-                        </div>
-                    </header>
-                    <div className={styles.securitySettingsItem}>
-                        <div className={styles.securitySettingsItemTitleBlock}>
-                            <Icons.Lock                                width={25}
-                                height={25}
-                                color="var(--color-text)"
-                            />
-                            <div>
-                                <p>Change password</p>
-                                <p>Last changed 32 days ago</p>
+                            <p>Accent color</p>
+                            <div style={{display: "flex", gap: 15}}>
+                                {
+                                    ACCENTS.map(color => (
+                                        <div className={styles.accentColorItem} style={{
+                                            backgroundColor: color
+                                        }} onClick={() => {
+                                            setAppearanceSettings(prev => ({...prev, accentColor: color}))
+                                        }}>
+                                            {
+                                                appearanceSettings.accentColor == color && <Icons.CompletedOutline width={20} height={20} color="white"/>
+                                            }
+                                        </div>
+                                    ))
+                                }
                             </div>
-                        </div>
-                        <button className={styles.changePasswordButton}>
-                            Change password
-                        </button>
+                        </section>
                     </div>
-                </section>
+                    <section className={styles.securityBlock}>
+                        <header>
+                            <div className={styles.headerTitleBlock}>
+                                <Icons.Shield
+                                    width={40}
+                                    height={40}
+                                    color="var(--color-accent)"
+                                />
+                                <div>
+                                    <p className={styles.title}>Security</p>
+                                    <p className={styles.description}>Kepp your account safe</p>
+                                </div>
+                            </div>
+                        </header>
+                        <div className={styles.securitySettingsItem}>
+                            <div className={styles.securitySettingsItemTitleBlock}>
+                                <Icons.Lock                                width={25}
+                                    height={25}
+                                    color="var(--color-text)"
+                                />
+                                <div>
+                                    <p>Change password</p>
+                                    <p>Last changed 32 days ago</p>
+                                </div>
+                            </div>
+                            <button className={styles.changePasswordButton}>
+                                Change password
+                            </button>
+                        </div>
+                    </section>
+                </main>
             </section>
         </MainLayout>
     )

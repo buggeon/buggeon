@@ -3,3 +3,9 @@ query GetUser($userId: ID!) {
         ...UserDetails
     }
 }
+
+query GetUsers {
+    users {
+        ...UserDetails
+    }
+}
