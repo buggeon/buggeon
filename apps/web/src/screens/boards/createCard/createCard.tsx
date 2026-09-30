@@ -21,7 +21,7 @@ interface CreateCardProps {
 function CreateCard({isVisible, setVisibility, boardId} : CreateCardProps) {
 
     const { projectId } = useParams()
-    const { data } = useGetMembers(projectId)
+    const { membersData } = useGetMembers(projectId)
     const { refetch } = useGetBoards(projectId)
     const [newCardData, setNewCardData] = useState<CardData | null>({
         assignees: [],
@@ -81,7 +81,7 @@ function CreateCard({isVisible, setVisibility, boardId} : CreateCardProps) {
                     title='Assignees'
                     placeholder='Select assignees...'
                     onChange={(text) => { console.log(text); setNewCardData(prev => ({...prev, assignees: [...prev.assignees, text]}))}}
-                    content={data ? data.members : []}
+                    content={membersData ? membersData.members : []}
                     subtitle='Choose team members responsible for this task'
                     renderFunc={(member) => (
                         <div className={styles.assigneeItem}>

@@ -9,6 +9,42 @@
         @media (max-width: 1000px) {
             display: none;
         }
+
+        .account{
+            width: 100%;
+            background-color: var(--color-bg);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            gap: 10px;
+            
+
+            .accountAvatar{
+                width: 50px;
+                height: 50px;
+                border-radius: 50px;
+            }
+
+            .accountPersonalInfo{
+                display: flex;
+                flex-direction: column;
+
+                p{
+                    margin: 0;
+                }
+
+                .accountLogin{
+                    color: #727b8c;
+                }
+
+            }
+
+            .accountArrow {
+                width: 20px;
+                height: 20px;
+            }
+        }
     }
 
     .screen{

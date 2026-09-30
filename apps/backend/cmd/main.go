@@ -154,12 +154,10 @@ func main() {
 	projectService := services.NewProjectService(projectRepo, memberService, memberRepo, boardRepo, cardRepo, messageRepo, s3Storage)
 	tokenService := services.NewTokenService(config.LoadConfig())
 	userService := services.NewUserService(userRepo, tokenService, s3Storage, userCache)
-	systemService := services.NewSystemService(userRepo)
 	messageService := services.NewMessageService(messageRepo, cardRepo)
 
 	projectHandler := handlers.NewProjectHandler(projectService, schemaService, cardService, boardService, memberService, messageService)
 	userHandler := handlers.NewUserHandler(userService)
-	systemHandler := handlers.NewSystemHandler(systemService)
 	chatHandler := handlers.NewChatHandler(messageService, tokenService, userService)
 
 	authMiddleware := middleware.NewAuthMiddleware(tokenService)
@@ -191,7 +189,6 @@ func main() {
 		router,
 		projectHandler,
 		userHandler,
-		systemHandler,
 		chatHandler,
 		authMiddleware,
 		permissionsMiddleware,
@@ -200,17 +197,16 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "9187"
 	}
 	log.Printf("Server starting on :%s", port)
-	router.Run(":9187")
+	router.Run(fmt.Sprintf(":%s", port))
 }
 
 func setupRoutes(
 	router *gin.Engine,
 	projectHandler *handlers.ProjectHandler,
 	userHandler *handlers.UserHandler,
-	systemHandler *handlers.SystemHandler,
 	chatHandler *handlers.ChatHandler,
 	authMiddleware *middleware.AuthMiddleware,
 	permissionsMiddleware *middleware.PermissionsMiddleware,
@@ -245,6 +241,8 @@ func setupRoutes(
 		{
 			users := protected.Group("/users")
 			{
+				users.GET("/:user_id", userHandler.GetUser)
+				users.GET("/", userHandler.GetUsers)
 				users.PATCH("/:user_id/avatar", userHandler.SetAvatar)
 			}
 
@@ -295,8 +293,6 @@ func setupRoutes(
 
 			queryGroup := protected.Group("/query")
 			queryGroup.POST("", gin.WrapH(gqlHandler))
-
-			protected.GET("/users", systemHandler.GetAllUsers)
 		}
 	}
 

@@ -1,0 +1,87 @@
+.main{
+    width: 600px;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+
+    .inviteLinkBlock{
+        background-color: var(--color-bg-elevated);
+        border-radius: 10px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .inviteLinkDescriptionBlock{
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+
+            div{
+
+                p{
+                    &:last-child{
+                        color: var(--dark-grey);
+                    }
+                }
+            }
+        }
+
+        .inviteLinkCopyBlock{
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--color-bg);
+            border-radius: 10px;
+            padding: 10px;
+
+            &:hover{
+                cursor: pointer;
+            }
+        
+        }
+
+    }
+
+    .usersBlock{
+
+        ul{
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            li{
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                align-items: center;
+
+                div:first-child{
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+
+                    img{
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 100%;
+                    }
+
+                    div{
+                        p:last-of-type{
+                            color: var(--dark-grey);
+                        }
+                    }
+                }
+
+                svg:hover{
+                    cursor: pointer;
+                }
+            }
+        }
+
+    }
+
+
+}

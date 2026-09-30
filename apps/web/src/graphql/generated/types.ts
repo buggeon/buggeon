@@ -179,6 +179,7 @@ export type Query = {
   project: Project;
   projects: Array<Project>;
   user: User;
+  users: Array<User>;
 };
 
 

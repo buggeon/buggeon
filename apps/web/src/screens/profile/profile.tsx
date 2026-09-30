@@ -8,7 +8,7 @@ import type { RootState } from '../../store/slices';
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import ProgressBar from '../../components/progressBar/progressBar';
 import { useGetProjects } from '../../hooks/useGetProjects';
-import buildLink from '../../utils/buildLink';
+import AvatarImage from '../../components/avatarImage/avatarImage';
 
 
 function ProfileScreen() {
@@ -62,7 +62,7 @@ function ProfileScreen() {
                                 data && data.projects.map(project => (
                                     <div className={styles.projectItem}>
                                         <div className={styles.nameAndLogoBlock}>
-                                            <img src={buildLink(project.logoKey)}/>
+                                            <AvatarImage imageKey={project.logoKey} title={project.name}/>
                                             <p>{project.name}</p>
                                         </div>
                                         <div className={styles.progressBarBlock}>

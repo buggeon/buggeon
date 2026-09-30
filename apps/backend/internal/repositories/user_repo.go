@@ -138,7 +138,7 @@ func (r *UserRepo) GetUsersByIDs(ctx context.Context, userIDs []primitive.Object
 
 }
 
-func (r *UserRepo) GetAllUsers(ctx context.Context) ([]models.User, error) {
+func (r *UserRepo) GetUsers(ctx context.Context) ([]models.User, error) {
 
 	var users []models.User
 

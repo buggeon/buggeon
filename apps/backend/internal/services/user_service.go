@@ -24,6 +24,8 @@ import (
 	s3storage "buggeon/internal/s3Storage"
 	"buggeon/internal/security"
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"mime/multipart"
@@ -62,11 +64,17 @@ func (s *UserService) Register(ctx context.Context, loginDto *dto.UserRegistrati
 
 	userID := primitive.NewObjectID()
 
+	initialAvatar, err := randomHexColor()
+
+	if err != nil {
+		initialAvatar = "#FF0000"
+	}
+
 	user := &models.User{
 		ID:        userID,
 		Name:      loginDto.Name,
 		Email:     loginDto.Email,
-		AvatarKey: "",
+		AvatarKey: initialAvatar,
 		Login:     loginDto.Login,
 		Password:  passwordHash,
 		Role:      "user",
@@ -156,13 +164,13 @@ func (s *UserService) RefreshAccessToken(ctx context.Context, refreshToken strin
 
 func (s *UserService) GetUser(ctx context.Context, userID string) (models.User, error) {
 
-	user, err := s.userRepo.GetUser(ctx, userID)
+	return s.userRepo.GetUser(ctx, userID)
 
-	if err != nil {
-		return models.User{}, nil
-	}
+}
 
-	return user, nil
+func (s *UserService) GetUsers(ctx context.Context) ([]models.User, error) {
+
+	return s.userRepo.GetUsers(ctx)
 
 }
 
@@ -189,5 +197,16 @@ func (s *UserService) SetAvatar(ctx context.Context, userID string, avatar *mult
 	}
 
 	return fmt.Sprintf("buggeon/%s", key), s.userRepo.SetAvatar(ctx, userObjID, fmt.Sprintf("buggeon/%s", key))
+
+}
+
+func randomHexColor() (string, error) {
+
+	b := make([]byte, 3)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+
+	return "#" + hex.EncodeToString(b), nil
 
 }

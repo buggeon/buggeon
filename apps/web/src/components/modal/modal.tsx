@@ -58,7 +58,7 @@ function Modal({
                     <button onClick={async () => {
                         onFooterActiveButtonClick()
                         setState(false)
-                    }} style={{backgroundColor: footerActiveButtonColor}}>{footerActiveButtonLabel}</button>
+                    }}>{footerActiveButtonLabel}</button>
                 </footer>
             </div>
         </div>,

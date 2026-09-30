@@ -5,5 +5,5 @@ export const useGetMembers = (projectId: string) => {
   const { data, loading, error } = useQuery(GetMembersDocument, {
     variables: { projectId },
   })
-  return { data, loading, error }
+  return { membersData: data, loading, error }
 }

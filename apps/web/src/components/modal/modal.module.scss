@@ -49,7 +49,7 @@
                 border-radius: 5px;
                 font-size: 16px;
 
-                &:first-child{
+                &.cancelButton{
                     background-color: transparent;
                     border-width: 0.5px;
                     border-color: var(--color-text);
@@ -57,8 +57,9 @@
                     color: var(--color-text);
                 }
 
-                &:last-child{
-                    color: var(--color-bg);
+                &.activeButton{
+                    background-color: var(--color-accent);
+                    color: var(--color-text);
                 }
             }
         }
