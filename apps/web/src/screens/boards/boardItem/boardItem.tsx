@@ -5,11 +5,10 @@ import { useDroppable } from '@dnd-kit/core';
 import Icons from '../../../assets/icons';
 import { useState } from 'react';
 import CreateCard from '../createCard/createCard';
-import { priorityDict } from '../../../dicts/priority';
-import AlertModal from '../../../components/alertModal/alertModal';
 import { useMutation } from '@apollo/client/react';
 import { DeleteBoardDocument } from '../../../graphql/generated/graphql';
 import { useGetBoards } from '../../../hooks/useGetBoards';
+import Modal from '../../../components/modal/modal';
 
 export interface BoardItemProps {
 
@@ -57,7 +56,7 @@ function BoardItem({id, name, cards, projectId} : BoardItemProps) {
 
     return(
         <section className={styles.main} ref={setNodeRef} key={id}>
-            <AlertModal
+            <Modal
                 isOpen={isDeleteBoardAlertModalVisible}
                 setState={seteleteBoardAlertModalVisibility}
                 onFooterActiveButtonClick={async () => {
@@ -65,9 +64,11 @@ function BoardItem({id, name, cards, projectId} : BoardItemProps) {
                     await refetch()
                 }}
                 footerActiveButtonLabel='Удалить'
-                content='Вы действительно хотите удалить эту доску?'
+                footerActiveButtonColor='var(--red)'
                 title='Удаление доски'
-            />
+            >
+                <p>Вы действительно хотите удалить эту доску?</p>
+            </Modal>
             <CreateCard
                 isVisible={isNewCardModalVisible}
                 setVisibility={setNewCardModalVisibility}

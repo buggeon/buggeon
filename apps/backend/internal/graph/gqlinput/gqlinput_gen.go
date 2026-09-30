@@ -9,10 +9,11 @@ type CreateBoardInput struct {
 }
 
 type CreateCardInput struct {
-	Title    string `json:"title"`
-	Content  string `json:"content"`
-	Priority string `json:"priority"`
-	DueDate  string `json:"dueDate"`
+	Title     string   `json:"title"`
+	Content   string   `json:"content"`
+	Priority  string   `json:"priority"`
+	DueDate   string   `json:"dueDate"`
+	Assignees []string `json:"assignees,omitempty"`
 }
 
 type CreateProjectInput struct {

@@ -1,0 +1,18 @@
+.main{
+    height: 20px;
+    width: 20px;
+    border-radius: 5px;
+    border-color: var(--color-text);
+    border-width: 0.5px;
+    border-style: solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2 ease;
+
+    &.selected{
+        border: 0;
+        background-color: var(--color-accent);
+    }
+
+}

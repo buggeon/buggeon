@@ -109,7 +109,7 @@ function ProjectsScreen() {
                                                 </td>
                                                 <td>
                                                     <div className={styles.leadInfo}>
-                                                        <img src={buildLink(project.logoKey)}/>
+                                                        <img src={buildLink(project.lead.user.avatarKey)}/>
                                                         <p>{project.lead.user.name}</p>
                                                     </div>
                                                 </td>

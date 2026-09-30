@@ -9,3 +9,14 @@
     }
     
 }
+
+.assigneeItem{
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    padding: 10px;
+
+    &:hover{
+        cursor: pointer;
+    }
+}

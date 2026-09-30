@@ -35,7 +35,7 @@ func (r *mutationResolver) CreateCard(
 		BoardID:   boardID,
 		Title:     input.Title,
 		Content:   input.Content,
-		Assignees: []string{""},
+		Assignees: input.Assignees,
 		DueDate:   input.DueDate,
 		Priority:  input.Priority,
 	})

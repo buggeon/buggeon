@@ -12,8 +12,8 @@
         width: 400px;
         border-radius: 10px;
         overflow: hidden;
-        border-color: var(--dark-foreground);
-        border-width: 3px;
+        border-color: var(--color-text);
+        border-width: 1px;
         border-style: solid;
         display: flex;
         flex-direction: column;
@@ -30,9 +30,15 @@
             .messageItem{
                 width: 100%;
                 display: flex;
+
+                img{
+                    border-radius: 100%;
+                    width: 50px;
+                    height: 50px;
+                }
             }
 
-            .messageInput{
+            .messageInputBlock{
                 border-radius: 10px;
                 background-color: var(--dark-foreground);
                 //height: 50px;
@@ -48,7 +54,20 @@
                 gap: 10px;
 
                 textarea{
+                    border-width: 0.5px;
+                    padding: 5px;
+                    color: var(--color-text);
                     flex: 1;
+                    resize: none;
+                    background-color: transparent;
+                    border-radius: 10px;
+                    outline: none;
+                    font-size: 16px;
+                    min-height: 10px;
+
+                    &:focus-visible{
+                        border-color: var(--color-accent);
+                    }
                 }
             }
         }

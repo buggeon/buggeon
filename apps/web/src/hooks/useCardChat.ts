@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { WS_URL } from '../../config'
 
 export type ChatMessage = {
     id?: string
     content: string
     senderId?: string
     senderName?: string
-    senderAvatarUrl?: string
+    senderAvatarKey?: string
     sentAt?: string
 }
 
@@ -17,6 +18,9 @@ type UseCardChatOptions = {
 }
 
 export function useCardChat({ cardId, onMessage }: UseCardChatOptions) {
+
+    console.log("Send message...")
+
     const [readyState, setReadyState] = useState<ReadyState>('closed')
     const [lastMessage, setLastMessage] = useState<ChatMessage | null>(null)
 
@@ -30,9 +34,10 @@ export function useCardChat({ cardId, onMessage }: UseCardChatOptions) {
             return
         }
 
-        const apiUrl = import.meta.env.WS_URL as string
-        const url = `${apiUrl}/${cardId}?token=${encodeURIComponent(token)}`
+        const url = `${WS_URL}/${cardId}?token=${encodeURIComponent(token)}`
 
+        console.log(url)
+        
         const ws = new WebSocket(url)
         wsRef.current = ws
 

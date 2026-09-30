@@ -10,7 +10,7 @@ import (
 type Client struct {
 	UserID        string
 	UserName      string
-	UserAvatarUrl string
+	UserAvatarKey string
 	Conn          *websocket.Conn
 	Send          chan []byte
 }
@@ -19,17 +19,17 @@ type BroadcastMessage struct {
 	ID              string    `json:"id"`
 	SenderName      string    `json:"senderName"`
 	SenderID        string    `json:"senderId"`
-	SenderAvatarUrl string    `json:"senderAvatarUrl"`
+	SenderAvatarKey string    `json:"senderAvatarKey"`
 	SentAt          time.Time `json:"sendAt"`
 	Content         string    `json:"content"`
 }
 
-func NewClient(conn *websocket.Conn, userID, userName, userAvatarUrl string) *Client {
+func NewClient(conn *websocket.Conn, userID, userName, userAvatarKey string) *Client {
 	return &Client{
 		Conn:          conn,
 		UserID:        userID,
 		UserName:      userName,
-		UserAvatarUrl: userAvatarUrl,
+		UserAvatarKey: userAvatarKey,
 		Send:          make(chan []byte, 256),
 	}
 }
@@ -55,7 +55,7 @@ func (c *Client) ReadPump(hub *Hub, onMessage func(*Client, []byte)) {
 			ID:              hub.name,
 			SenderName:      c.UserName,
 			SenderID:        c.UserID,
-			SenderAvatarUrl: c.UserAvatarUrl,
+			SenderAvatarKey: c.UserAvatarKey,
 			Content:         string(msg),
 			SentAt:          time.Now(),
 		}

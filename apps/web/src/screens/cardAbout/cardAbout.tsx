@@ -14,14 +14,14 @@ function CardAboutScreen() {
 
     const {cardId} = useParams()
     const user = useSelector((state : RootState) => state.user)
-    const { data } = useGetCard(cardId, ["title", "content", "messages { content, sender { id , name, avatarUrl } }"])
+    const { data } = useGetCard(cardId, ["title", "content", "messages { content, sender { id , name, avatarKey } }"])
     const [messageText, setMessageText] = useState("")
     const [liveMessages, setLiveMessages] = useState<ChatMessage[]>([])
 
     const history: ChatMessage[] = data?.card.messages.map(m => ({
         senderId: m.sender.id,
         senderName: m.sender.name,
-        senderAvatarUrl: buildLink(m.sender.avatarKey),
+        senderAvatarKey: buildLink(m.sender.avatarKey),
         content: m.content,
         id: m.id,
     })) ?? []
@@ -34,6 +34,8 @@ function CardAboutScreen() {
     })
 
     const messages = [...history, ...liveMessages]
+
+    console.log(liveMessages)
 
     return(
         <MainLayout
@@ -55,10 +57,11 @@ function CardAboutScreen() {
                             messages && messages?.map(message => (
                                 <div className={styles.messageItem} style={{justifyContent: user.id == message.senderId ? "flex-end" : "flex-start"}}>
                                     <p>{message.content}</p>
+                                    <img src={message.senderAvatarKey}/>
                                 </div>
                             ))
                         }
-                        <div className={styles.messageInput}>
+                        <div className={styles.messageInputBlock}>
                             <Icons.Smile width={25} height={25} color='white'/>
                             <textarea onChange={(event) => setMessageText(event.target.value)}/>
                             <Icons.Send onClick={() => {

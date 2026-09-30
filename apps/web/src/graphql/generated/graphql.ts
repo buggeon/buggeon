@@ -2,7 +2,7 @@
 type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** Internal type. DO NOT USE DIRECTLY. */
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
-import type * as Types from './types';
+import type * as Types from '../../../types';
 
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type BoardDetailsFragment = { id: string, name: string, direction: string, createdAt: string, updatedAt: string, cardsStatus: string, cards: Array<{ id: string, title: string, content: string, priority: string, createdAt: string, boardId: string, status: string, dueDate: string, updatedAt: string, assignees: Array<{ id: string, role: string, directions: Array<string>, createdAt: string, projectId: string, user: { id: string, name: string, email: string, login: string, createdAt: string, avatarKey: string } }>, messages: Array<{ id: string, content: string, createdAt: string, updatedAt: string, cardId: string, sender: { id: string, name: string, email: string, login: string, createdAt: string, avatarKey: string }, replyTo: { id: string, content: string, sender: { name: string } } | null, replies: Array<{ id: string, content: string, sender: { name: string } }> }> }> };

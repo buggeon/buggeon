@@ -63,10 +63,10 @@
 
         input {
             width: 100%;
-            border: none;
+            border: none    ;
             outline: none;
             background-color: transparent;
-            color: var(--light-grey);
+            color: var(--color-text);
             font-size: 16px;
             padding: 8px 0;
             min-height: 40px;
@@ -87,15 +87,13 @@
         max-height: 200px;
         overflow-y: auto;
         z-index: 1000;
+        background-color: var(--color-bg);
 
         .listItem {
+            flex: 1;
             padding: 10px 16px;
             cursor: pointer;
             transition: background-color 0.15s;
-
-            &:hover {
-                background-color: rgba(255, 255, 255, 0.05);
-            }
 
             &:not(:last-child) {
                 border-bottom: 1px solid rgba(255, 255, 255, 0.05);

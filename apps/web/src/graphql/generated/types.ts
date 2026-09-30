@@ -43,6 +43,7 @@ export type CreateBoardInput = {
 };
 
 export type CreateCardInput = {
+  assignees?: InputMaybe<Array<Scalars['ID']['input']>>;
   content: Scalars['String']['input'];
   dueDate: Scalars['String']['input'];
   priority: Scalars['String']['input'];

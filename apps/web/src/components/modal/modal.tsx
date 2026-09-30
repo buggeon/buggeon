@@ -11,9 +11,19 @@ interface ModalProps {
     className? : string
     footerActiveButtonLabel : string
     onFooterActiveButtonClick : () => void
+    footerActiveButtonColor? : string
 }
 
-function Modal({isOpen, title, setState, children, className, onFooterActiveButtonClick, footerActiveButtonLabel} : ModalProps) {
+function Modal({
+    isOpen,
+    title,
+    setState,
+    children,
+    className,
+    onFooterActiveButtonClick,
+    footerActiveButtonLabel,
+    footerActiveButtonColor = "var(--color-accent)"
+} : ModalProps) {
 
     useEffect(() => {
 
@@ -48,7 +58,7 @@ function Modal({isOpen, title, setState, children, className, onFooterActiveButt
                     <button onClick={async () => {
                         onFooterActiveButtonClick()
                         setState(false)
-                    }}>{footerActiveButtonLabel}</button>
+                    }} style={{backgroundColor: footerActiveButtonColor}}>{footerActiveButtonLabel}</button>
                 </footer>
             </div>
         </div>,

@@ -130,6 +130,7 @@ input CreateCardInput {
     content: String!
     priority: String!
     dueDate: String!
+    assignees: [ID!]
 }
 
 input UpdateCardInput {

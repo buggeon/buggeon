@@ -10,6 +10,7 @@ import type { CardData } from "../../../api/types/createCard.type"
 import { useGetMembers } from "../../../hooks/useGetMembers"
 import { useMutation } from "@apollo/client/react"
 import { CreateCardDocument } from "../../../graphql/generated/graphql"
+import Checkbox from "../../../components/checkbox/checkbox"
 
 interface CreateCardProps {
     isVisible : boolean
@@ -23,7 +24,7 @@ function CreateCard({isVisible, setVisibility, boardId} : CreateCardProps) {
     const { data } = useGetMembers(projectId)
     const { refetch } = useGetBoards(projectId)
     const [newCardData, setNewCardData] = useState<CardData | null>({
-        assignees: [""],
+        assignees: [],
         title: "",
         content: "",
         boardId: "",
@@ -34,13 +35,12 @@ function CreateCard({isVisible, setVisibility, boardId} : CreateCardProps) {
 
     const handleCreateCardButtonClick = async () => {
 
-        console.log("===CREATE PROJECT===")
-
         try {
             const result = await createCard({
                 variables: {
                     boardId,
                     input: {
+                        assignees: newCardData.assignees,
                         content: newCardData.content,
                         dueDate: newCardData.dueDate,
                         priority: newCardData.priority,
@@ -59,6 +59,7 @@ function CreateCard({isVisible, setVisibility, boardId} : CreateCardProps) {
 
     return(
         <Modal
+            className={styles.modal}
             isOpen={isVisible}
             setState={setVisibility}
             title='Create New Card'
@@ -76,15 +77,25 @@ function CreateCard({isVisible, setVisibility, boardId} : CreateCardProps) {
                     onChange={(text) => {setNewCardData(prev => ({...prev, title: text}))}}
                 />
                 <DropInput
-                    value={""}
+                    value={data?.members?.filter(m => newCardData.assignees.includes(m.id)).map(m => m.user.name)}
                     title='Assignees'
                     placeholder='Select assignees...'
                     onChange={(text) => { console.log(text); setNewCardData(prev => ({...prev, assignees: [...prev.assignees, text]}))}}
                     content={data ? data.members : []}
                     subtitle='Choose team members responsible for this task'
                     renderFunc={(member) => (
-                        <div>
+                        <div className={styles.assigneeItem}>
                             <p>{member.user.name}</p>
+                            <Checkbox
+                                isSelected={newCardData.assignees.includes(member.id)}
+                                setSelected={(e) => {
+                                    e.stopPropagation()
+                                    if(newCardData.assignees.includes(member.id))
+                                        setNewCardData(prev => ({...prev, assignees: prev.assignees.filter(m => m != member.id)}))
+                                    else
+                                        setNewCardData(prev => ({...prev, assignees: [...prev.assignees, member.id]}))
+                                }}
+                            />
                         </div>
                     )}
                 />

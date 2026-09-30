@@ -16,6 +16,8 @@
 
 package hub
 
+import "fmt"
+
 type Hub struct {
 	name       string
 	clients    map[*Client]bool
@@ -47,6 +49,7 @@ func (h *Hub) Run() {
 		select {
 
 		case client := <-h.register:
+			fmt.Println(client)
 			h.clients[client] = true
 
 		case client := <-h.unregister:

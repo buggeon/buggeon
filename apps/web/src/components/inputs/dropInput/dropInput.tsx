@@ -33,9 +33,9 @@ function DropInput({
     const wrapperRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
 
-    const displayValue = selectedItem 
-        ? (typeof selectedItem === 'object' ? selectedItem.name : selectedItem)
-        : searchValue
+    // const displayValue = selectedItem 
+    //     ? (typeof selectedItem === 'object' ? selectedItem.name : selectedItem)
+    //     : searchValue
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -112,7 +112,7 @@ function DropInput({
                 <input
                     ref={inputRef}
                     placeholder={placeholder}
-                    value={displayValue}
+                    value={value}
                     onChange={handleInputChange}
                     onFocus={handleFocus}
                     autoComplete="off"
@@ -120,7 +120,7 @@ function DropInput({
                 <ArrowIcon
                     width={20}
                     height={20}
-                    color='var(--dark-grey)'
+                    color='var(--color-text)'
                     className={`${styles.suffixIcon} ${isListVisible ? styles.rotated : ''}`}
                     onClick={handleToggleList}
                 />
@@ -129,18 +129,7 @@ function DropInput({
             {isListVisible && filteredItems.length > 0 && (
                 <div className={styles.list}>
                     {filteredItems.map((item, index) => (
-                        <div
-                            key={index}
-                            className={styles.listItem}
-                            onMouseDown={(e) => {
-                                e.preventDefault()
-                                handleItemSelect(item)
-                            }}
-                        >
-                            {renderFunc ? renderFunc(item) : (
-                                <span>{typeof item === 'object' ? item.name : item}</span>
-                            )}
-                        </div>
+                        renderFunc(item)
                     ))}
                 </div>
             )}

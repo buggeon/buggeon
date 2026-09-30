@@ -5089,7 +5089,7 @@ func (ec *executionContext) unmarshalInputCreateCardInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "content", "priority", "dueDate"}
+	fieldsInOrder := [...]string{"title", "content", "priority", "dueDate", "assignees"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5124,6 +5124,13 @@ func (ec *executionContext) unmarshalInputCreateCardInput(ctx context.Context, o
 				return it, err
 			}
 			it.DueDate = data
+		case "assignees":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("assignees"))
+			data, err := ec.unmarshalOID2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Assignees = data
 		}
 	}
 	return it, nil

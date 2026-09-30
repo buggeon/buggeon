@@ -92,7 +92,9 @@ function CreateBoard({isVisible, setVisibility, direction} : CreateBoardProps) {
                     value={newBoardData.direction == "" ? direction : newBoardData.direction}
                     subtitle='Boards help organize work within a specific area'
                     renderFunc={() => (
-                        <div></div>
+                        <div>
+                            
+                        </div>
                     )}
                 />
                 <DropInput

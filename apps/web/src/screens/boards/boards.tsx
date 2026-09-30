@@ -10,8 +10,6 @@ import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, type Dra
 import CardPreview from './cardItem/preview/cardPreview';
 import projectApi from '../../api/project.api';
 import CreateBoard from './createBoard/createBoard';
-import { priorityDict } from '../../dicts/priority';
-import AlertModal from '../../components/alertModal/alertModal';
 
 function BoardsScreen() {
 
