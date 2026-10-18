@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom"
 import { useGetMembers } from "../../hooks/useGetMembers"
 import MainLayout from "../../layouts/mainLayout/mainLayout"
-import styles from './membersScreen.module.scss'
+import styles from './members.module.scss'
 import Mark from "../../components/mark/mark"
 import Icons from "../../assets/icons"
 import { use, useState } from "react"
@@ -77,7 +77,7 @@ function MembersScreen() {
                                 <tr onClick={() => navigate(`/projects/${projectId}/members/${member.id}`)} key={member.id}>
                                     <td>
                                         <div className={styles.personalInfo}>
-                                            <AvatarImage imageKey={member.user.avatarKey} title={member.user.name}/>
+                                            <AvatarImage imageKey={member.user.avatarKey} alt={member.user.name}/>
                                             <div>
                                                 <p>{member.user.name}</p>
                                                 <p>{member.user.email}</p>

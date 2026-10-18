@@ -125,6 +125,10 @@ type Mutation {
 
     updateUser(userId: ID!, input: UpdateUserInput!): User!
 
+    createMember(projectId: ID!, input: CreateMemberInput): Member!
+    updateMember(memberId: ID!, input: UpdateMemberInput): Member!
+    deleteMember(memberId: ID!): Boolean!
+
 }
 
 input CreateCardInput {
@@ -175,4 +179,15 @@ input UpdateUserInput {
     name: String
     login: String
     email: String
+}
+
+input CreateMemberInput {
+    userId: ID!
+    role: String!
+    rights: [String!]!
+}
+
+input UpdateMemberInput {
+    role: String!
+    rights: [String!]!
 }

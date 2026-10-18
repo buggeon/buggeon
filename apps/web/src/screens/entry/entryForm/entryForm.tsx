@@ -7,6 +7,7 @@ import Icons from '../../../assets/icons'
 import { useDispatch } from 'react-redux'
 import { setUser } from '../../../store/slices/userSlice'
 import type { User } from '../../../store/types/user.interface'
+import { userChannel } from '../../../api/userChannel'
 
 function EntryForm({mode, changeMode, className} : {mode : "regist" | "auth", changeMode : Dispatch<SetStateAction<"auth" | "regist">>, className? : string}) {
 

@@ -16,7 +16,7 @@ function BoardsScreen() {
     const { projectId } = useParams()
     
     const [isNewBoardModalVisible, setNewBoardModalVisibility] = useState(false)
-    const { data } = useGetBoards(projectId)
+    const { data, loading } = useGetBoards(projectId)
     const [focusedDirection, setFocusedDirection] = useState("")
     const [groupedBoards, setGroupBoards] = useState<Record<string, typeof data.boards>>({})
     const [activeCard, setActiveCard] = useState<{
@@ -112,6 +112,7 @@ function BoardsScreen() {
         <MainLayout
             title="Project boards"
             description="Here'are all project's boards."
+            loading={loading}
         >
             <DndContext sensors={sensors} onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
                 <section className={styles.main}>

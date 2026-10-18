@@ -9,8 +9,8 @@ interface ModalProps {
     setState : (state : boolean) => void
     children : React.ReactNode
     className? : string
-    footerActiveButtonLabel : string
-    onFooterActiveButtonClick : () => void
+    footerActiveButtonLabel? : string
+    onFooterActiveButtonClick? : () => void
     footerActiveButtonColor? : string
 }
 
@@ -54,11 +54,13 @@ function Modal({
                 </header>
                 {children}
                 <footer>
-                    <button onClick={() => setState(false)}>Cancel</button>
-                    <button onClick={async () => {
-                        onFooterActiveButtonClick()
-                        setState(false)
-                    }}>{footerActiveButtonLabel}</button>
+                    <button onClick={() => setState(false)} className={styles.cancelButton}>Cancel</button>
+                    {
+                        footerActiveButtonLabel && <button onClick={async () => {
+                            onFooterActiveButtonClick()
+                            setState(false)
+                        }} className={styles.activeButton}>{footerActiveButtonLabel}</button>
+                    }
                 </footer>
             </div>
         </div>,

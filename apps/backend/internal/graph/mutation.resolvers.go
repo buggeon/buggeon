@@ -20,6 +20,7 @@ import (
 	"buggeon/internal/dto"
 	"buggeon/internal/graph/gqlinput"
 	"buggeon/internal/graph/gqlmodel"
+	"buggeon/internal/models"
 	"context"
 	"errors"
 	"time"
@@ -236,5 +237,41 @@ func (r *mutationResolver) UpdateUser(
 	updatedProject, err := r.UserService.UpdateUser(ctx, userID, &user)
 
 	return gqlmodel.NewUser(*updatedProject), err
+
+}
+
+func (r *mutationResolver) CreateMember(
+	ctx context.Context,
+	projectID string,
+	input *gqlinput.CreateMemberInput,
+) (*gqlmodel.Member, error) {
+
+	r.MemberService.CreateMember(ctx, &dto.CreateMemberDto{
+		ProjectID: projectID,
+		UserID:    input.UserID,
+		Role:      input.Role,
+		Rights:    input.Rights,
+	})
+
+	return gqlmodel.NewMember(models.Member{}), nil
+
+}
+
+func (r *mutationResolver) UpdateMember(
+	ctx context.Context,
+	memberID string,
+	input *gqlinput.UpdateMemberInput,
+) (*gqlmodel.Member, error) {
+
+	return gqlmodel.NewMember(models.Member{}), nil
+
+}
+
+func (r *mutationResolver) DeleteMember(
+	ctx context.Context,
+	memberID string,
+) (bool, error) {
+
+	return false, nil
 
 }

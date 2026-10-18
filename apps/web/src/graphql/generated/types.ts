@@ -50,6 +50,12 @@ export type CreateCardInput = {
   title: Scalars['String']['input'];
 };
 
+export type CreateMemberInput = {
+  rights: Array<Scalars['String']['input']>;
+  role: Scalars['String']['input'];
+  userId: Scalars['ID']['input'];
+};
+
 export type CreateProjectInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   leadId: Scalars['String']['input'];
@@ -84,12 +90,15 @@ export type Mutation = {
   __typename?: 'Mutation';
   createBoard: Board;
   createCard: Card;
+  createMember: Member;
   createProject: Project;
   deleteBoard: Scalars['Boolean']['output'];
   deleteCard: Scalars['Boolean']['output'];
+  deleteMember: Scalars['Boolean']['output'];
   deleteProject: Scalars['Boolean']['output'];
   updateBoard: Board;
   updateCard: Card;
+  updateMember: Member;
   updateProject: Project;
   updateUser: User;
 };
@@ -104,6 +113,12 @@ export type MutationCreateBoardArgs = {
 export type MutationCreateCardArgs = {
   boardId: Scalars['ID']['input'];
   input: CreateCardInput;
+};
+
+
+export type MutationCreateMemberArgs = {
+  input?: InputMaybe<CreateMemberInput>;
+  projectId: Scalars['ID']['input'];
 };
 
 
@@ -124,6 +139,11 @@ export type MutationDeleteCardArgs = {
 };
 
 
+export type MutationDeleteMemberArgs = {
+  memberId: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteProjectArgs = {
   projectId: Scalars['ID']['input'];
 };
@@ -138,6 +158,12 @@ export type MutationUpdateBoardArgs = {
 export type MutationUpdateCardArgs = {
   cardId: Scalars['ID']['input'];
   input: UpdateCardInput;
+};
+
+
+export type MutationUpdateMemberArgs = {
+  input?: InputMaybe<UpdateMemberInput>;
+  memberId: Scalars['ID']['input'];
 };
 
 
@@ -262,6 +288,11 @@ export type UpdateCardInput = {
   priority?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateMemberInput = {
+  rights: Array<Scalars['String']['input']>;
+  role: Scalars['String']['input'];
 };
 
 export type UpdateProjectInput = {

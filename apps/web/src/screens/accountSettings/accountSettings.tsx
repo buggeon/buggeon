@@ -241,7 +241,7 @@ function AccountSettingsScreen() {
                         <div style={{display: "flex"}}>
                             <div className={styles.avatar} onClick={handleAvatarClick} style={avatarPreviewUrl == "" && !accountSettings.avatar ? {borderWidth: 1, borderColor: "var(--light-grey)", borderStyle: "solid"} : {}}>
                                 {avatarPreviewUrl != ""
-                                    ?   <AvatarImage size={70} imageKey={avatarPreviewUrl} title={user.name}/>
+                                    ?   <AvatarImage size={70} imageKey={avatarPreviewUrl} alt={user.name}/>
                                     :    <Icons.PersonOutline
                                             width={30}
                                             height={30}

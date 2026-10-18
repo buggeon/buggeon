@@ -16,6 +16,12 @@ type CreateCardInput struct {
 	Assignees []string `json:"assignees,omitempty"`
 }
 
+type CreateMemberInput struct {
+	UserID string   `json:"userId"`
+	Role   string   `json:"role"`
+	Rights []string `json:"rights"`
+}
+
 type CreateProjectInput struct {
 	LeadID      string    `json:"leadId"`
 	Name        string    `json:"name"`
@@ -44,6 +50,11 @@ type UpdateCardInput struct {
 	Priority  *string  `json:"priority,omitempty"`
 	DueDate   *string  `json:"dueDate,omitempty"`
 	Assignees []string `json:"assignees,omitempty"`
+}
+
+type UpdateMemberInput struct {
+	Role   string   `json:"role"`
+	Rights []string `json:"rights"`
 }
 
 type UpdateProjectInput struct {

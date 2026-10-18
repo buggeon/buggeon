@@ -15,5 +15,5 @@ export const useGetCard = (id: string, fields : string[]) => {
   const { data, loading, error } = useQuery(query as typeof GetCardDocument, {
     variables: { cardId: id },
   })
-  return { data, loading, error }
+  return { cardData: data, loading, error }
 }

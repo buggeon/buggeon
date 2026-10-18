@@ -1,0 +1,1 @@
+export type ReadyState = 'connecting' | 'open' | 'closing' | 'closed'

@@ -6,14 +6,42 @@ import styles from './addMember.module.scss'
 import { useSelector } from 'react-redux'
 import type { RootState } from '../../../store/slices'
 import AvatarImage from '../../../components/avatarImage/avatarImage'
+import { useMutation } from '@apollo/client/react'
+import { CreateMemberDocument } from '../../../graphql/generated/graphql'
+import { useParams } from 'react-router-dom'
 
 function AddMember() {
+
+    const { projectId } = useParams()
 
     const userState = useSelector((state : RootState) => state.user)
     const { usersData, loading } = useGetUsers()
     const [filter, setFilter] = useState("")
     const [isCopied, setCopied] = useState(false)
     const [isInvited, setInvited] = useState<Record<string, boolean>>({})
+    const [createMember, { error }] = useMutation(CreateMemberDocument)
+
+    const handleCreateMemberButtonClick = async (userId : string) => {
+
+        try {
+            const result = await createMember({
+                variables: {
+                    projectId: projectId,
+                    input: {
+                        userId,
+                        role: "member",
+                        rights: ["project.close.card"]
+                    }
+                }
+            })
+
+            return result.data?.createMember
+        }
+        catch(e) {
+            console.error(`Error: ${e}`)
+        }
+        
+    }
 
     useEffect(() => {
 
@@ -83,7 +111,7 @@ function AddMember() {
                         usersData?.users.filter(user => filter == "" || user.name.toLowerCase().includes(filter.toLowerCase()) || user.email.toLowerCase().includes(filter.toLowerCase())).filter(u => u.id != userState.id).map(user => (
                             <li key={user.id}>
                                 <div>
-                                    <AvatarImage imageKey={user.avatarKey} title={user.name}/>
+                                    <AvatarImage imageKey={user.avatarKey} alt={user.name}/>
                                     <div>
                                         <p>{user.name}</p>
                                         <p>{user.email}</p>
@@ -95,7 +123,10 @@ function AddMember() {
                                                 width={20}
                                                 height={20}
                                                 color="var(--color-text)"
-                                                onClick={async () => {setInvited(prev => ({...prev, [user.id]: true}))}}
+                                                onClick={async () => {
+                                                    handleCreateMemberButtonClick(user.id)
+                                                    setInvited(prev => ({...prev, [user.id]: true}))}
+                                                }
                                             />
                                         :   <Icons.Check
                                                 width={20}

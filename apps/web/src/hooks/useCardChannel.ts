@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { WS_URL } from '../../config'
+import type { ReadyState } from '../types/readyState.type'
 
 export type ChatMessage = {
     id?: string
@@ -10,16 +11,12 @@ export type ChatMessage = {
     sentAt?: string
 }
 
-type ReadyState = 'connecting' | 'open' | 'closing' | 'closed'
-
 type UseCardChatOptions = {
     cardId: string
     onMessage?: (msg: ChatMessage) => void
 }
 
-export function useCardChat({ cardId, onMessage }: UseCardChatOptions) {
-
-    console.log("Send message...")
+export function useCardChannel({ cardId, onMessage }: UseCardChatOptions) {
 
     const [readyState, setReadyState] = useState<ReadyState>('closed')
     const [lastMessage, setLastMessage] = useState<ChatMessage | null>(null)
@@ -34,13 +31,11 @@ export function useCardChat({ cardId, onMessage }: UseCardChatOptions) {
             return
         }
 
-        const url = `${WS_URL}/${cardId}?token=${encodeURIComponent(token)}`
-
-        console.log(url)
+        const url = `${WS_URL}/card/${cardId}?token=${encodeURIComponent(token)}`
         
         const ws = new WebSocket(url)
         wsRef.current = ws
-
+        
         ws.onopen = () => {
             console.log('[ws] connected to', cardId)
             setReadyState('open')

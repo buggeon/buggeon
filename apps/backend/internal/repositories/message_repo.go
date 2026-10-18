@@ -44,7 +44,7 @@ func NewMessageRepoWithDbName(dbName string) *MessageRepo {
 	}
 }
 
-func (r *MessageRepo) NewMessage(ctx context.Context, message *models.Message) (primitive.ObjectID, error) {
+func (r *MessageRepo) CreateMessage(ctx context.Context, message *models.Message) (primitive.ObjectID, error) {
 
 	message.ID = primitive.NewObjectID()
 	message.CreatedAt = time.Now()

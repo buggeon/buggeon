@@ -21,6 +21,7 @@ import (
 	"buggeon/internal/models"
 	"buggeon/internal/repositories"
 	"context"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -40,56 +41,49 @@ func NewMessageService(
 	}
 }
 
-func (s *MessageService) CreateMessage(ctx context.Context, message dto.NewMessageDto) (*models.Message, error) {
+func (s *MessageService) CreateMessage(ctx context.Context, createMessageDto dto.NewMessageDto) (*models.Message, error) {
 
-	senderID, err := primitive.ObjectIDFromHex(message.SenderID)
+	var message models.Message
 
-	if err != nil {
-		return &models.Message{}, err
-	}
-
-	cardID, err := primitive.ObjectIDFromHex(message.CardID)
-	var messageID primitive.ObjectID
+	senderID, err := primitive.ObjectIDFromHex(createMessageDto.SenderID)
 
 	if err != nil {
 		return &models.Message{}, err
 	}
 
-	if message.ReplyTo != "" {
-		replyTo, err := primitive.ObjectIDFromHex(message.ReplyTo)
+	cardID, err := primitive.ObjectIDFromHex(createMessageDto.CardID)
 
-		if err != nil {
-			return &models.Message{}, err
-		}
-
-		id, err := s.messageRepo.NewMessage(ctx, &models.Message{
-			SenderID: senderID,
-			CardID:   cardID,
-			ReplyTo:  replyTo,
-			Content:  message.Content,
-		})
-
-		if err != nil {
-			return &models.Message{}, err
-		}
-
-		messageID = id
-
-	} else {
-		id, err := s.messageRepo.NewMessage(ctx, &models.Message{
-			SenderID: senderID,
-			CardID:   cardID,
-			Content:  message.Content,
-		})
-
-		if err != nil {
-			return &models.Message{}, err
-		}
-
-		messageID = id
+	if err != nil {
+		return &models.Message{}, err
 	}
 
-	return &models.Message{}, s.cardRepo.AddMessage(ctx, cardID, messageID)
+	if createMessageDto.ReplyTo != "" {
+
+		replyToObjID, err := primitive.ObjectIDFromHex(createMessageDto.ReplyTo)
+
+		if err != nil {
+			return &models.Message{}, err
+		}
+
+		message.ReplyTo = replyToObjID
+
+	}
+
+	message.CardID = cardID
+	message.Content = createMessageDto.Content
+	message.SenderID = senderID
+	message.CreatedAt = time.Now()
+	message.UpdatedAt = time.Now()
+
+	messageID, err := s.messageRepo.CreateMessage(ctx, &message)
+
+	if err != nil {
+		return &models.Message{}, err
+	}
+
+	message.ID = messageID
+
+	return &message, s.cardRepo.AddMessage(ctx, cardID, messageID)
 
 }
 

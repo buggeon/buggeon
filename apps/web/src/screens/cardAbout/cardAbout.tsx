@@ -4,29 +4,30 @@ import { useParams } from 'react-router-dom';
 import { useGetCard } from '../../hooks/useGetCard';
 import Icons from '../../assets/icons';
 import { useState } from 'react';
-import { useCardChat } from '../../hooks/useCardChat';
-import type { ChatMessage } from '../../hooks/useCardChat';
+import { useCardChannel } from '../../hooks/useCardChannel';
+import type { ChatMessage } from '../../hooks/useCardChannel';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store/slices';
 import buildLink from '../../utils/buildLink';
+import AvatarImage from '../../components/avatarImage/avatarImage';
 
 function CardAboutScreen() {
 
     const {cardId} = useParams()
     const user = useSelector((state : RootState) => state.user)
-    const { data } = useGetCard(cardId, ["title", "content", "messages { content, sender { id , name, avatarKey } }"])
+    const { cardData, loading } = useGetCard(cardId, ["title", "content", "messages { content, sender { id , name, avatarKey } }"])
     const [messageText, setMessageText] = useState("")
     const [liveMessages, setLiveMessages] = useState<ChatMessage[]>([])
 
-    const history: ChatMessage[] = data?.card.messages.map(m => ({
+    const history: ChatMessage[] = cardData?.card.messages.map(m => ({
         senderId: m.sender.id,
         senderName: m.sender.name,
-        senderAvatarKey: buildLink(m.sender.avatarKey),
+        senderAvatarKey: m.sender.avatarKey,
         content: m.content,
         id: m.id,
     })) ?? []
 
-    const { send } = useCardChat({
+    const { send } = useCardChannel({
         cardId,
         onMessage: (msg) => {
             setLiveMessages(prev => [...prev, msg])
@@ -35,41 +36,47 @@ function CardAboutScreen() {
 
     const messages = [...history, ...liveMessages]
 
-    console.log(liveMessages)
-
     return(
         <MainLayout
-            title={data?.card?.title}
+            title={cardData?.card?.title}
             description=""
             isModal
+            loading={loading}
         >
             <section className={styles.main}>
                 <section>
-                    <p>{data?.card?.content}</p>
+                    <p>{cardData?.card?.content}</p>
                 </section>
                 <section className={styles.discussion}>
                     <header>
-                        <Icons.Message width={30} height={30} color='white'/>
+                        <Icons.Message width={30} height={30} color='var(--color-text)'/>
                         <p>Discussion</p>
                     </header>
-                    <section className={styles.chatBlock}>
+                    <ul className={styles.chatBlock}>
                         {
                             messages && messages?.map(message => (
-                                <div className={styles.messageItem} style={{justifyContent: user.id == message.senderId ? "flex-end" : "flex-start"}}>
+                                <li className={styles.messageItem} style={{justifyContent: user.id == message.senderId ? "flex-end" : "flex-start"}}>
                                     <p>{message.content}</p>
-                                    <img src={message.senderAvatarKey}/>
-                                </div>
+                                    <AvatarImage
+                                        imageKey={message.senderAvatarKey}
+                                        alt={message.senderName}
+                                        size={30}
+                                    />
+                                </li>
                             ))
                         }
-                        <div className={styles.messageInputBlock}>
-                            <Icons.Smile width={25} height={25} color='white'/>
-                            <textarea onChange={(event) => setMessageText(event.target.value)}/>
-                            <Icons.Send onClick={() => {
-                                send(messageText)
-                                setMessageText("")
-                            }} width={25} height={25} color='white'/>
-                        </div>
-                    </section>
+                    </ul>
+                    <div className={styles.messageInputBlock}>
+                        <Icons.Smile width={25} height={25} color='var(--color-text)'/>
+                        <textarea
+                            onChange={(event) => setMessageText(event.target.value)}
+                            value={messageText}
+                        />
+                        <Icons.Send onClick={() => {
+                            send(messageText)
+                            setMessageText("")
+                        }} width={25} height={25} color='var(--color-text)'/>
+                    </div>
                 </section>
             </section>
         </MainLayout>

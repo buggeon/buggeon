@@ -23,6 +23,7 @@ import (
 	"buggeon/internal/db"
 	"buggeon/internal/graph"
 	"buggeon/internal/handlers"
+	"buggeon/internal/hub"
 	"buggeon/internal/middleware"
 	"buggeon/internal/models"
 	"buggeon/internal/repositories"
@@ -139,6 +140,13 @@ func main() {
 	userCache := cache.NewUserCache(5 * time.Minute)
 	permissionsCache := cache.NewPermissionCache(5 * time.Minute)
 
+	wsHub := hub.NewHub()
+
+	go wsHub.Run()
+
+	cardHub := hub.NewCardHub(wsHub)
+	userHub := hub.NewUserHub(wsHub)
+
 	userRepo := repositories.NewUserRepo()
 	projectRepo := repositories.NewProjectRepo()
 	memberRepo := repositories.NewMemberRepo()
@@ -146,19 +154,25 @@ func main() {
 	cardRepo := repositories.NewCardRepo()
 	messageRepo := repositories.NewMessageRepo()
 	schemaRepo := repositories.NewSchemaRepo()
+	notificationRepo := repositories.NewNotificationRepo()
 
+	notificationService := services.NewNotificationService(notificationRepo, userHub)
+	tokenService := services.NewTokenService(config.LoadConfig())
 	boardService := services.NewBoardService(boardRepo, projectRepo, cardRepo, messageRepo)
-	cardService := services.NewCardService(cardRepo, boardRepo, messageRepo)
-	memberService := services.NewMemberService(memberRepo, projectRepo)
+	cardService := services.NewCardService(cardRepo, boardRepo, messageRepo, notificationService, memberRepo)
+	memberService := services.NewMemberService(memberRepo, projectRepo, *notificationService)
 	schemaService := services.NewSchemaService(projectRepo, schemaRepo, s3Storage)
 	projectService := services.NewProjectService(projectRepo, memberService, memberRepo, boardRepo, cardRepo, messageRepo, s3Storage)
-	tokenService := services.NewTokenService(config.LoadConfig())
 	userService := services.NewUserService(userRepo, tokenService, s3Storage, userCache)
 	messageService := services.NewMessageService(messageRepo, cardRepo)
 
 	projectHandler := handlers.NewProjectHandler(projectService, schemaService, cardService, boardService, memberService, messageService)
 	userHandler := handlers.NewUserHandler(userService)
-	chatHandler := handlers.NewChatHandler(messageService, tokenService, userService)
+	cardHandler := handlers.NewCardHandler(cardService, boardService)
+	boardHandler := handlers.NewBoardHandler(cardService, boardService)
+	memberHandler := handlers.NewMemberHandler(memberService)
+	cardWSHandler := handlers.NewCardWSHandler(messageService, tokenService, userService, cardHub)
+	userWSHandler := handlers.NewUserWSHandler(tokenService, userService, userHub)
 
 	authMiddleware := middleware.NewAuthMiddleware(tokenService)
 	permissionsMiddleware := middleware.NewPermissionsMiddleware(permissionsCache)
@@ -188,8 +202,12 @@ func main() {
 	setupRoutes(
 		router,
 		projectHandler,
+		memberHandler,
+		cardHandler,
+		boardHandler,
 		userHandler,
-		chatHandler,
+		cardWSHandler,
+		userWSHandler,
 		authMiddleware,
 		permissionsMiddleware,
 		gqlHandler,
@@ -206,8 +224,12 @@ func main() {
 func setupRoutes(
 	router *gin.Engine,
 	projectHandler *handlers.ProjectHandler,
+	memberHandler *handlers.MemberHandler,
+	cardHandler *handlers.CardHandler,
+	boardHandler *handlers.BoardHandler,
 	userHandler *handlers.UserHandler,
-	chatHandler *handlers.ChatHandler,
+	cardWSHandler *handlers.CardWSHandler,
+	userWSHandler *handlers.UserWSHandler,
 	authMiddleware *middleware.AuthMiddleware,
 	permissionsMiddleware *middleware.PermissionsMiddleware,
 	gqlHandler *handler.Server,
@@ -216,7 +238,8 @@ func setupRoutes(
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 	router.GET("/test", handlers.Test)
-	router.GET("/ws/:cardId", chatHandler.ServeWS)
+	router.GET("/ws/card/:cardId", cardWSHandler.ServeWS)
+	router.GET("/ws/user", userWSHandler.ServeWS)
 
 	router.Static("/assets", "static/assets")
 	router.NoRoute(func(c *gin.Context) {
@@ -254,39 +277,28 @@ func setupRoutes(
 				projects.DELETE("/:project_id", projectHandler.DeleteProject)
 				projects.PATCH("/:project_id/logo", projectHandler.SetProjectLogo)
 
-				schemas := projects.Group("/:project_id/schemas")
-				{
-					schemas.POST("", projectHandler.CreateProjectSchema)
-					schemas.GET("", projectHandler.GetProjectSchemas)
-				}
-
 				members := projects.Group("/:project_id/members")
 				{
-					members.GET("", projectHandler.GetMembers)
-					members.GET("/:member_id", projectHandler.GetMember)
-					members.POST("", projectHandler.CreateMember)
-					members.DELETE("/:member_id", projectHandler.DeleteMember)
+					members.GET("", memberHandler.GetMembers)
+					members.GET("/:member_id", memberHandler.GetMember)
+					members.POST("", memberHandler.CreateMember)
+					members.DELETE("/:member_id", memberHandler.DeleteMember)
 				}
 
 				boards := projects.Group("/:project_id/boards")
 				{
-					boards.GET("", projectHandler.GetBoards)
-					boards.GET("/:board_id", projectHandler.GetBoard)
-					boards.POST("", projectHandler.CreateBoard)
-					boards.DELETE("/:board_id", projectHandler.DeleteBoard)
+					boards.GET("", boardHandler.GetBoards)
+					boards.GET("/:board_id", boardHandler.GetBoard)
+					boards.POST("", boardHandler.CreateBoard)
+					boards.DELETE("/:board_id", boardHandler.DeleteBoard)
 
 					cards := boards.Group("/:board_id/cards")
 					{
-						cards.GET("", projectHandler.GetCards)
-						cards.GET("/:card_id", projectHandler.GetCard)
-						cards.POST("", projectHandler.CreateCard)
-						cards.DELETE("/:card_id", projectHandler.DeleteCard)
-						cards.PUT("/:card_id/updatelocation", projectHandler.UpdateCardLocation)
-
-						messages := cards.Group("/:card_id/messages")
-						{
-							messages.POST("", projectHandler.NewMessage)
-						}
+						cards.GET("", cardHandler.GetCards)
+						cards.GET("/:card_id", cardHandler.GetCard)
+						cards.POST("", cardHandler.CreateCard)
+						cards.DELETE("/:card_id", cardHandler.DeleteCard)
+						cards.PUT("/:card_id/updatelocation", cardHandler.UpdateCardLocation)
 					}
 				}
 			}

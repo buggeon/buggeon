@@ -6,7 +6,7 @@ function buildLink(imageKey : string) {
 
 }
 
-function AvatarImage({imageKey, title, size = 50} : {imageKey : string, title? : string, size? : number}) {
+function AvatarImage({imageKey, alt, size = 50} : {imageKey : string, alt? : string, size? : number}) {
 
     if(!imageKey) return
 
@@ -25,7 +25,7 @@ function AvatarImage({imageKey, title, size = 50} : {imageKey : string, title? :
                 alignItems: "center",
                 justifyContent: "center"
             }}>
-                <p style={{fontSize: 20, fontWeight: 700}}>{title[0]}</p>
+                <p style={{fontSize: 20, fontWeight: 700}}>{alt[0]}</p>
             </div>
     )
 

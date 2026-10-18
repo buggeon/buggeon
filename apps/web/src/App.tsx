@@ -11,7 +11,7 @@ import CardAboutScreen from './screens/cardAbout/cardAbout'
 import SettingsScreen from './screens/accountSettings/accountSettings'
 import AccountSettingsScreen from './screens/accountSettings/accountSettings'
 import ProjectSettingsScreen from './screens/projectSettings/projectSettings'
-import MembersScreen from './screens/members/membersScreen'
+import MembersScreen from './screens/members/members'
 import MemberAboutScreen from './screens/members/memberAbout/memberAbout'
 
 function App() {

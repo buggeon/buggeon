@@ -1,6 +1,7 @@
 import { decodeJwt } from 'jose'
 import type { User } from '../store/types/user.interface'
 import api from './api'
+import { userChannel } from './userChannel'
 
 class UserApi {
 
@@ -13,9 +14,8 @@ class UserApi {
 
             if(result.status == 200) {
 
-                console.log(result)
-
                 localStorage.setItem("accessToken", result.data.accessToken)
+                userChannel.connect(result.data.accessToken)
 
                 const userId = decodeJwt(result.data.accessToken).userId
 

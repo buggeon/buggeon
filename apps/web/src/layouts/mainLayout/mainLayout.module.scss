@@ -5,6 +5,26 @@
     background-color: var(--color-bg);
     overflow-y: hidden;
 
+    .spinnerBlock{
+        display: flex;
+        flex: 1;
+        align-items: center;
+        justify-content: center;
+
+        .spinner{
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0%{
+                transform: rotate(0deg);
+            }
+            100%{
+                transform: rotate(360deg);
+            }
+        }
+    }
+
     .sidebar{
         @media (max-width: 1000px) {
             display: none;
@@ -53,9 +73,9 @@
         display: flex;
         padding: 2.5%;
         flex-direction: column;
-        overflow-y: scroll;
         position: relative;
-        overflow-x: hidden;
+        overflow: hidden;
+        min-height: 0;
         gap: 30px;
 
         @media (max-width: 1000px) {

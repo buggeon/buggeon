@@ -93,7 +93,7 @@ function ProjectsScreen() {
                                             }} key={project.id}>
                                                 <td>
                                                     <div className={styles.projectAbout}>
-                                                        <AvatarImage imageKey={project.logoKey} title={project.name}/>
+                                                        <AvatarImage imageKey={project.logoKey} alt={project.name}/>
                                                         <div className={styles.projectNameAndDescription}>
                                                             <p>{project.name}</p>
                                                             <p>{project.description}</p>
@@ -102,7 +102,7 @@ function ProjectsScreen() {
                                                 </td>
                                                 <td>
                                                     <div className={styles.leadInfo}>
-                                                        <AvatarImage imageKey={project.lead.user.avatarKey} title={project.lead.user.name}/>
+                                                        <AvatarImage imageKey={project.lead.user.avatarKey} alt={project.lead.user.name}/>
                                                         <p>{project.lead.user.name}</p>
                                                     </div>
                                                 </td>
@@ -110,7 +110,7 @@ function ProjectsScreen() {
                                                     <div className={styles.members}>
                                                         {
                                                             project.members.slice(0, 4).map(member => (
-                                                                <AvatarImage imageKey={member.user.avatarKey} title={member.user.name}/>
+                                                                <AvatarImage size={40} imageKey={member.user.avatarKey} alt={member.user.name}/>
                                                             ))
                                                         }
                                                         {

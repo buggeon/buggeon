@@ -1,72 +1,81 @@
-// Buggeon - SelfHosted service for bug and task tracking
-// Copyright (C) 2026 DEVE corp.
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 package hub
 
-import "fmt"
+import (
+	"sync"
+)
 
 type Hub struct {
-	name       string
-	clients    map[*Client]bool
-	broadcast  chan []byte
+	mu    sync.RWMutex
+	rooms map[string]map[*Client]struct{}
+
 	register   chan *Client
 	unregister chan *Client
+	broadcast  chan broadcastMessage
 }
 
-func NewHub(name string) *Hub {
+type broadcastMessage struct {
+	RoomID  string
+	Payload []byte
+	Except  *Client
+}
 
-	h := &Hub{
-		name:       name,
-		clients:    make(map[*Client]bool),
-		broadcast:  make(chan []byte),
+func NewHub() *Hub {
+	return &Hub{
+		rooms:      make(map[string]map[*Client]struct{}),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
+		broadcast:  make(chan broadcastMessage),
 	}
-
-	return h
 }
 
 func (h *Hub) Register(c *Client)   { h.register <- c }
 func (h *Hub) Unregister(c *Client) { h.unregister <- c }
-func (h *Hub) Broadcast(msg []byte) { h.broadcast <- msg }
-
+func (h *Hub) Broadcast(roomID string, msg []byte) {
+	h.broadcast <- broadcastMessage{
+		RoomID:  roomID,
+		Payload: msg,
+	}
+}
+func (h *Hub) BroadcastExcept(roomID string, msg []byte, ex *Client) {
+	h.broadcast <- broadcastMessage{
+		RoomID:  roomID,
+		Payload: msg,
+		Except:  ex,
+	}
+}
 func (h *Hub) Run() {
 
 	for {
+
 		select {
 
 		case client := <-h.register:
-			fmt.Println(client)
-			h.clients[client] = true
+
+			if h.rooms[client.RoomID] == nil {
+				h.rooms[client.RoomID] = map[*Client]struct{}{}
+			}
+
+			h.rooms[client.RoomID][client] = struct{}{}
 
 		case client := <-h.unregister:
-			if _, ok := h.clients[client]; ok {
-				delete(h.clients, client)
-				close(client.Send)
+
+			if clients, ok := h.rooms[client.RoomID]; ok {
+				if _, exists := clients[client]; exists {
+					delete(clients, client)
+					close(client.Send)
+
+					if len(clients) == 0 {
+						delete(h.rooms, client.RoomID)
+					}
+				}
 			}
 
 		case message := <-h.broadcast:
-			for client := range h.clients {
-				select {
 
-				case client.Send <- message:
-				default:
-					close(client.Send)
-					delete(h.clients, client)
-				}
+			for client := range h.rooms[message.RoomID] {
+
+				client.Send <- message.Payload
+
 			}
 
 		}

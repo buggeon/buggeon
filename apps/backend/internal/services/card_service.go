@@ -29,36 +29,45 @@ import (
 )
 
 type CardService struct {
-	cardRepo    *repositories.CardRepo
-	boardRepo   *repositories.BoardRepo
-	messageRepo *repositories.MessageRepo
+	cardRepo             *repositories.CardRepo
+	boardRepo            *repositories.BoardRepo
+	messageRepo          *repositories.MessageRepo
+	notififactionService *NotificationService
+	memberRepo           *repositories.MemberRepo
 }
 
 func NewCardService(
 	cardRepo *repositories.CardRepo,
 	boardRepo *repositories.BoardRepo,
 	messageRepo *repositories.MessageRepo,
+	notificationService *NotificationService,
+	memberRepo *repositories.MemberRepo,
 ) *CardService {
 	return &CardService{
-		cardRepo:    cardRepo,
-		boardRepo:   boardRepo,
-		messageRepo: messageRepo,
+		cardRepo:             cardRepo,
+		boardRepo:            boardRepo,
+		messageRepo:          messageRepo,
+		notififactionService: notificationService,
+		memberRepo:           memberRepo,
 	}
 }
 
 func (s *CardService) CreateCard(ctx context.Context, dto *dto.CreateCardDto) (*models.Card, error) {
 
+	fmt.Println("Создаём карточку...")
+
 	boardID, err := primitive.ObjectIDFromHex(dto.BoardID)
-	var assigneeIDs []primitive.ObjectID
+	var assigneeObjIDs []primitive.ObjectID
 
 	for _, assigneeID := range dto.Assignees {
-		cardObjID, err := primitive.ObjectIDFromHex(assigneeID)
+
+		assigneeObjID, err := primitive.ObjectIDFromHex(assigneeID)
 
 		if err != nil {
 			continue
 		}
 
-		assigneeIDs = append(assigneeIDs, cardObjID)
+		assigneeObjIDs = append(assigneeObjIDs, assigneeObjID)
 	}
 
 	if err != nil {
@@ -75,7 +84,7 @@ func (s *CardService) CreateCard(ctx context.Context, dto *dto.CreateCardDto) (*
 	card := &models.Card{
 		Title:     dto.Title,
 		Content:   dto.Content,
-		Assignees: assigneeIDs,
+		Assignees: assigneeObjIDs,
 		Status:    "inProgress",
 		BoardID:   boardID,
 		Priority:  dto.Priority,
@@ -87,7 +96,36 @@ func (s *CardService) CreateCard(ctx context.Context, dto *dto.CreateCardDto) (*
 
 	cardID, err := s.cardRepo.CreateCard(ctx, card)
 
-	return card, s.boardRepo.AddCard(ctx, boardID, cardID)
+	err = s.boardRepo.AddCard(ctx, boardID, cardID)
+
+	if err != nil {
+		return &models.Card{}, err
+	}
+
+	members, err := s.memberRepo.GetMembersByIDs(ctx, card.Assignees)
+
+	for _, member := range members {
+
+		fmt.Println("Оповещаем " + member.UserID.Hex())
+
+		_, err := s.notififactionService.NewNotification(
+			ctx,
+			member.UserID,
+			"Appending in card",
+			"You was append in card",
+			map[string]any{
+				"cardId": cardID,
+			},
+		)
+
+		if err != nil {
+			continue
+		}
+
+	}
+
+	return card, nil
+
 }
 
 func (s *CardService) UpdateCard(ctx context.Context, cardID string, newCardData *models.Card) (*models.Card, error) {

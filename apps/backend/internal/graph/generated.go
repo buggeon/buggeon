@@ -7,7 +7,6 @@ import (
 	"buggeon/internal/graph/gqlmodel"
 	"bytes"
 	"context"
-	"embed"
 	"errors"
 	"fmt"
 	"math"
@@ -92,12 +91,15 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateBoard   func(childComplexity int, projectID string, input gqlinput.CreateBoardInput) int
 		CreateCard    func(childComplexity int, boardID string, input gqlinput.CreateCardInput) int
+		CreateMember  func(childComplexity int, projectID string, input *gqlinput.CreateMemberInput) int
 		CreateProject func(childComplexity int, input gqlinput.CreateProjectInput) int
 		DeleteBoard   func(childComplexity int, projectID string, boardID string) int
 		DeleteCard    func(childComplexity int, boardID string, cardID string) int
+		DeleteMember  func(childComplexity int, memberID string) int
 		DeleteProject func(childComplexity int, projectID string) int
 		UpdateBoard   func(childComplexity int, boardID string, input gqlinput.UpdateBoardInput) int
 		UpdateCard    func(childComplexity int, cardID string, input gqlinput.UpdateCardInput) int
+		UpdateMember  func(childComplexity int, memberID string, input *gqlinput.UpdateMemberInput) int
 		UpdateProject func(childComplexity int, projectID string, input gqlinput.UpdateProjectInput) int
 		UpdateUser    func(childComplexity int, userID string, input gqlinput.UpdateUserInput) int
 	}
@@ -180,6 +182,9 @@ type MutationResolver interface {
 	UpdateProject(ctx context.Context, projectID string, input gqlinput.UpdateProjectInput) (*gqlmodel.Project, error)
 	DeleteProject(ctx context.Context, projectID string) (bool, error)
 	UpdateUser(ctx context.Context, userID string, input gqlinput.UpdateUserInput) (*gqlmodel.User, error)
+	CreateMember(ctx context.Context, projectID string, input *gqlinput.CreateMemberInput) (*gqlmodel.Member, error)
+	UpdateMember(ctx context.Context, memberID string, input *gqlinput.UpdateMemberInput) (*gqlmodel.Member, error)
+	DeleteMember(ctx context.Context, memberID string) (bool, error)
 }
 type ProjectResolver interface {
 	Lead(ctx context.Context, obj *gqlmodel.Project) (*gqlmodel.Member, error)
@@ -446,6 +451,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.CreateCard(childComplexity, args["boardId"].(string), args["input"].(gqlinput.CreateCardInput)), true
+	case "Mutation.createMember":
+		if e.ComplexityRoot.Mutation.CreateMember == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createMember_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.CreateMember(childComplexity, args["projectId"].(string), args["input"].(*gqlinput.CreateMemberInput)), true
 	case "Mutation.createProject":
 		if e.ComplexityRoot.Mutation.CreateProject == nil {
 			break
@@ -479,6 +495,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.DeleteCard(childComplexity, args["boardId"].(string), args["cardId"].(string)), true
+	case "Mutation.deleteMember":
+		if e.ComplexityRoot.Mutation.DeleteMember == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMember_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.DeleteMember(childComplexity, args["memberId"].(string)), true
 	case "Mutation.deleteProject":
 		if e.ComplexityRoot.Mutation.DeleteProject == nil {
 			break
@@ -512,6 +539,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.UpdateCard(childComplexity, args["cardId"].(string), args["input"].(gqlinput.UpdateCardInput)), true
+	case "Mutation.updateMember":
+		if e.ComplexityRoot.Mutation.UpdateMember == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateMember_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.UpdateMember(childComplexity, args["memberId"].(string), args["input"].(*gqlinput.UpdateMemberInput)), true
 	case "Mutation.updateProject":
 		if e.ComplexityRoot.Mutation.UpdateProject == nil {
 			break
@@ -815,9 +853,11 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateBoardInput,
 		ec.unmarshalInputCreateCardInput,
+		ec.unmarshalInputCreateMemberInput,
 		ec.unmarshalInputCreateProjectInput,
 		ec.unmarshalInputUpdateBoardInput,
 		ec.unmarshalInputUpdateCardInput,
+		ec.unmarshalInputUpdateMemberInput,
 		ec.unmarshalInputUpdateProjectInput,
 		ec.unmarshalInputUpdateUserInput,
 	)
@@ -894,19 +934,200 @@ func newExecutionContext(
 	}
 }
 
-//go:embed "schema.graphqls"
-var sourcesFS embed.FS
-
-func sourceData(filename string) string {
-	data, err := sourcesFS.ReadFile(filename)
-	if err != nil {
-		panic(fmt.Sprintf("codegen problem: %s not available", filename))
-	}
-	return string(data)
+var sources = []*ast.Source{
+	{Name: "../../../../schema.graphql", Input: `type User {
+    id: ID!
+    name: String!
+    avatarKey: String!
+    login: String!
+    email: String!
+    createdAt: String!
 }
 
-var sources = []*ast.Source{
-	{Name: "schema.graphqls", Input: sourceData("schema.graphqls"), BuiltIn: false},
+type Project {
+    id: ID!
+    createdAt: String!
+    updatedAt: String!
+    name: String!
+    description: String!
+    logoKey: String!
+    progress: Int!
+
+    lead: Member!
+    members: [Member!]!
+    boards: [Board!]!
+}
+
+type Message {
+    id: ID!
+    content: String!
+    createdAt: String!
+    updatedAt: String!
+    cardId: String!
+
+    sender: User!
+    replyTo: Message
+    replies: [Message!]!
+}
+
+type Member {
+    id: ID!
+    role: String!
+    directions: [String!]!
+    createdAt: String!
+    projectId: String!
+
+    user: User!
+}
+
+type Card {
+    id: ID!
+    title: String!
+    content: String!
+    priority: String!  
+    createdAt: String!
+    updatedAt: String!
+    boardId: String!
+    dueDate: String!
+    status: String!
+
+    assignees: [Member!]!
+    messages: [Message!]!
+}
+
+type Board {
+    id: ID!
+    name: String!
+    direction: String!
+    createdAt: String!
+    updatedAt: String!
+    projectId: String!
+    cardsStatus: String!
+
+    cards: [Card!]!
+}
+
+type Schema {
+    id: ID!
+    direction: String
+    url: String!
+    name: String!
+    createdAt: String!
+    updatedAt: String!
+
+    author: Member!
+}
+
+type Query {
+    
+    project(projectId: ID!): Project!
+    
+    projects(userId: ID!): [Project!]!
+    
+    message(messageId: ID!): Message!
+
+    messages(cardId: ID!): [Message!]!
+
+    board(boardId: ID!): Board!
+
+    boards(projectId: ID!): [Board!]!
+    
+    card(cardId: ID!): Card!
+
+    cards(boardId: ID!): [Card!]!
+    
+    member(memberId: ID!): Member!
+
+    members(projectId: ID!): [Member!]!
+
+    user(userId: ID!): User!
+
+    users: [User!]!
+
+}
+
+type Mutation {
+
+    createCard(boardId: ID!, input: CreateCardInput!): Card!
+    updateCard(cardId: ID!, input: UpdateCardInput!): Card!
+    deleteCard(boardId: ID!, cardId: ID!): Boolean!
+
+    createBoard(projectId: ID!, input: CreateBoardInput!): Board!
+    updateBoard(boardId: ID!, input: UpdateBoardInput!): Board!
+    deleteBoard(projectId: ID!, boardId: ID!): Boolean!
+
+    createProject(input: CreateProjectInput!): Project!
+    updateProject(projectId: ID!, input: UpdateProjectInput!): Project!
+    deleteProject(projectId: ID!): Boolean!
+
+    updateUser(userId: ID!, input: UpdateUserInput!): User!
+
+    createMember(projectId: ID!, input: CreateMemberInput): Member!
+    updateMember(memberId: ID!, input: UpdateMemberInput): Member!
+    deleteMember(memberId: ID!): Boolean!
+
+}
+
+input CreateCardInput {
+    title: String!
+    content: String!
+    priority: String!
+    dueDate: String!
+    assignees: [ID!]
+}
+
+input UpdateCardInput {
+    title: String
+    content: String
+    status: String
+    priority: String
+    dueDate: String
+    assignees: [ID!]
+}
+
+input CreateBoardInput {
+    name: String!
+    direction: String!
+    cardsStatus: String!
+}
+
+input UpdateBoardInput {
+    name: String
+    direction: String
+    themeColor: String
+    cardsStatus: String
+}
+
+input CreateProjectInput {
+    leadId: String!
+    name: String!
+    description: String
+    members: [String]
+    progress: Int
+}
+
+input UpdateProjectInput {
+    name: String
+    description: String
+    progress: Int
+}
+
+input UpdateUserInput {
+    name: String
+    login: String
+    email: String
+}
+
+input CreateMemberInput {
+    userId: ID!
+    role: String!
+    rights: [String!]!
+}
+
+input UpdateMemberInput {
+    role: String!
+    rights: [String!]!
+}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -1208,6 +1429,28 @@ func (ec *executionContext) field_Mutation_createCard_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createMember_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "projectId",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNID2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["projectId"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input",
+		func(ctx context.Context, v any) (*gqlinput.CreateMemberInput, error) {
+			return ec.unmarshalOCreateMemberInput2ᚖbuggeonᚋinternalᚋgraphᚋgqlinputᚐCreateMemberInput(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createProject_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1266,6 +1509,20 @@ func (ec *executionContext) field_Mutation_deleteCard_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteMember_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "memberId",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNID2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["memberId"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteProject_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1316,6 +1573,28 @@ func (ec *executionContext) field_Mutation_updateCard_args(ctx context.Context, 
 	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input",
 		func(ctx context.Context, v any) (gqlinput.UpdateCardInput, error) {
 			return ec.unmarshalNUpdateCardInput2buggeonᚋinternalᚋgraphᚋgqlinputᚐUpdateCardInput(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateMember_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "memberId",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNID2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["memberId"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input",
+		func(ctx context.Context, v any) (*gqlinput.UpdateMemberInput, error) {
+			return ec.unmarshalOUpdateMemberInput2ᚖbuggeonᚋinternalᚋgraphᚋgqlinputᚐUpdateMemberInput(ctx, v)
 		})
 	if err != nil {
 		return nil, err
@@ -2852,6 +3131,138 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_createMember(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().CreateMember(ctx, fc.Args["projectId"].(string), fc.Args["input"].(*gqlinput.CreateMemberInput))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *gqlmodel.Member) graphql.Marshaler {
+			return ec.marshalNMember2ᚖbuggeonᚋinternalᚋgraphᚋgqlmodelᚐMember(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_createMember(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Member(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createMember_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_updateMember(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().UpdateMember(ctx, fc.Args["memberId"].(string), fc.Args["input"].(*gqlinput.UpdateMemberInput))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *gqlmodel.Member) graphql.Marshaler {
+			return ec.marshalNMember2ᚖbuggeonᚋinternalᚋgraphᚋgqlmodelᚐMember(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_updateMember(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Member(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateMember_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_deleteMember(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().DeleteMember(ctx, fc.Args["memberId"].(string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+			return ec.marshalNBoolean2bool(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_deleteMember(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteMember_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5176,6 +5587,50 @@ func (ec *executionContext) unmarshalInputCreateCardInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateMemberInput(ctx context.Context, obj any) (gqlinput.CreateMemberInput, error) {
+	var it gqlinput.CreateMemberInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"userId", "role", "rights"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "userId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
+		case "role":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Role = data
+		case "rights":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rights"))
+			data, err := ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Rights = data
+		}
+	}
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context, obj any) (gqlinput.CreateProjectInput, error) {
 	var it gqlinput.CreateProjectInput
 	if obj == nil {
@@ -5345,6 +5800,43 @@ func (ec *executionContext) unmarshalInputUpdateCardInput(ctx context.Context, o
 				return it, err
 			}
 			it.Assignees = data
+		}
+	}
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateMemberInput(ctx context.Context, obj any) (gqlinput.UpdateMemberInput, error) {
+	var it gqlinput.UpdateMemberInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"role", "rights"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "role":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Role = data
+		case "rights":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("rights"))
+			data, err := ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Rights = data
 		}
 	}
 	return it, nil
@@ -6060,6 +6552,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "updateUser":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateUser(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createMember":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createMember(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateMember":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateMember(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteMember":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteMember(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -7620,6 +8133,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) unmarshalOCreateMemberInput2ᚖbuggeonᚋinternalᚋgraphᚋgqlinputᚐCreateMemberInput(ctx context.Context, v any) (*gqlinput.CreateMemberInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCreateMemberInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOID2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
 	if v == nil {
 		return nil, nil
@@ -7737,6 +8258,14 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	_ = ctx
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOUpdateMemberInput2ᚖbuggeonᚋinternalᚋgraphᚋgqlinputᚐUpdateMemberInput(ctx context.Context, v any) (*gqlinput.UpdateMemberInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUpdateMemberInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

@@ -16,17 +16,63 @@
 
 package services
 
+import (
+	"buggeon/internal/hub"
+	"buggeon/internal/models"
+	"buggeon/internal/repositories"
+	"context"
+	"encoding/json"
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
 type NotificationService struct {
+	notificationRepo *repositories.NotificationRepo
+	userHub          *hub.UserHub
 }
 
-func NewNotificationService() *NotificationService {
-	return &NotificationService{}
+func NewNotificationService(
+	notificationRepo *repositories.NotificationRepo,
+	userHub *hub.UserHub,
+) *NotificationService {
+	return &NotificationService{
+		notificationRepo: notificationRepo,
+		userHub:          userHub,
+	}
 }
 
-func (s *NotificationService) SendNotificationByEmail(email string, message string) {
+func (s *NotificationService) NewNotification(ctx context.Context, userID primitive.ObjectID, title, content string, payload map[string]any) (*models.Notification, error) {
+
+	notificationID := primitive.NewObjectID()
+
+	notification := &models.Notification{
+		ID:        notificationID,
+		Title:     title,
+		Content:   content,
+		Payload:   payload,
+		UserID:    userID,
+		CreatedAt: time.Now(),
+	}
+
+	_, err := s.notificationRepo.CreateNotification(ctx, notification)
+
+	notificationBytes, err := json.Marshal(notification)
+
+	if err != nil {
+		return &models.Notification{}, err
+	}
+
+	go s.userHub.Broadcast(notificationBytes, userID.Hex())
+
+	return notification, err
 
 }
 
-func (s *NotificationService) SendNotificationByTelegram(email string, message string) {
+func (s *NotificationService) SendNotificationByEmail(ctx context.Context, email string, notification string) {
+
+}
+
+func (s *NotificationService) SendNotificationByTelegram(ctx context.Context, chatID string, notification models.Notification) {
 
 }

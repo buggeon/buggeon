@@ -28,29 +28,32 @@ import (
 )
 
 type MemberService struct {
-	memberRepo  *repositories.MemberRepo
-	projectRepo *repositories.ProjectRepo
+	memberRepo          *repositories.MemberRepo
+	projectRepo         *repositories.ProjectRepo
+	notificationService NotificationService
 }
 
 func NewMemberService(
 	memberRepo *repositories.MemberRepo,
 	projectRepo *repositories.ProjectRepo,
+	notificationService NotificationService,
 ) *MemberService {
 	return &MemberService{
-		memberRepo:  memberRepo,
-		projectRepo: projectRepo,
+		memberRepo:          memberRepo,
+		projectRepo:         projectRepo,
+		notificationService: notificationService,
 	}
 }
 
-func (s *MemberService) CreateMember(ctx context.Context, dto *dto.CreateMemberDto) (*models.Member, error) {
+func (s *MemberService) CreateMember(ctx context.Context, createMemberDto *dto.CreateMemberDto) (*models.Member, error) {
 
-	userID, err := primitive.ObjectIDFromHex(dto.UserID)
+	userID, err := primitive.ObjectIDFromHex(createMemberDto.UserID)
 
 	if err != nil {
 		return &models.Member{}, err
 	}
 
-	projectID, err := primitive.ObjectIDFromHex(dto.ProjectID)
+	projectID, err := primitive.ObjectIDFromHex(createMemberDto.ProjectID)
 
 	if err != nil {
 		return &models.Member{}, err
@@ -58,15 +61,31 @@ func (s *MemberService) CreateMember(ctx context.Context, dto *dto.CreateMemberD
 
 	member := &models.Member{
 		UserID:     userID,
-		Role:       dto.Role,
+		Role:       createMemberDto.Role,
 		ProjectID:  projectID,
-		Directions: dto.Directions,
+		Directions: createMemberDto.Directions,
 		CreatedAt:  time.Now(),
 	}
 
 	memberID, err := s.memberRepo.CreateMember(ctx, member)
 
-	return member, s.projectRepo.AddMember(ctx, projectID, memberID)
+	err = s.projectRepo.AddMember(ctx, projectID, memberID)
+
+	if err != nil {
+		return &models.Member{}, err
+	}
+
+	s.notificationService.NewNotification(
+		ctx,
+		userID,
+		"Добавление в проект",
+		"Вы были добавлены в проект",
+		map[string]any{
+			"projectId": createMemberDto.ProjectID,
+		},
+	)
+
+	return member, nil
 }
 
 func (s *MemberService) UpdateMember(ctx context.Context, memberID string, newMemberData *models.Member) (*models.Member, error) {

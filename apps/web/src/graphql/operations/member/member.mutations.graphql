@@ -1,0 +1,15 @@
+mutation CreateMember($projectId: ID!, $input: CreateMemberInput!) {
+    createMember(projectId: $projectId, input: $input) {
+        ...MemberDetails
+    }
+}
+
+mutation UpdateMember($memberId: ID!, $input: UpdateMemberInput!) {
+    updateMember(memberId: $memberId, input: $input) {
+        ...MemberDetails
+    }
+}
+
+mutation DeleteMember($memberId: ID!) {
+    deleteMember(memberId: $memberId)
+}

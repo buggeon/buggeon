@@ -1,13 +1,13 @@
 package hub
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
 
 type Client struct {
+	RoomID        string
 	UserID        string
 	UserName      string
 	UserAvatarKey string
@@ -17,6 +17,7 @@ type Client struct {
 
 type BroadcastMessage struct {
 	ID              string    `json:"id"`
+	RoomID          string    `json:""`
 	SenderName      string    `json:"senderName"`
 	SenderID        string    `json:"senderId"`
 	SenderAvatarKey string    `json:"senderAvatarKey"`
@@ -34,13 +35,13 @@ func NewClient(conn *websocket.Conn, userID, userName, userAvatarKey string) *Cl
 	}
 }
 
-func (c *Client) ReadPump(hub *Hub, onMessage func(*Client, []byte)) {
+func (c *Client) ReadPump(onMessage func(*Client, []byte), onClose func(*Client)) {
 
 	c.Conn.SetReadLimit(1024)
 
 	defer func() {
 		c.Conn.Close()
-		hub.unregister <- c
+		onClose(c)
 	}()
 
 	for {
@@ -51,21 +52,6 @@ func (c *Client) ReadPump(hub *Hub, onMessage func(*Client, []byte)) {
 			break
 		}
 
-		messageObject := BroadcastMessage{
-			ID:              hub.name,
-			SenderName:      c.UserName,
-			SenderID:        c.UserID,
-			SenderAvatarKey: c.UserAvatarKey,
-			Content:         string(msg),
-			SentAt:          time.Now(),
-		}
-
-		messageObjectBytes, err := json.Marshal(messageObject)
-		if err != nil {
-			break
-		}
-
-		hub.Broadcast(messageObjectBytes)
 		onMessage(c, msg)
 
 	}

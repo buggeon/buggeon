@@ -11,7 +11,7 @@ import { setAppearance } from "../../store/slices/themeSlice";
 import { LogoIcon } from "../../assets/logo/logo";
 import AvatarImage from "../../components/avatarImage/avatarImage";
 
-function MainLayout({children, title, description, isModal = false} : {children : React.ReactNode, title? : string, description? : string, isModal? : boolean}) {
+function MainLayout({children, title, description, isModal = false, loading} : {children : React.ReactNode, title? : string, description? : string, isModal? : boolean, loading? : boolean}) {
     
     const globalLocation = useLocation().pathname.split("/")[1]
     const locationParts = useLocation().pathname.split("/")
@@ -75,7 +75,7 @@ function MainLayout({children, title, description, isModal = false} : {children 
                 }
                 footer={
                     <section className={styles.account}>
-                        <AvatarImage imageKey={user.avatarKey} title={user.name}/>
+                        <AvatarImage imageKey={user.avatarKey} alt={user.name}/>
                         <div className={styles.accountPersonalInfo}>
                             <p>{user.name}</p>
                             <p className={styles.accountLogin}>{user.login}</p>
@@ -119,7 +119,17 @@ function MainLayout({children, title, description, isModal = false} : {children 
                     <h1>{title}</h1>
                     <p style={{color: "var(--color-text)"}}>{description}</p>
                 </div>
-                {children}
+                {
+                    loading
+                        ?   <div className={styles.spinnerBlock}>
+                                <Icons.Spinner
+                                    width={50}
+                                    height={50}
+                                    color="var(--color-text)"
+                                    className={styles.spinner}/>
+                            </div>
+                        : children
+                }
             </section>
         </section>
     )
