@@ -104,6 +104,10 @@ function CreateProject({isModalVisible, setModalVisibility} : CreateProjectProps
 
     }
 
+    useEffect(() => {
+        console.log(projectInfo)
+    }, [projectInfo])
+
     return(
         <Modal
             onFooterActiveButtonClick={async () => {
@@ -171,7 +175,7 @@ function CreateProject({isModalVisible, setModalVisibility} : CreateProjectProps
                         id: user.id
                     }))}
                     renderFunc={(item) => (
-                        <div>
+                        <div onClick={() => setProjectInfo(prev => ({...prev, leadId: item.id}))}>
                             <p>{item.name}</p>
                         </div>
                     )}

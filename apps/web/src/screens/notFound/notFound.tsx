@@ -4,7 +4,7 @@ import styles from './notFound.module.scss'
 function NotFoundScreen() {
     return(
         <section className={styles.main}>
-            <Icons.Logo width={50} height={50}/>
+            <Icons.Logo width={50} height={50} color='var(--color-text)'/>
             <p>Oops... Looks like you took the wrong path</p>
         </section>
     )   

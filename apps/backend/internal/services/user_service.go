@@ -66,6 +66,8 @@ func (s *UserService) Register(ctx context.Context, loginDto *dto.UserRegistrati
 
 	initialAvatar, err := randomHexColor()
 
+	fmt.Println("Initial avatar: " + initialAvatar)
+
 	if err != nil {
 		initialAvatar = "#FF0000"
 	}

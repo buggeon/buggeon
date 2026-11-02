@@ -25,7 +25,7 @@ function AvatarImage({imageKey, alt, size = 50} : {imageKey : string, alt? : str
                 alignItems: "center",
                 justifyContent: "center"
             }}>
-                <p style={{fontSize: 20, fontWeight: 700}}>{alt[0]}</p>
+                <p style={{fontSize: 20, fontWeight: 700, color: "white"}}>{alt[0]}</p>
             </div>
     )
 

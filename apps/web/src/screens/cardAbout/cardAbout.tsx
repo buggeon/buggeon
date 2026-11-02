@@ -56,7 +56,7 @@ function CardAboutScreen() {
                         {
                             messages && messages?.map(message => (
                                 <li className={styles.messageItem} style={{justifyContent: user.id == message.senderId ? "flex-end" : "flex-start"}}>
-                                    <p>{message.content}</p>
+                                    <p style={{order: user.id == message.senderId ? -1 :  1}}>{message.content}</p>
                                     <AvatarImage
                                         imageKey={message.senderAvatarKey}
                                         alt={message.senderName}

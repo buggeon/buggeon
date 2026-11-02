@@ -26,7 +26,7 @@ function MembersScreen() {
     return(
         <MainLayout
             title="Members"
-            description="Manage your team DmembersData, their roles and permissions."
+            description="Manage your team, their roles and permissions."
         >
             <main className={styles.main}>
                 <Modal
@@ -55,7 +55,7 @@ function MembersScreen() {
                         <Icons.Plus
                             width={20}
                             height={20}
-                            color="var(--color-text)"
+                            color="white"
                         />
                         <p>Add Member</p>
                     </button>

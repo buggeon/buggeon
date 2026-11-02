@@ -128,6 +128,8 @@ function BoardsScreen() {
                                                 key={board.id}
                                                 id={board.id}
                                                 name={board.name}
+                                                direction={direction}
+                                                cardsStatus={board.cardsStatus}
                                                 cards={board.cards}
                                                 projectId={projectId}
                                             />

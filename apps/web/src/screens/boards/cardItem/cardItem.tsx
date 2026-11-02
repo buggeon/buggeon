@@ -7,10 +7,11 @@ interface CardItemProps {
     title : string;
     priority : string;
     boardId : string;
-    status : string
+    status : string;
+    customStyle? : React.CSSProperties
 }
 
-function CardItem({id, title, priority, boardId, status} : CardItemProps) {
+function CardItem({id, title, priority, boardId, status, customStyle} : CardItemProps) {
 
     console.log(status)
 
@@ -36,7 +37,8 @@ function CardItem({id, title, priority, boardId, status} : CardItemProps) {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0 : 1,
-        cursor: isDragging ? "grab" : "pointer"
+        cursor: isDragging ? "grab" : "pointer",
+        ...customStyle
     }
 
     return(

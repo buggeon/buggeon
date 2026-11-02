@@ -13,6 +13,7 @@ import AccountSettingsScreen from './screens/accountSettings/accountSettings'
 import ProjectSettingsScreen from './screens/projectSettings/projectSettings'
 import MembersScreen from './screens/members/members'
 import MemberAboutScreen from './screens/members/memberAbout/memberAbout'
+import DiagramsScreen from './screens/diagrams/diagrams'
 
 function App() {
 
@@ -44,9 +45,8 @@ function App() {
                 <Route path="members" element={<MembersScreen/>}/>
                 <Route path="boards" element={<BoardsScreen/>}/>
                 <Route path="members/:memberId" element={<MemberAboutScreen/>}/>
-                <Route path='boards/:boardId/cards/:cardId' element={<CardAboutScreen/>}>
-
-                </Route>
+                <Route path='boards/:boardId/cards/:cardId' element={<CardAboutScreen/>}></Route>
+                <Route path='diagrams' element={<DiagramsScreen/>}/>
             </Route>
 
             <Route path='*' element={<NotFoundScreen/>}/>

@@ -42,6 +42,11 @@ function MainLayout({children, title, description, isModal = false, loading} : {
             label: "Settings",
             path: `/projects/${projectId}/settings`
         },
+        {
+            icon: <Icons.StatisticUp width={20} height={20} color="var(--color-text"/>,
+            label: "Diagrams",
+            path: `/projects/${projectId}/diagrams`
+        }
     ], [projectId]);
 
     const dashboardMenuItems = useMemo<ISidebarMenuItem[]>(() => [

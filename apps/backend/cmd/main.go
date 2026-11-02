@@ -165,6 +165,7 @@ func main() {
 	projectService := services.NewProjectService(projectRepo, memberService, memberRepo, boardRepo, cardRepo, messageRepo, s3Storage)
 	userService := services.NewUserService(userRepo, tokenService, s3Storage, userCache)
 	messageService := services.NewMessageService(messageRepo, cardRepo)
+	aiService := services.NewAIService(projectService, memberService)
 
 	projectHandler := handlers.NewProjectHandler(projectService, schemaService, cardService, boardService, memberService, messageService)
 	userHandler := handlers.NewUserHandler(userService)
@@ -173,6 +174,7 @@ func main() {
 	memberHandler := handlers.NewMemberHandler(memberService)
 	cardWSHandler := handlers.NewCardWSHandler(messageService, tokenService, userService, cardHub)
 	userWSHandler := handlers.NewUserWSHandler(tokenService, userService, userHub)
+	aiHandler := handlers.NewAIHandler(aiService)
 
 	authMiddleware := middleware.NewAuthMiddleware(tokenService)
 	permissionsMiddleware := middleware.NewPermissionsMiddleware(permissionsCache)
@@ -208,6 +210,7 @@ func main() {
 		userHandler,
 		cardWSHandler,
 		userWSHandler,
+		aiHandler,
 		authMiddleware,
 		permissionsMiddleware,
 		gqlHandler,
@@ -230,6 +233,7 @@ func setupRoutes(
 	userHandler *handlers.UserHandler,
 	cardWSHandler *handlers.CardWSHandler,
 	userWSHandler *handlers.UserWSHandler,
+	aiHandler *handlers.AIHandler,
 	authMiddleware *middleware.AuthMiddleware,
 	permissionsMiddleware *middleware.PermissionsMiddleware,
 	gqlHandler *handler.Server,
@@ -300,6 +304,11 @@ func setupRoutes(
 						cards.DELETE("/:card_id", cardHandler.DeleteCard)
 						cards.PUT("/:card_id/updatelocation", cardHandler.UpdateCardLocation)
 					}
+				}
+
+				ai := projects.Group("/:project_id/ai")
+				{
+					ai.POST("", aiHandler.FullAnalytic)
 				}
 			}
 

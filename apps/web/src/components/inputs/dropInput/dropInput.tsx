@@ -33,6 +33,8 @@ function DropInput({
     const wrapperRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
 
+    console.log("Value: " + value)
+
     // const displayValue = selectedItem 
     //     ? (typeof selectedItem === 'object' ? selectedItem.name : selectedItem)
     //     : searchValue

@@ -9,19 +9,25 @@ import { useMutation } from '@apollo/client/react';
 import { DeleteBoardDocument } from '../../../graphql/generated/graphql';
 import { useGetBoards } from '../../../hooks/useGetBoards';
 import Modal from '../../../components/modal/modal';
+import EditBoard from '../editBoard/editBoard';
+import type { IBoardData } from '../editBoard/editBoard'
+import useVisibleCards from '../../../hooks/useVisibleCards';
 
 export interface BoardItemProps {
 
     id : string
     name : string
+    direction : string
+    cardsStatus : string
     cards : any
     projectId : string
 
 }
 
-function BoardItem({id, name, cards, projectId} : BoardItemProps) {
+function BoardItem({id, name, direction, cardsStatus, projectId, cards} : BoardItemProps) {
 
     const [isNewCardModalVisible, setNewCardModalVisibility] = useState(false)
+    const [isEditBoardModalVisible, setEditBoardModalVisibility] = useState(false)
     const [isDeleteBoardAlertModalVisible, seteleteBoardAlertModalVisibility] = useState(false)
     const { refetch } = useGetBoards(projectId)
 
@@ -69,6 +75,16 @@ function BoardItem({id, name, cards, projectId} : BoardItemProps) {
             >
                 <p>Вы действительно хотите удалить эту доску?</p>
             </Modal>
+            <EditBoard
+                isVisible={isEditBoardModalVisible}
+                setVisibility={setEditBoardModalVisibility}
+                boardData={{
+                    name: name,
+                    direction: direction,
+                    cardsStatus: cardsStatus,
+                    id: id
+                }}
+            />
             <CreateCard
                 isVisible={isNewCardModalVisible}
                 setVisibility={setNewCardModalVisibility}
@@ -82,8 +98,16 @@ function BoardItem({id, name, cards, projectId} : BoardItemProps) {
             </div>
             <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
                 {
-                    cards.map(card => (
-                        <CardItem key={card.id} boardId={id} id={card.id} title={card.title} priority={card.priority} status={card.status}/>
+                    cards.map((card, index) => (
+                        <CardItem
+                            key={card.id}
+                            boardId={id}
+                            id={card.id}
+                            title={card.title}
+                            priority={card.priority}
+                            status={card.status}
+                            //customStyle={{display: index + 1 > visibleCards ? "none" : ""}}
+                        />
                     ))
                 }
                 <button className={styles.addBoard} onClick={() => {
@@ -92,7 +116,12 @@ function BoardItem({id, name, cards, projectId} : BoardItemProps) {
                     <Icons.Plus width={20} height={20} color='var(--light-grey)'/>
                 </button>
                 <div className={styles.footer}>
-                    <Icons.Options width={20} height={20} color='white'/>
+                    <Icons.Edit
+                        width={20}
+                        height={20}
+                        color='white'
+                        onClick={() => setEditBoardModalVisibility(true)}
+                    />
                     <Icons.Trash width={20} height={20} color='white' onClick={() => seteleteBoardAlertModalVisibility(true)}/>
                 </div>
             </SortableContext>

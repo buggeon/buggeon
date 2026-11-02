@@ -21,6 +21,7 @@ import (
 	"buggeon/internal/models"
 	"buggeon/internal/repositories"
 	"context"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -73,6 +74,8 @@ func (s *BoardService) CreateBoard(ctx context.Context, dto *dto.CreateBoardDto)
 }
 
 func (s *BoardService) UpdateBoard(ctx context.Context, boardID string, newBoardData *models.Board) (*models.Board, error) {
+
+	fmt.Println("Обновляем доску...")
 
 	boardObjID, err := primitive.ObjectIDFromHex(boardID)
 
